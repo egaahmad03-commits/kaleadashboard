@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang Kami | Kalea Furniture</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <!-- Menggunakan class container page-about untuk mendukung format full-width desktop -->
+    <div class="container page-about">
+        
+        <!-- HEADER NAV MINI -->
+        <header class="about-nav">
+            <a href="index.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+            </a>
+        </header>
+
+        <!-- COMPANY PROFILE CARD -->
+        <main class="about-main-card">
+            <div class="brand-logo mini">
+                <i class="fa-solid fa-couch"></i>
+            </div>
+            <span class="badge">Profil Perusahaan</span>
+            <h1>Kalea Furniture</h1>
+            <p class="subtitle">Seni Mewujudkan Ruang Impian Anda</p>
+            
+            <!-- GRID LAYOUT TOP: Memisahkan Cerita & Founder di Layar Lebar -->
+            <div class="about-grid-top">
+                <div class="story-content">
+                    <p>Di <strong>Kalea Furniture</strong>, kami believe bahwa furnitur dan interior bukan sekadar pengisi ruangan, melainkan refleksi dari karakter, kenyamanan, dan gaya hidup pemiliknya. Setiap sudut ruangan memiliki ceritanya sendiri.</p>
+                    <p>Oleh karena itu, kami hadir sebagai mitra profesional untuk kebutuhan <em>custom interior</em> dan furniture premium Anda. Mulai dari tahap perencanaan, desain 3D, hingga produksi akhir, seluruh proses kami kerjakan dengan standar kualitas ketat demi menciptakan ruang hunian yang estetik, fungsional, dan tahan lama.</p>
+                </div>
+
+                <!-- FOTO PENDIRI SECTION -->
+                <div class="founder-section">
+                    <div class="founder-avatar">
+                        <img src="founder.jpg" alt="Pendiri Kalea Furniture" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'">
+                    </div>
+                    <div class="founder-info">
+                        <h4>Nama Pendiri</h4>
+                        <p class="founder-title">Founder & Lead Designer</p>
+                        <p class="founder-quotes">"Kenyamanan sebuah ruang dimulai dari detail kecil yang dikerjakan dengan hati dan presisi tinggi."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROJECTS SECTION (PORTOFOLIO AUTOMATIC SLIDER) -->
+            <div class="about-projects-section">
+                <div class="section-slider-header">
+                    <h3>Proyek yang Diselesaikan</h3>
+                    <div class="slider-nav-buttons">
+                        <button id="project-prev" aria-label="Previous Project"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button id="project-next" aria-label="Next Project"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <p class="section-desc">Beberapa portofolio interior premium yang telah kami wujudkan:</p>
+                
+                <div class="projects-slider-wrapper">
+                    <div class="projects-slider" id="projects-slider">
+                        <!-- Project 1 -->
+                        <div class="project-item">
+                            <div class="project-card-inner">
+                                <div class="project-img">
+                                    <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=400&auto=format&fit=crop" alt="Project 1">
+                                </div>
+                                <h4>Elegant Wardrobe</h4>
+                                <p>Walk-in closet minimalis modern dengan pencahayaan LED terintegrasi.</p>
+                            </div>
+                        </div>
+
+                        <!-- Project 2 -->
+                        <div class="project-item">
+                            <div class="project-card-inner">
+                                <div class="project-img">
+                                    <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=400&auto=format&fit=crop" alt="Project 2">
+                                </div>
+                                <h4>Premium Kitchen Set</h4>
+                                <p>Dapur bersih premium menggunakan finishing HPL bertekstur dan top table marmer.</p>
+                            </div>
+                        </div>
+
+                        <!-- Project 3 -->
+                        <div class="project-item">
+                            <div class="project-card-inner">
+                                <div class="project-img">
+                                    <img src="https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?q=80&w=400&auto=format&fit=crop" alt="Project 3">
+                                </div>
+                                <h4>Minimalist Living Room</h4>
+                                <p>Satu set backdrop TV mewah dipadukan dengan kisi-kisi kayu estetik.</p>
+                            </div>
+                        </div>
+
+                        <!-- Project 4 -->
+                        <div class="project-item">
+                            <div class="project-card-inner">
+                                <div class="project-img">
+                                    <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=400&auto=format&fit=crop" alt="Project 4">
+                                </div>
+                                <h4>Master Bedroom Suite</h4>
+                                <p>Pengerjaan dipan custom, wall panel kain beludru, dan meja rias gantung.</p>
+                            </div>
+                        </div>
+
+                        <!-- Project 5 -->
+                        <div class="project-item">
+                            <div class="project-card-inner">
+                                <div class="project-img">
+                                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&auto=format&fit=crop" alt="Project 5">
+                                </div>
+                                <h4>Executive Office Desk</h4>
+                                <p>Meja kerja direktur dan lemari berkas custom bertema industrial formal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Dots -->
+                <div class="slider-dots" id="project-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+
+            <!-- REVIEW CUSTOMER SECTION (AUTOMATIC SLIDER) -->
+            <div class="reviews-section">
+                <div class="section-slider-header">
+                    <h3>Review Customer</h3>
+                    <div class="slider-nav-buttons">
+                        <button id="review-prev" aria-label="Previous Review"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button id="review-next" aria-label="Next Review"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <p class="section-desc">Apa kata pelanggan setia mengenai layanan kami:</p>
+
+                <div class="reviews-slider-wrapper">
+                    <div class="reviews-slider" id="reviews-slider">
+                        <!-- Review 1 -->
+                        <div class="review-item">
+                            <div class="review-card">
+                                <div class="review-stars">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="review-text">"Pengerjaan lemari pakaian custom di Kalea sangat rapi. Detail sudut dan finishingnya halus sekali, sangat puas!"</p>
+                                <div class="review-user">
+                                    <h5>Bpk. Hendra</h5>
+                                    <p>Pemilik Wardrobe Custom</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review 2 -->
+                        <div class="review-item">
+                            <div class="review-card">
+                                <div class="review-stars">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="review-text">"Kitchen set selesai tepat waktu sesuai deadline yang dijanjikan. Desain minimalisnya bikin dapur kelihatan luas."</p>
+                                <div class="review-user">
+                                    <h5>Ibu Citra</h5>
+                                    <p>Residensial Kitchen</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review 3 -->
+                        <div class="review-item">
+                            <div class="review-card">
+                                <div class="review-stars">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="review-text">"Komunikasi tim desainer ramah dan sangat komunikatif. Revisi layout diakomodasi dengan profesional."</p>
+                                <div class="review-user">
+                                    <h5>Rian Pratama</h5>
+                                    <p>Apartemen Studio Set</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Dots -->
+                <div class="slider-dots" id="review-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="about-cta">
+                <p>Siap Memulai Proyek Ruang Impian Anda?</p>
+                <a href="https://wa.me/6289504977797" target="_blank" rel="noopener noreferrer" class="btn-cta-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i> Konsultasi Gratis Sekarang
+                </a>
+            </div>
+        </main>
+
+        <footer class="footer-section">
+            <p>&copy; 2026 Kalea Furniture. All Rights Reserved.</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
