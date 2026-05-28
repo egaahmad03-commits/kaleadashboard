@@ -1,0 +1,57 @@
+/* --- Import & Base --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+* { box-sizing: border-box; }
+
+html, body { 
+    height: 100%; margin: 0; 
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    background-attachment: fixed;
+    color: #ffffff;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* Ambient Light Background */
+body::before {
+    content: ""; position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none; z-index: -1;
+}
+/* --- Komponen Sosial --- */
+.social-links { text-align: center; margin: 20px 0; display: flex; justify-content: center; gap: 20px; }
+.social-icon { 
+    position: relative; width: 50px; height: 50px; border-radius: 50%; 
+    background-color: #1f1f1f; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; border: 1px solid #333; transition: 0.5s;
+    overflow: hidden;
+}
+.social-icon:hover { border-color: #fda4af; color: #fda4af; }
+.social-icon:hover::before {
+    content: ""; position: absolute; width: 20px; height: 20px;
+    background: #fda4af; filter: blur(10px); z-index: 1;
+}
+
+/* --- Footer --- */
+footer { text-align: center; padding: 20px; color: #666; font-size: 13px; }
+
+/* --- Responsif (Mobile) --- */
+@media (max-width: 768px) {
+    main { 
+        flex-direction: column; 
+        padding: 40px 20px; 
+        text-align: center; 
+        justify-content: flex-start;
+    }
+    .text-wrapper { margin-bottom: 40px; }
+    .text-wrapper h1 { font-size: 2.5rem; }
+    
+    .button-wrapper { width: 100%; align-items: center; }
+    .btn-uiverse { width: 100%; max-width: 300px; }
+    
+    footer { margin-top: 20px; }
+}

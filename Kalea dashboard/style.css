@@ -1,0 +1,469 @@
+/* --- Import & Base --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+* { box-sizing: border-box; }
+
+html, body { 
+    height: 100%; margin: 0; 
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    background-attachment: fixed;
+    color: #ffffff;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* Ambient Light Background */
+body::before {
+    content: ""; position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none; z-index: -1;
+}
+
+/* --- Layout --- */
+main { 
+    flex: 1; display: flex; flex-direction: row; 
+    align-items: center; justify-content: space-between; 
+    padding: 0 80px; max-width: 1200px;
+    margin: 0 auto; width: 100%;
+}
+
+.text-wrapper { max-width: 500px; }
+.text-wrapper h1 { font-size: 3.5rem; margin: 0; font-weight: 700; text-transform: uppercase; }
+.text-wrapper p { font-size: 1.2rem; color: #a0a0a0; margin-top: 10px; }
+
+.button-wrapper { display: flex; flex-direction: column; gap: 20px; }
+
+/* --- Komponen Tombol --- */
+.btn-uiverse {
+    position: relative; height: 60px; width: 260px;
+    background-color: #1a1a1a; border: 1px solid #333;
+    border-radius: 12px; color: #ffffff; font-weight: 600;
+    font-size: 14px; text-transform: uppercase;
+    text-decoration: none; display: flex;
+    align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden;
+    transition: all 0.5s ease;
+}
+
+.btn-uiverse::before, .btn-uiverse::after {
+    content: ""; position: absolute; z-index: 1;
+    border-radius: 50%; filter: blur(20px);
+    transition: all 0.5s ease;
+}
+
+.btn-uiverse::before { width: 48px; height: 48px; background-color: #8b5cf6; right: 4px; top: 4px; }
+.btn-uiverse::after { width: 80px; height: 80px; background-color: #fda4af; right: 32px; top: 12px; }
+
+.btn-uiverse:hover { border-color: #fda4af; color: #fda4af; }
+.btn-uiverse:hover::before { right: 48px; bottom: -32px; box-shadow: 20px 20px 20px 30px #a21caf; }
+.btn-uiverse:hover::after { right: -32px; }
+
+/* --- Komponen Sosial --- */
+.social-links { text-align: center; margin: 20px 0; display: flex; justify-content: center; gap: 20px; }
+.social-icon { 
+    position: relative; width: 50px; height: 50px; border-radius: 50%; 
+    background-color: #1f1f1f; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; border: 1px solid #333; transition: 0.5s;
+    overflow: hidden;
+}
+.social-icon:hover { border-color: #fda4af; color: #fda4af; }
+.social-icon:hover::before {
+    content: ""; position: absolute; width: 20px; height: 20px;
+    background: #fda4af; filter: blur(10px); z-index: 1;
+}
+
+/* --- Footer --- */
+footer { text-align: center; padding: 20px; color: #666; font-size: 13px; }
+
+/* --- Responsif (Mobile) --- */
+@media (max-width: 768px) {
+    main { 
+        flex-direction: column; 
+        padding: 40px 20px; 
+        text-align: center; 
+        justify-content: flex-start;
+    }
+    .text-wrapper { margin-bottom: 40px; }
+    .text-wrapper h1 { font-size: 2.5rem; }
+    
+    .button-wrapper { width: 100%; align-items: center; }
+    .btn-uiverse { width: 100%; max-width: 300px; }
+    
+    footer { margin-top: 20px; }
+}
+/* Container Navigasi */
+.kf-navigation {
+    position: fixed; /* Membuat tombol tetap di atas saat di-scroll */
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+/* Styling Tombol */
+.kf-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05); /* Latar transparan */
+    backdrop-filter: blur(10px); /* Efek kaca */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* --- Navigasi --- */
+.kf-nav-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.kf-nav-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.kf-nav-back:hover {
+    background: #fda4af;
+    color: #000;
+}
+
+/* --- Layout Grid Utama (Brand & Story) --- */
+.kf-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Kolom kiri (brand) lebih kecil */
+    gap: 80px;
+    padding-top: 100px; /* Jarak dari atas */
+    align-items: start;
+}
+
+.kf-brand-identity h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+/* --- Our Story (Kanan) --- */
+.kf-our-story .kf-section-title {
+    text-align: left; /* Judul rata kiri agar senada dengan teks lainnya */
+    margin-bottom: 40px;
+}
+
+.kf-story-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    display: block;
+    margin-bottom: 30px;
+}
+
+.kf-story-content h3 {
+    margin-bottom: 15px;
+    color: #fda4af;
+}
+
+.kf-story-highlight {
+    border-left: 3px solid #fda4af;
+    padding-left: 20px;
+    margin-top: 20px;
+    font-style: italic;
+    color: #b0b0b0;
+}
+
+/* --- Responsif (Ponsel & Tablet) --- */
+@media (max-width: 900px) {
+    .kf-layout-grid {
+        grid-template-columns: 1fr; /* Jadi satu kolom di layar kecil */
+        gap: 50px;
+        padding-top: 80px;
+    }
+
+    .kf-brand-identity {
+        position: static; /* Hilangkan sticky di ponsel agar tidak menutupi konten */
+        text-align: center;
+    }
+
+    .kf-our-story .kf-section-title {
+        text-align: center;
+    }
+}
+
+/* Layout Visi & Misi */
+/* 1. Wrapper untuk mengatur posisi kartu agar berjajar */
+.kf-vision-mission-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Berjajar kiri-kanan */
+    gap: 30px;
+    max-width: 900px;
+    margin: 60px auto;
+}
+
+/* 2. Style untuk kartu individu (Masing-masing punya border) */
+.kf-vision-mission-card {
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.05); 
+    border: 2px solid #fda4af; 
+    border-radius: 25px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+/* 3. Efek Glow Hover */
+.kf-vision-mission-card:hover {
+    box-shadow: 0 0 30px rgba(253, 164, 175, 0.5);
+    border-color: #fff;
+    transform: translateY(-5px);
+}
+
+/* 4. Animasi Ponsel */
+@media (max-width: 768px) {
+    .kf-vision-mission-wrapper {
+        grid-template-columns: 1fr; /* Jadi satu kolom di HP */
+    }
+    .kf-vision-mission-card {
+        animation: pulse-glow 5s infinite;
+    }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0px rgba(253, 164, 175, 0); }
+    50% { box-shadow: 0 0 20px rgba(253, 164, 175, 0.4); }
+}
+
+/* --- Seksi Nilai Utama (Nilai Utama Perusahaan) --- */
+.kf-values-container {
+    max-width: 1100px;
+    margin: 100px auto; /* Memberikan jarak agar tidak menempel dengan konten atas */
+    padding: 0 20px;
+    text-align: center;
+}
+
+/* Judul seksi */
+.kf-values-container .kf-section-title {
+    margin-bottom: 50px;
+    color: #ffffff;
+    font-size: 2rem;
+}
+
+/* Grid untuk 3 kolom */
+.kf-values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+/* Kartu nilai */
+.kf-value-card {
+    padding: 40px 30px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(253, 164, 175, 0.3);
+    border-radius: 20px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+/* Ikon */
+.kf-value-card i {
+    font-size: 2.5rem;
+    color: #fda4af;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Teks dalam kartu */
+.kf-value-card h3 {
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.kf-value-card p {
+    color: #b0b0b0;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* Efek Glow saat Hover */
+.kf-value-card:hover {
+    box-shadow: 0 0 25px rgba(253, 164, 175, 0.3);
+    border-color: #fda4af;
+    transform: translateY(-10px);
+    background: rgba(253, 164, 175, 0.05);
+}
+
+/* Responsif untuk layar ponsel */
+@media (max-width: 768px) {
+    .kf-values-grid {
+        grid-template-columns: 1fr; /* Jadi satu kolom */
+    }
+    .kf-values-container {
+        margin: 50px auto;
+    }
+}
+
+/* Layout Why Choose Us */
+.kf-why-choose-section {
+    padding: 80px 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02); /* Sedikit pembeda background */
+    border-radius: 30px;
+    margin: 50px auto;
+}
+
+.kf-why-choose-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-width: 1000px;
+    margin: 40px auto 0;
+}
+
+.kf-why-card {
+    padding: 30px;
+    border: 1px solid rgba(253, 164, 175, 0.2);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.kf-why-card i {
+    font-size: 2rem;
+    color: #fda4af;
+    margin-bottom: 15px;
+}
+
+/* Efek Interaktif */
+.kf-why-card:hover {
+    border-color: #fda4af;
+    background: rgba(253, 164, 175, 0.05);
+    transform: translateY(-5px);
+}
+
+/* Responsif Mobile */
+@media (max-width: 768px) {
+    .kf-why-choose-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Container Testimoni */
+.kf-testimonial-section { text-align: center; margin: 80px auto; max-width: 600px; padding: 0 20px; }
+
+.kf-testimonial-container {
+    height: 160px; 
+    overflow: hidden;
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #fda4af;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.kf-testimonial-slider {
+    display: flex;
+    flex-direction: column;
+    animation: slideTestimonial 50s linear infinite;
+}
+
+.kf-testimonial-item {
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.kf-testimonial-item p { margin: 5px 0; font-size: 1rem; line-height: 1.4; }
+.kf-client-name { color: #fda4af; font-weight: 600; font-size: 0.9rem; margin-top: 5px !important; }
+.kf-stars { color: #ffd700; font-size: 0.9rem; margin-bottom: 5px; }
+
+/* Animasi Slide Desktop (160px per item) */
+@keyframes slideTestimonial {
+    0%, 8%     { transform: translateY(0); }
+    10%, 18%   { transform: translateY(-160px); }
+    20%, 28%   { transform: translateY(-320px); }
+    30%, 38%   { transform: translateY(-480px); }
+    40%, 48%   { transform: translateY(-640px); }
+    50%, 58%   { transform: translateY(-800px); }
+    60%, 68%   { transform: translateY(-960px); }
+    70%, 78%   { transform: translateY(-1120px); }
+    80%, 88%   { transform: translateY(-1280px); }
+    90%, 98%   { transform: translateY(-1440px); }
+    100%       { transform: translateY(0); }
+}
+
+/* Responsif Mobile (180px per item) */
+@media (max-width: 768px) {
+    .kf-testimonial-container { height: 180px; }
+    .kf-testimonial-item { height: 180px; }
+    
+    @keyframes slideTestimonial {
+        0%, 8%     { transform: translateY(0); }
+        10%, 18%   { transform: translateY(-180px); }
+        20%, 28%   { transform: translateY(-360px); }
+        30%, 38%   { transform: translateY(-540px); }
+        40%, 48%   { transform: translateY(-720px); }
+        50%, 58%   { transform: translateY(-900px); }
+        60%, 68%   { transform: translateY(-1080px); }
+        70%, 78%   { transform: translateY(-1260px); }
+        80%, 88%   { transform: translateY(-1440px); }
+        90%, 98%   { transform: translateY(-1620px); }
+        100%       { transform: translateY(0); }
+    }
+}
+
+
+.kf-projects-section .kf-section-title {
+    text-align: center;
+    margin-bottom: 20px; /* Memberi sedikit jarak antara tulisan dan slider */
+}
+.kf-projects-slider-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 15px;
+    border: 3px solid #fda4af;
+    background-color: #000;
+    /* Rasio kotak (misalnya 16:9 atau 4:3) */
+    aspect-ratio: 4 / 3; 
+    display: flex;
+}
+
+.kf-projects-slider {
+    display: flex;
+    transition: transform 0.8s ease-in-out;
+    width: 100%;
+}
+
+.kf-project-item {
+    min-width: 100%;
+    height: 100%;
+}
+
+.kf-project-item img {
+    width: 100%;
+    height: 100%;
+    /* 'contain' tidak memotong gambar, 'cover' memenuhi kotak */
+    object-fit: cover; 
+    display: block;
+}
