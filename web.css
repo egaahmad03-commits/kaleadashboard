@@ -1,0 +1,116 @@
+/* --- 1. Import & Reset --- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Inter:wght@400;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { 
+    height: 100%; 
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    background-attachment: fixed;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* --- 2. Navbar & Logo --- */
+.navbarweb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.logo { 
+    font-size: 48px; 
+    font-weight: 700; 
+    padding: 40px 0;
+    color: #fff; 
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+    letter-spacing: 2px;
+}
+
+.menu-container {
+    width: 100%;
+    background-color: #333; 
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.nav-links { display: flex; list-style: none; gap: 50px; flex-wrap: wrap; justify-content: center; }
+
+.nav-links a { 
+    text-decoration: none; 
+    color: #ddd; 
+    font-weight: 600; 
+    font-size: 16px;
+    transition: all 0.3s ease; 
+}
+
+.nav-links a:hover { color: #fff; letter-spacing: 1px; }
+
+/* --- 3. Dropdown --- */
+.dropdown { position: relative; }
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    list-style: none;
+    padding: 15px;
+    min-width: 160px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.5s ease;
+}
+.dropdown-content li a { color: #333; padding: 5px 0; display: block; text-decoration: none; }
+.dropdown:hover .dropdown-content { opacity: 1; visibility: visible; transform: translateY(0); }
+
+/* --- 4. Social Media Icons --- */
+.social-links { text-align: center; margin: 20px 0; display: flex; justify-content: center; gap: 20px; }
+.social-icon { 
+    position: relative; width: 50px; height: 50px; border-radius: 50%; 
+    background-color: #1f1f1f; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; border: 1px solid #333; transition: 0.5s;
+    overflow: hidden;
+}
+.social-icon:hover { border-color: #fda4af; color: #fda4af; }
+.social-icon:hover::before {
+    content: ""; position: absolute; width: 20px; height: 20px;
+    background: #fda4af; filter: blur(10px); z-index: 1;
+}
+
+/* --- 5. Content Section --- */
+.content-sectionweb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    padding: 80px 10%;
+}
+.content-imageweb { flex: 1; }
+.content-imageweb img { width: 100%; height: auto; border-radius: 8px; }
+.content-textweb { flex: 1; max-width: 500px; font-family: 'Montserrat', sans-serif; }
+.content-textweb h2 { font-weight: 700; font-size: 24px; margin-bottom: 25px; }
+.content-textweb p { font-weight: 400; font-size: 16px; line-height: 1.8; color: #ccc; }
+
+/* --- 6. Footer (Copyright) --- */
+footer { 
+    text-align: center; 
+    padding: 40px 20px; 
+    color: #666; 
+    font-size: 14px; 
+    border-top: 1px solid #333;
+    margin-top: auto;
+}
+
+/* --- 7. Media Query (Responsif Mobile) --- */
+@media (max-width: 768px) {
+    .content-sectionweb { flex-direction: column; padding: 40px 20px; text-align: center; }
+    .nav-links { gap: 15px; padding: 0 10px; }
+    .logo { font-size: 32px; padding: 20px 0; }
+}
