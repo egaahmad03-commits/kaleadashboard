@@ -1,0 +1,185 @@
+/* Reset dasar */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Times New Roman', serif; background-color: #fcfcfc; }
+
+.navbarweb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.logo { 
+  font-size: 48px; 
+  font-weight: 700; 
+  padding: 40px 0;
+  color: #fff; 
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+  letter-spacing: 2px;
+}
+
+.menu-container {
+  width: 100%;
+  background-color: #333; 
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.nav-links { display: flex; list-style: none; gap: 50px; }
+
+.nav-links a { 
+  text-decoration: none; 
+  color: #ddd; 
+  font-weight: 600; 
+  font-size: 16px;
+  transition: all 0.3s ease; 
+}
+
+/* Efek Hover */
+.nav-links a:hover { 
+  color: #fff; 
+  letter-spacing: 1px; 
+}
+
+/* Dropdown dengan Animasi Smooth */
+.dropdown { position: relative; }
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  list-style: none;
+  padding: 15px;
+  min-width: 160px;
+  z-index: 1000;
+  
+  /* Properti untuk animasi halus */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.5s ease; /* Anda bisa ubah 0.5s ke 0.8s jika ingin lebih lambat */
+}
+
+.dropdown-content li a { 
+  color: #333; 
+  padding: 5px 0; 
+  display: block; 
+  text-decoration: none;
+}
+
+.dropdown-content li a:hover { 
+  color: #000; 
+  font-weight: bold; 
+}
+
+/* Trigger Animasi saat di-hover */
+.dropdown:hover .dropdown-content { 
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0); 
+}
+
+/* Mengimpor font Montserrat dari Google Fonts agar mirip dengan referensi */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+.content-sectionweb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  padding: 80px 10%;
+  background-color: #fcfcfc;
+}
+
+.content-imageweb {
+  flex: 1;
+}
+
+.content-imageweb img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.content-textweb {
+  flex: 1;
+  max-width: 500px;
+  font-family: 'Montserrat', sans-serif; /* Menggunakan font modern */
+}
+
+.content-textweb h2 {
+  font-weight: 700;
+  font-size: 24px; /* Ukuran yang lebih proporsional dengan referensi */
+  margin-bottom: 25px;
+  color: #333;
+  letter-spacing: 0.5px;
+}
+
+.content-textweb p {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.8; /* Spasi baris lebih longgar agar mirip "image_e7296b.png" */
+  color: #666;      /* Warna abu-abu gelap agar lebih lembut */
+}
+
+/* --- Import & Base --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+* { box-sizing: border-box; }
+
+html, body { 
+    height: 100%; margin: 0; 
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    background-attachment: fixed;
+    color: #ffffff;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* Ambient Light Background */
+body::before {
+    content: ""; position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none; z-index: -1;
+}
+
+/* --- Komponen Sosial --- */
+.social-links { text-align: center; margin: 20px 0; display: flex; justify-content: center; gap: 20px; }
+.social-icon { 
+    position: relative; width: 50px; height: 50px; border-radius: 50%; 
+    background-color: #1f1f1f; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; border: 1px solid #333; transition: 0.5s;
+    overflow: hidden;
+}
+.social-icon:hover { border-color: #fda4af; color: #fda4af; }
+.social-icon:hover::before {
+    content: ""; position: absolute; width: 20px; height: 20px;
+    background: #fda4af; filter: blur(10px); z-index: 1;
+}
+
+/* --- Footer --- */
+footer { text-align: center; padding: 20px; color: #666; font-size: 13px; }
+
+/* --- Responsif (Mobile) --- */
+@media (max-width: 768px) {
+    main { 
+        flex-direction: column; 
+        padding: 40px 20px; 
+        text-align: center; 
+        justify-content: flex-start;
+    }
+    .text-wrapper { margin-bottom: 40px; }
+    .text-wrapper h1 { font-size: 2.5rem; }
+    
+    .button-wrapper { width: 100%; align-items: center; }
+    .btn-uiverse { width: 100%; max-width: 300px; }
+    
+    footer { margin-top: 20px; }
+}
