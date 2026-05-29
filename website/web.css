@@ -1,0 +1,1264 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  background-color: #121212; /* Latar belakang gelap pekat sesuai gambar */
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.text-wrapperweb {
+  text-align: center;
+  padding: 30px 15px 10px 15px;
+}
+
+.text-wrapperweb h1 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.button-wrapperweb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px;
+}
+
+.btn-uiverse {
+  display: inline-block;
+  padding: 10px 24px;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.btn-uiverse:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #b46e96;
+  box-shadow: 0 0 15px rgba(180, 110, 150, 0.3);
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 105%;
+  left: 0;
+  min-width: 220px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  z-index: 100;
+  overflow: hidden;
+  padding: 5px 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.dropdown-content a {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 12px 20px;
+  text-decoration: none;
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.dropdown-content a:hover {
+  color: #ffffff;
+  background: linear-gradient(90deg, rgba(80, 45, 95, 0.6) 0%, rgba(180, 110, 150, 0.4) 100%);
+  padding-left: 25px;
+}
+
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
+  display: block;
+}
+
+.hero-banner {
+  position: relative;
+  width: calc(100% - 40px);
+  max-width: 1200px;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  margin: 30px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 5px 14px;
+  border: 1px solid rgba(180, 110, 150, 0.4);
+  border-radius: 50px;
+  margin-bottom: 20px;
+  color: #b46e96;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+}
+
+.kalea-stats {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: calc(100% - 40px);
+  max-width: 1200px;
+  padding: 30px 20px;
+  margin: 30px auto;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #502d5f 0%, #b46e96 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+.furniture-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: calc(100% - 40px);
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+.showcase-item {
+  display: flex;
+  align-items: center;
+  gap: 5%;
+  width: 100%;
+}
+
+.showcase-item.reverse {
+  flex-direction: row-reverse;
+}
+
+.showcase-image {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1a1a1a;
+  aspect-ratio: 4 / 3;
+}
+
+.showcase-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-text {
+  flex: 1;
+  color: #ffffff;
+  text-align: left;
+}
+
+.showcase-badge {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #b46e96; /* Aksen warna pink persis seperti di gambar */
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.showcase-text h2 {
+  font-size: 2.2rem; /* Ukuran font judul utama diperbesar */
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.showcase-text p {
+  color: rgba(255, 255, 255, 0.6); /* Warna deskripsi abu-abu transparan murni */
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 30px 0;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  border-color: #b46e96;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(180, 110, 150, 0.4);
+}
+
+footer {
+  width: 100%;
+  padding: 25px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.footer-content p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES KHUSUS HP (100% RESPONSIVE TIDAK AKAN RUSAK)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .button-wrapperweb {
+    flex-direction: column;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+    gap: 10px;
+  }
+
+  .btn-uiverse, .dropdown {
+    width: 100% !important;
+  }
+
+  .btn-uiverse {
+    text-align: center;
+  }
+
+  .dropdown-content {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .hero-banner {
+    width: calc(100% - 20px);
+    padding: 30px 15px;
+  }
+
+  .hero-title {
+    font-size: 1.6rem;
+  }
+
+  .kalea-stats {
+    width: calc(100% - 20px);
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .furniture-showcase {
+    width: calc(100% - 20px);
+    gap: 30px;
+  }
+
+  .showcase-item, 
+  .showcase-item.reverse {
+    flex-direction: column; /* Otomatis menumpuk ke bawah di HP */
+    gap: 15px;
+  }
+
+  .showcase-image, 
+  .showcase-text {
+    width: 100%;
+    flex: none;
+  }
+
+  .showcase-text {
+    text-align: center; /* Rata tengah otomatis khusus mobile */
+    padding: 10px;
+  }
+
+  .showcase-text h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+}
+
+.klcont-body-dark {
+  background-color: #0b0b0b;
+  color: #f5f5f5;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.klcont-dashboard-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 60px 20px; 
+  box-sizing: border-box;
+}
+
+.klcont-main-panel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column; /* MEMAKSA HEADER DI ATAS DAN KARTU DI BAWAH PADA DESKTOP */
+  gap: 40px;
+}
+
+
+.klcont-header {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 25px;
+  width: 100%;
+}
+
+.klcont-header-text h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.klcont-header-text p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Menggunakan CSS Grid murni agar kartu tidak bergeser keluar layar monitor */
+.klcont-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  width: 100%;
+}
+
+.klcont-card-item {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  width: 100%; /* Memastikan lebar kartu konsisten */
+}
+
+.klcont-card-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.klcont-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  background: rgba(15, 15, 15, 0.8);
+}
+
+.klcont-card-details h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 12px;
+}
+
+.klcont-highlight {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  color: #ffffff;
+}
+
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.klcont-address-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 20px 0;
+  min-height: 68px;
+}
+
+.klcont-status-tag {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 25px;
+}
+
+.dot-active {
+  width: 6px;
+  height: 6px;
+  background-color: #25D366;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #25D366;
+}
+
+.klcont-btn-action-main {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, rgba(80, 45, 95, 0.9) 0%, rgba(180, 110, 150, 0.8) 100%);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: auto; 
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(180, 110, 150, 0.15);
+}
+
+.klcont-btn-action-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(180, 110, 150, 0.4);
+}
+
+.card-wa { border-color: rgba(37, 211, 102, 0.2); }
+.card-wa .klcont-card-icon { border: 1px solid #25D366; color: #25D366; box-shadow: 0 0 12px rgba(37, 211, 102, 0.2); }
+
+.card-phone { border-color: rgba(52, 152, 219, 0.2); }
+.card-phone .klcont-card-icon { border: 1px solid #3498db; color: #3498db; box-shadow: 0 0 12px rgba(52, 152, 219, 0.2); }
+
+.card-email { border-color: rgba(234, 67, 53, 0.2); }
+.card-email .klcont-card-icon { border: 1px solid #ea4335; color: #ea4335; box-shadow: 0 0 12px rgba(234, 67, 53, 0.2); }
+
+.card-maps { border-color: rgba(180, 110, 150, 0.2); }
+.card-maps .klcont-card-icon { border: 1px solid #b46e96; color: #b46e96; box-shadow: 0 0 12px rgba(180, 110, 150, 0.2); }
+
+/* MEDIA QUERIES UNTUK TAMPILAN PONSEL */
+@media (max-width: 768px) {
+  .klcont-dashboard-wrapper {
+    align-items: flex-start; /* Mengembalikan flex ke atas dengan batas aman */
+    padding: 60px 15px 40px 15px; /* Jarak atas ditambah agar tidak terlalu mentok ke notch/ponor HP */
+  }
+
+  .klcont-header-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .klcont-header-text p {
+    font-size: 0.9rem;
+  }
+
+  .klcont-grid-container {
+    grid-template-columns: 1fr; /* Memaksa 4 kartu berurutan satu per satu ke bawah */
+    gap: 20px;
+  }
+  
+  .klcont-address-text {
+    min-height: auto;
+  }
+}
+
+/* --- Navigasi --- */
+.kf-nav-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.kf-nav-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.kf-nav-back:hover {
+    background: #fda4af;
+    color: #000;
+}
+
+
+
+
+.klterm-body-dark {
+  background-color: #0b0b0b;
+  color: #f5f5f5;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.klterm-nav-container {
+  width: 100%;
+  padding: 20px 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.klterm-nav-back {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.klterm-nav-back:hover {
+  color: #b46e96;
+}
+
+.klterm-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 100px 20px 40px 20px;
+}
+
+.klterm-main-panel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.klterm-header {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 30px;
+  width: 100%;
+}
+
+.klterm-header-text h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+.klterm-header-text p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.klterm-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 30px;
+  width: 100%;
+}
+
+.klterm-card-box {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 35px 30px;
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.klterm-card-box:hover {
+  background: #161616;
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.klterm-card-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(90deg, #502d5f 0%, #b46e96 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.klterm-card-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+
+.klterm-card-info p {
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.klterm-social-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 30px 0;
+}
+
+.klterm-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.klterm-social-icon:hover {
+  border-color: #b46e96;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(180, 110, 150, 0.4);
+}
+
+.klterm-footer {
+  width: 100%;
+  padding: 25px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.klterm-footer-content p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .klterm-nav-container {
+    padding: 20px;
+  }
+
+  .klterm-page-wrapper {
+    align-items: flex-start;
+    padding: 80px 15px 30px 15px;
+  }
+
+  .klterm-header-text h1 {
+    font-size: 1.7rem;
+  }
+
+  .klterm-header-text p {
+    font-size: 0.9rem;
+  }
+
+  .klterm-content-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .klterm-card-box {
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px 20px;
+  }
+
+  .klterm-card-number {
+    font-size: 2rem;
+  }
+}
+.klpay-body-dark {
+  background-color: #0b0b0b;
+  color: #f5f5f5;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.klpay-nav-container {
+  width: 100%;
+  padding: 20px 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.klpay-nav-back {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.klpay-nav-back:hover {
+  color: #b46e96;
+}
+
+.klpay-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 100px 20px 40px 20px;
+}
+
+.klpay-main-panel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.klpay-header {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 30px;
+  width: 100%;
+}
+
+.klpay-header-text h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+.klpay-header-text p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.klpay-split-layout {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+}
+
+.klpay-steps-column,
+.klpay-bank-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.klpay-split-layout h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.klpay-step-card {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.klpay-step-card:hover {
+  background: #161616;
+  transform: translateY(-2px);
+}
+
+.klpay-step-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(180, 110, 150, 0.15);
+  border: 1px solid #b46e96;
+  color: #b46e96;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.klpay-step-info h3 {
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.klpay-step-info p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.klpay-warning-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #ea4335;
+  background: rgba(234, 67, 53, 0.05);
+  border: 1px solid rgba(234, 67, 53, 0.15);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.klpay-warning-text i {
+  margin-right: 5px;
+}
+
+.klpay-bank-card {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.klpay-bank-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #b46e96;
+}
+
+.klpay-bank-details h3 {
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 6px;
+}
+
+.klpay-account-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.klpay-account-name {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.klpay-btn-confirm {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(90deg, rgba(80, 45, 95, 0.9) 0%, rgba(180, 110, 150, 0.8) 100%);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(180, 110, 150, 0.15);
+  margin-top: 10px;
+}
+
+.klpay-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(180, 110, 150, 0.4);
+}
+
+.klpay-social-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 30px 0;
+}
+
+.klpay-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.klpay-social-icon:hover {
+  border-color: #b46e96;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(180, 110, 150, 0.4);
+}
+
+.klpay-footer {
+  width: 100%;
+  padding: 25px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.klpay-footer-content p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .klpay-nav-container {
+    padding: 20px;
+  }
+
+  .klpay-page-wrapper {
+    align-items: flex-start;
+    padding: 80px 15px 30px 15px;
+  }
+
+  .klpay-header-text h1 {
+    font-size: 1.7rem;
+  }
+
+  .klpay-split-layout {
+    flex-direction: column;
+    gap: 35px;
+  }
+
+  .klpay-account-number {
+    font-size: 1.35rem;
+  }
+
+  .klpay-bank-card {
+    padding: 20px;
+    gap: 15px;
+  }
+}
+
+.klship-body-dark {
+  background-color: #0b0b0b;
+  color: #f5f5f5;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.klship-nav-container {
+  width: 100%;
+  padding: 20px 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.klship-nav-back {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.klship-nav-back:hover {
+  color: #b46e96;
+}
+
+.klship-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 100px 20px 40px 20px;
+}
+
+.klship-main-panel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.klship-header {
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 30px;
+  width: 100%;
+}
+
+.klship-header-text h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+.klship-header-text p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.klship-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 30px;
+  width: 100%;
+}
+
+.klship-card-box {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 35px 30px;
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.klship-card-box:hover {
+  background: #161616;
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.klship-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #b46e96;
+  text-shadow: 0 0 10px rgba(180, 110, 150, 0.3);
+  flex-shrink: 0;
+}
+
+.klship-card-info h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.klship-card-info p {
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.klship-social-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 30px 0;
+}
+
+.klship-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.klship-social-icon:hover {
+  border-color: #b46e96;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(180, 110, 150, 0.4);
+}
+
+.klship-footer {
+  width: 100%;
+  padding: 25px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.klship-footer-content p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .klship-nav-container {
+    padding: 20px;
+  }
+
+  .klship-page-wrapper {
+    align-items: flex-start;
+    padding: 80px 15px 30px 15px;
+  }
+
+  .klship-header-text h1 {
+    font-size: 1.7rem;
+  }
+
+  .klship-header-text p {
+    font-size: 0.9rem;
+  }
+
+  .klship-content-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .klship-card-box {
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px 20px;
+  }
+}
