@@ -47,9 +47,7 @@ const CATEGORY_SLUGS = {
    ini secara otomatis (satu baris per produk) setiap kali produk
    disimpan/dihapus lewat admin (kalau folder project terhubung). */
 const DEFAULT_PRODUCTS = [
-  {"id":27,"name":"a","category":"Kursi Makan","price":2222,"description":"Kursi makan dengan rangka kayu jati solid dan sandaran ukir minimalis, kokoh untuk pemakaian harian.","material":"Kayu Jati Solid","color":"Coklat Natural","dimensions":"45 x 50 x 90 cm","slug":"a"},
-  {"id":28,"name":"b","category":"Kursi Makan","price":1,"description":"a","material":"a","color":"a","dimensions":"a","slug":"b"},
-  {"id":29,"name":"Kursi Makan Fyn","category":"Kursi Makan","price":2000000,"description":"Kursi makan dengan rangka kayu jati solid dan sandaran ukir minimalis, kokoh untuk pemakaian harian.","material":"Kayu Jati Solid","color":"Coklat Natural","dimensions":"45 x 50 x 90 cm","slug":"kursi-makan-fyn"},
+
 ];
 /* === KALEA_PRODUCTS_DATA_END === */
 
