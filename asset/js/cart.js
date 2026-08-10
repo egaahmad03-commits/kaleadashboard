@@ -11,13 +11,39 @@
 const CART_STORAGE_KEY = "kalea_cart";
 const CART_WA_NUMBER = "6289504977797";
 
+var lastPrunedCount = 0; // jumlah item yang baru dibuang getCart() krn produknya sudah dihapus
+
 function getCart() {
+  var cart;
   try {
     var raw = localStorage.getItem(CART_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    cart = raw ? JSON.parse(raw) : [];
   } catch (e) {
-    return [];
+    cart = [];
   }
+
+  /* Buang item yang produknya sudah dihapus dari katalog (lewat Panel
+     Admin, atau data produk yang berubah setelah deploy baru). Tanpa ini,
+     badge keranjang tetap menghitung item tsb (notif muncul) padahal saat
+     halaman keranjang dibuka, item itu tidak bisa dirender karena
+     produknya sudah tidak ada — hasilnya keranjang tampak kosong/rusak
+     meski badge menunjukkan ada isi. getProductById hanya tersedia di
+     halaman yang memuat products.js. */
+  lastPrunedCount = 0;
+  if (typeof getProductById === "function") {
+    var validCart = cart.filter(function (item) { return !!getProductById(item.id); });
+    lastPrunedCount = cart.length - validCart.length;
+    if (lastPrunedCount > 0) {
+      cart = validCart;
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      } catch (e) {
+        console.error("Gagal menyimpan keranjang:", e);
+      }
+    }
+  }
+
+  return cart;
 }
 
 function saveCart(cart) {
@@ -82,8 +108,16 @@ function renderCartPage() {
 
   var cart = getCart();
 
+  var staleNotice = lastPrunedCount > 0 ?
+    '<div class="cart-stale-notice">' +
+    (lastPrunedCount === 1 ?
+      'Ada 1 produk di keranjang yang sudah tidak tersedia dan telah dihapus otomatis.' :
+      'Ada ' + lastPrunedCount + ' produk di keranjang yang sudah tidak tersedia dan telah dihapus otomatis.') +
+    '</div>' : '';
+
   if (cart.length === 0) {
     container.innerHTML =
+      staleNotice +
       '<div class="cart-empty">' +
       '<p>Keranjang Anda masih kosong.</p>' +
       '<div class="button-container">' +
@@ -101,7 +135,7 @@ function renderCartPage() {
 
   var total = 0;
 
-  container.innerHTML = cart.map(function (item) {
+  container.innerHTML = staleNotice + cart.map(function (item) {
     var product = getProductById(item.id);
     if (!product) return "";
 
@@ -159,6 +193,11 @@ function buildCartWaMessage(cart, total) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  updateCartBadge();
+  // renderCartPage() dulu (baru getCart() pertama kali di page load ini,
+  // jadi ia yang "melihat" lastPrunedCount untuk notice) — baru
+  // updateCartBadge() setelahnya. Di halaman selain cart.html,
+  // renderCartPage() langsung return (tidak ada #cartItems) jadi urutan
+  // ini tidak berpengaruh sama sekali di sana.
   renderCartPage();
+  updateCartBadge();
 });

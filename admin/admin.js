@@ -254,6 +254,47 @@ function resetPendingPhotos() {
     if (input) input.value = '';
 }
 
+/* BUG FIX — Muat foto yang SUDAH tersimpan di folder project ke
+   pendingPhotoBlobs saat membuka form Edit Produk.
+   Sebelumnya, buka form Edit selalu mulai dari pendingPhotoBlobs
+   kosong (lihat resetPendingPhotos() di openModal). Akibatnya, kalau
+   user menambah foto baru lewat form Edit tanpa mengunggah ulang
+   foto lama, writePhotosToProjectFolder() menulis foto baru itu
+   mulai dari 1.jpg lagi — MENIMPA foto lama yang bernomor sama, dan
+   foto lama bernomor lebih besar (mis. 3.jpg–6.jpg) jadi file "yatim"
+   yang tidak lagi dirujuk kapan pun produk diedit ulang. Ini yang
+   menyebabkan produk yang aslinya diunggah dengan 6 foto akhirnya
+   cuma tersisa 2 foto di katalog.
+   Foto lama sekarang dibaca balik dari folder project (kalau folder
+   sedang terhubung) dan dimasukkan ke pendingPhotoBlobs, sehingga
+   muncul di preview form Edit dan tidak akan tertimpa/hilang kecuali
+   user sengaja menghapusnya lewat tombol hapus di preview. */
+async function loadExistingPhotosIntoPending(product) {
+    if (!product || !product.slug || !projectFolderHandle) return;
+
+    try {
+        const perm = await projectFolderHandle.queryPermission({ mode: 'read' });
+        if (perm === 'denied') return;
+
+        const assetDir = await projectFolderHandle.getDirectoryHandle('asset');
+        const imagesDir = await assetDir.getDirectoryHandle('images');
+        const productsDir = await imagesDir.getDirectoryHandle('products');
+        const slugDir = await productsDir.getDirectoryHandle(product.slug);
+
+        for (let i = 1; i <= MAX_PRODUCT_PHOTOS; i++) {
+            try {
+                const fileHandle = await slugDir.getFileHandle(i + '.jpg');
+                const file = await fileHandle.getFile();
+                pendingPhotoBlobs.push({ blob: file, previewUrl: URL.createObjectURL(file) });
+            } catch (e) {
+                break; // nomor foto ini tidak ada -> foto berikutnya juga tidak ada (urutan selalu rapat)
+            }
+        }
+    } catch (e) {
+        // Folder foto produk ini belum ada (produk lama tanpa foto tersimpan) — aman diabaikan.
+    }
+}
+
 async function handlePhotoFilesSelected(fileList) {
     const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/'));
     if (files.length === 0) return;
@@ -559,10 +600,11 @@ function clearFormError() {
     el.style.display = 'none';
 }
 
-function openModal(mode, id = null) {
+async function openModal(mode, id = null) {
     const modal = document.getElementById('productModal');
     const modalTitle = document.getElementById('modalTitle');
     const form = document.getElementById('productForm');
+    const status = document.getElementById('photoStatusNote');
 
     clearFormError();
     resetPendingPhotos();
@@ -580,6 +622,17 @@ function openModal(mode, id = null) {
             document.getElementById('productDimensions').value = product.dimensions || '';
             document.getElementById('productDescription').value = product.description || '';
             populateCategoryOptions(product.category);
+
+            if (projectFolderHandle) {
+                if (status) status.textContent = 'Memuat foto yang sudah tersimpan...';
+                await loadExistingPhotosIntoPending(product);
+                renderPhotoPreviews();
+            } else if (status) {
+                // Folder belum terhubung -> foto lama TIDAK bisa dimuat balik ke form ini.
+                // Beri tahu user secara eksplisit supaya tidak menambah foto baru dengan
+                // asumsi foto lama otomatis dipertahankan (itu penyebab foto lama hilang).
+                status.textContent = 'Folder project belum terhubung, jadi foto lama produk ini tidak bisa ditampilkan di sini. Hubungkan folder project dulu (tombol di kanan atas) sebelum menambah/mengganti foto, supaya foto lama tidak tertimpa.';
+            }
         }
     } else {
         modalTitle.innerText = "Tambah Produk Baru";
@@ -712,30 +765,35 @@ async function saveProduct(event) {
         ? PRODUCTS.find(p => p.id === parseInt(id, 10))?.slug
         : PRODUCTS[PRODUCTS.length - 1].slug;
 
+    // PENTING — urutan di bawah ini disengaja:
+    // localStorage ditulis & tabel di-render DULU, SEBELUM ada file apa pun
+    // ditulis ke folder project. Kalau folder itu sedang dipantau Live Server
+    // (atau tool sejenis), menulis foto/products.js ke dalamnya memicu
+    // auto-reload halaman — dan reload menghapus semua state JS yang belum
+    // sempat disimpan. Dengan localStorage ditulis di awal, produk baru tetap
+    // aman & tetap tampil di dashboard walau reload itu terjadi di tengah
+    // proses penulisan foto/products.js di bawah.
+    persistProducts();
+    renderProducts();
+
     if (pendingPhotoBlobs.length > 0 && savedSlug) {
         try {
             await writePhotosToProjectFolder(savedSlug);
         } catch (e) {
             console.error('Gagal menyimpan foto:', e);
             showFormError('Produk tersimpan, tapi foto GAGAL ditulis ke folder: ' + e.message);
-            persistProducts();
-            renderProducts();
             return;
         }
     }
-
-    persistProducts();
 
     try {
         await writeProductsFileToProjectFolder();
     } catch (e) {
         console.error('Gagal menulis products.js:', e);
         showFormError('Produk tersimpan di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
-        renderProducts();
         return;
     }
 
-    renderProducts();
     resetPendingPhotos();
     closeModal();
 }
