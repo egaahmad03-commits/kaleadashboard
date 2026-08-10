@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meja Kerja - Kalea Furniture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../asset/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="../asset/favicon.svg">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="../index.html" class="site-logo">
+        <img src="../asset/images/logo.jpg" alt="Kalea Furniture" class="site-logo-icon">
+        <span>Kalea Furniture</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Buka menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav">
+      <a href="../index.html">Beranda</a>
+      <a href="../katalog.html" class="nav-active">Katalog</a>
+      <a href="../tentangkami.html">Tentang Kami</a>
+      <a href="../kontak.html">Kontak</a>
+      <a href="../cart.html" class="nav-cart-link">
+        Keranjang
+        <span class="cart-badge" id="navCartBadge">0</span>
+      </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page product-list-page">
+    <div class="page-content">
+      <nav class="breadcrumb">
+        <a href="../katalog.html">Katalog</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Meja Kerja</span>
+      </nav>
+
+      <h1>Meja Kerja</h1>
+      <p>Pilih produk meja kerja yang sesuai dengan kebutuhan Anda.</p>
+
+      <div id="product-list" class="product-list-grid"></div>
+
+      <div class="button-container">
+        <a href="../katalog.html" class="animated-button">
+          <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+          </svg>
+          <span class="text">Kembali ke Katalog</span>
+          <span class="circle"></span>
+          <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <h2>Kalea Furniture</h2>
+      <p>Furniture Interior &amp; Exterior</p>
+
+      <p class="copyright">
+        &copy; <span id="year"></span> Kalea Furniture. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script src="../asset/js/products.js"></script>
+  <script src="../asset/js/catalog-render.js"></script>
+  <script src="../asset/js/cart.js"></script>
+  <script src="../asset/js/script.js"></script>
+  <script>
+    renderProductList("Meja Kerja");
+  </script>
+</body>
+</html>

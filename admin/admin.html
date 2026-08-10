@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Kalea Furniture</title>
+    <link rel="icon" type="image/svg+xml" href="../asset/favicon.svg">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-couch"></i>
+                <span>Kalea Furniture</span>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="admin.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="admin.html#productSection"><i class="fa-solid fa-box"></i> Produk</a>
+                <a href="../katalog.html" target="_blank"><i class="fa-solid fa-store"></i> Lihat Toko</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="btn-logout" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h1>Dashboard</h1>
+                <div class="topbar-right">
+                    <button type="button" id="folderConnectBtn" class="btn-folder" onclick="connectProjectFolder()">
+                        <i class="fa-solid fa-folder-open"></i> <span id="folderConnectLabel">Hubungkan Folder Project</span>
+                    </button>
+                    <div class="user-profile">
+                        <i class="fa-solid fa-circle-user" style="font-size:32px;color:var(--primary-color);"></i>
+                        <span id="loggedInUser">Admin</span>
+                    </div>
+                </div>
+            </div>
+            <p id="folderStatusNote" class="folder-status-note"></p>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fa-solid fa-box"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Produk</h3>
+                        <p id="statTotalProducts">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple"><i class="fa-solid fa-tags"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Kategori</h3>
+                        <p id="statTotalCategories">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="stat-info">
+                        <h3>Rata-rata Harga</h3>
+                        <p id="statAvgPrice">Rp 0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Table -->
+            <div class="content-section" id="productSection">
+                <div class="section-header">
+                    <h2>Daftar Produk</h2>
+                    <button class="btn-primary" onclick="openModal('add')"><i class="fa-solid fa-plus"></i> Tambah Produk</button>
+                </div>
+                <div class="table-filter-bar">
+                    <div class="filter-group">
+                        <label for="categoryFilter"><i class="fa-solid fa-filter"></i> Kategori</label>
+                        <select id="categoryFilter" onchange="onCategoryFilterChange()">
+                            <option value="all">Semua Kategori</option>
+                        </select>
+                    </div>
+                    <button type="button" id="bulkDeleteBtn" class="btn-delete btn-bulk-delete" onclick="bulkDeleteProducts()" style="display:none;">
+                        <i class="fa-solid fa-trash"></i> Hapus Terpilih (<span id="bulkDeleteCount">0</span>)
+                    </button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:36px;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th>
+                                <th>ID</th>
+                                <th>Foto</th>
+                                <th>Nama Produk</th>
+                                <th>Kategori</th>
+                                <th>Harga</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Tambah / Edit Produk -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Produk Baru</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="productId">
+
+                <div class="form-group">
+                    <label for="productName">Nama Produk</label>
+                    <input type="text" id="productName" placeholder="Contoh: Kursi Makan Jati Klasik" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productCategory">Kategori</label>
+                        <select id="productCategory" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Harga (Rp)</label>
+                        <input type="number" id="productPrice" placeholder="1500000" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productMaterial">Material</label>
+                        <input type="text" id="productMaterial" placeholder="Kayu Jati Solid" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productColor">Warna</label>
+                        <input type="text" id="productColor" placeholder="Coklat Natural" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDimensions">Dimensi</label>
+                    <input type="text" id="productDimensions" placeholder="45 x 50 x 90 cm" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDescription">Deskripsi</label>
+                    <input type="text" id="productDescription" placeholder="Deskripsi singkat produk" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Foto Produk <span style="font-weight:400;color:var(--text-muted);">(maks. 6, urutan = urutan tampil)</span></label>
+                    <label for="productPhotoInput" class="photo-dropzone" id="photoDropzone">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Klik atau seret foto ke sini (JPG/PNG/WebP)</span>
+                    </label>
+                    <input type="file" id="productPhotoInput" accept="image/*" multiple style="display:none;" onchange="handlePhotoFilesSelected(this.files)">
+                    <div id="photoPreviewList" class="photo-preview-list"></div>
+                    <p id="photoStatusNote" style="font-size:12px;color:var(--text-muted);margin-top:6px;"></p>
+                </div>
+
+                <p style="font-size:12px;color:var(--text-muted);margin-top:-6px;margin-bottom:18px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Foto otomatis dikonversi ke JPG dan disimpan ke <code>asset/images/products/&lt;slug&gt;/</code>, dan data produk otomatis ditulis ke <code>asset/js/products.js</code>, saat produk disimpan (butuh folder project terhubung — tombol di kanan atas). Setelah itu tinggal <code>git add . && git commit && git push</code>.
+                    Tanpa folder terhubung, unggah manual file <code>1.jpg</code>, dst ke folder tersebut dan edit <code>products.js</code> manual.
+                </p>
+
+                <p id="formError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-10px;margin-bottom:16px;"></p>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan Produk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../asset/js/products.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
