@@ -521,6 +521,8 @@ body {
     background: var(--card-bg);
     width: 100%;
     max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
     border-radius: var(--radius);
     padding: 24px;
 }
