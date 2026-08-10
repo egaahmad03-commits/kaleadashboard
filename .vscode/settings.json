@@ -1,0 +1,7 @@
+{
+  "liveServer.settings.ignoreFiles": [
+    ".vscode/**",
+    "asset/images/products/**",
+    "asset/js/products.js"
+  ]
+}
