@@ -47,7 +47,7 @@ const CATEGORY_SLUGS = {
    ini secara otomatis (satu baris per produk) setiap kali produk
    disimpan/dihapus lewat admin (kalau folder project terhubung). */
 const DEFAULT_PRODUCTS = [
-  {"id":1,"name":"Kursi Makan Via","category":"Kursi Makan","price":2200000,"description":"a","material":"a","color":"a","dimensions":"a","slug":"kursi-makan-via"},
+  {"id":1,"name":"Kursi Makan Via","category":"Kursi Makan","price":2200000,"description":"Kursi makan dengan rangka kayu jati solid dan sandaran ukir minimalis, kokoh untuk pemakaian harian.","material":"Kayu Jati Solid","color":"Dark Walnut","dimensions":"45 x 50 x 90 cm","slug":"kursi-makan-via"},
 ];
 /* === KALEA_PRODUCTS_DATA_END === */
 
