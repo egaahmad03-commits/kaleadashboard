@@ -381,7 +381,16 @@ const PRODUCTS_DATA_START_MARKER = '/* === KALEA_PRODUCTS_DATA_START ===';
 const PRODUCTS_DATA_END_MARKER = '/* === KALEA_PRODUCTS_DATA_END === */';
 
 async function writeProductsFileToProjectFolder() {
-    if (!projectFolderHandle) return; // belum terhubung — lewati diam-diam, data tetap aman di localStorage
+    // PENTING: sebelumnya fungsi ini "return" diam-diam di sini kalau folder
+    // project belum terhubung — localStorage tetap ter-update (makanya dashboard
+    // tampil benar), tapi file asset/js/products.js di disk TIDAK ikut diperbarui,
+    // dan tidak ada pesan apa pun yang memberi tahu hal ini. Akibatnya file di
+    // disk/GitHub bisa diam-diam menjadi basi (stale) dibanding localStorage,
+    // tanpa disadari sampai di-cek manual. Sekarang fungsi ini mengembalikan
+    // status eksplisit { written: false, reason: 'not_connected' } supaya
+    // pemanggil (saveProduct/deleteProduct/bulkDeleteProducts) bisa menampilkan
+    // peringatan ke user, bukan gagal secara senyap.
+    if (!projectFolderHandle) return { written: false, reason: 'not_connected' };
 
     const perm = await projectFolderHandle.queryPermission({ mode: 'readwrite' });
     if (perm !== 'granted') {
@@ -433,6 +442,23 @@ async function writeProductsFileToProjectFolder() {
     const writable = await fileHandle.createWritable();
     await writable.write(newText);
     await writable.close();
+
+    return { written: true };
+}
+
+/* Pesan peringatan standar dipakai di saveProduct/deleteProduct/bulkDeleteProducts
+   ketika writeProductsFileToProjectFolder() melewati penulisan ke disk karena
+   folder project belum terhubung. Ditampilkan lewat alert() supaya tidak
+   mungkin terlewat oleh user (beda dengan showFormError yang hanya terlihat
+   di dalam modal produk). */
+function warnProductsFileNotWritten() {
+    alert(
+        'Perubahan sudah tersimpan di browser (dashboard sudah menampilkan data terbaru), ' +
+        'TAPI folder project belum terhubung, jadi file asset/js/products.js di disk BELUM ' +
+        'diperbarui dan belum siap di-push ke GitHub.\n\n' +
+        'Klik "Hubungkan Folder Project" di kanan atas, lalu edit & simpan ulang produk yang ' +
+        'baru saja diubah (atau hapus ulang untuk produk yang dihapus) supaya file di disk ikut diperbarui.'
+    );
 }
 
 /* ==================== RENDER TABEL PRODUK ==================== */
@@ -508,7 +534,10 @@ async function bulkDeleteProducts() {
     persistProducts();
 
     try {
-        await writeProductsFileToProjectFolder();
+        const writeResult = await writeProductsFileToProjectFolder();
+        if (writeResult && writeResult.written === false) {
+            warnProductsFileNotWritten();
+        }
     } catch (e) {
         console.error('Gagal menulis products.js:', e);
         alert('Produk terhapus di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
@@ -786,8 +815,9 @@ async function saveProduct(event) {
         }
     }
 
+    let writeResult;
     try {
-        await writeProductsFileToProjectFolder();
+        writeResult = await writeProductsFileToProjectFolder();
     } catch (e) {
         console.error('Gagal menulis products.js:', e);
         showFormError('Produk tersimpan di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
@@ -796,6 +826,10 @@ async function saveProduct(event) {
 
     resetPendingPhotos();
     closeModal();
+
+    if (writeResult && writeResult.written === false) {
+        warnProductsFileNotWritten();
+    }
 }
 
 async function deleteProduct(id) {
@@ -806,7 +840,10 @@ async function deleteProduct(id) {
         persistProducts();
 
         try {
-            await writeProductsFileToProjectFolder();
+            const writeResult = await writeProductsFileToProjectFolder();
+            if (writeResult && writeResult.written === false) {
+                warnProductsFileNotWritten();
+            }
         } catch (e) {
             console.error('Gagal menulis products.js:', e);
             alert('Produk terhapus di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
