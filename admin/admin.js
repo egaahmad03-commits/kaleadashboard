@@ -712,30 +712,35 @@ async function saveProduct(event) {
         ? PRODUCTS.find(p => p.id === parseInt(id, 10))?.slug
         : PRODUCTS[PRODUCTS.length - 1].slug;
 
+    // PENTING — urutan di bawah ini disengaja:
+    // localStorage ditulis & tabel di-render DULU, SEBELUM ada file apa pun
+    // ditulis ke folder project. Kalau folder itu sedang dipantau Live Server
+    // (atau tool sejenis), menulis foto/products.js ke dalamnya memicu
+    // auto-reload halaman — dan reload menghapus semua state JS yang belum
+    // sempat disimpan. Dengan localStorage ditulis di awal, produk baru tetap
+    // aman & tetap tampil di dashboard walau reload itu terjadi di tengah
+    // proses penulisan foto/products.js di bawah.
+    persistProducts();
+    renderProducts();
+
     if (pendingPhotoBlobs.length > 0 && savedSlug) {
         try {
             await writePhotosToProjectFolder(savedSlug);
         } catch (e) {
             console.error('Gagal menyimpan foto:', e);
             showFormError('Produk tersimpan, tapi foto GAGAL ditulis ke folder: ' + e.message);
-            persistProducts();
-            renderProducts();
             return;
         }
     }
-
-    persistProducts();
 
     try {
         await writeProductsFileToProjectFolder();
     } catch (e) {
         console.error('Gagal menulis products.js:', e);
         showFormError('Produk tersimpan di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
-        renderProducts();
         return;
     }
 
-    renderProducts();
     resetPendingPhotos();
     closeModal();
 }
