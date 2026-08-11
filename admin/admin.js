@@ -15,8 +15,8 @@ const ADMIN_SESSION_KEY = "kalea_admin_session";
 // Untuk keamanan sungguhan di produksi, login harus divalidasi
 // oleh backend, bukan oleh JavaScript di browser.
 const ADMIN_CREDENTIALS = {
-    username: "admin",
-    password: "kalea2026"
+    username: "kalea",
+    password: "kaleaaja"
 };
 
 /* ==================== LOGIN ==================== */
