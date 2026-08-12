@@ -8,6 +8,19 @@
    ========================================================= */
 
 const ADMIN_SESSION_KEY = "kalea_admin_session";
+const LAST_CATEGORY_KEY = "kalea_admin_last_category";
+
+// Ingat kategori terakhir dipakai saat menambah produk, supaya form
+// "Tambah Produk" berikutnya langsung terisi kategori yang sama
+// (berguna saat input banyak produk berturut-turut dari kategori
+// yang sama), bukan selalu kembali ke kategori pertama di daftar.
+function getLastUsedCategory() {
+    return localStorage.getItem(LAST_CATEGORY_KEY) || null;
+}
+
+function setLastUsedCategory(category) {
+    if (category) localStorage.setItem(LAST_CATEGORY_KEY, category);
+}
 
 // Kredensial login demo. Ganti sesuai kebutuhan Anda.
 // PENTING: ini hanya proteksi sisi-klien (front-end saja),
@@ -667,7 +680,9 @@ async function openModal(mode, id = null) {
         modalTitle.innerText = "Tambah Produk Baru";
         form.reset();
         document.getElementById('productId').value = '';
-        populateCategoryOptions(null);
+        const lastCategory = getLastUsedCategory();
+        const defaultCategory = (lastCategory && CATEGORY_SLUGS.hasOwnProperty(lastCategory)) ? lastCategory : null;
+        populateCategoryOptions(defaultCategory);
     }
 }
 
@@ -762,6 +777,7 @@ async function saveProduct(event) {
         return;
     }
     const finalPrice = Math.round(price);
+    setLastUsedCategory(category);
 
     if (id) {
         // Edit produk yang ada.

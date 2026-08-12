@@ -117,7 +117,7 @@
 
                 <div class="form-group">
                     <label for="productName">Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Contoh: Kursi Makan Jati Klasik" required>
+                    <input type="text" id="productName" placeholder="Contoh: Kursi Makan Jati Klasik" autocomplete="off" required>
                 </div>
 
                 <div class="form-row">
@@ -134,22 +134,22 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="productMaterial">Material</label>
-                        <input type="text" id="productMaterial" placeholder="Kayu Jati Solid" required>
+                        <input type="text" id="productMaterial" placeholder="Kayu Jati Solid" autocomplete="off" required>
                     </div>
                     <div class="form-group">
                         <label for="productColor">Warna</label>
-                        <input type="text" id="productColor" placeholder="Coklat Natural" required>
+                        <input type="text" id="productColor" placeholder="Coklat Natural" autocomplete="off" required>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="productDimensions">Dimensi</label>
-                    <input type="text" id="productDimensions" placeholder="45 x 50 x 90 cm" required>
+                    <input type="text" id="productDimensions" placeholder="45 x 50 x 90 cm" autocomplete="off" required>
                 </div>
 
                 <div class="form-group">
                     <label for="productDescription">Deskripsi</label>
-                    <input type="text" id="productDescription" placeholder="Deskripsi singkat produk" required>
+                    <input type="text" id="productDescription" placeholder="Deskripsi singkat produk" autocomplete="off" required>
                 </div>
 
                 <div class="form-group">
@@ -167,6 +167,11 @@
                     <i class="fa-solid fa-circle-info"></i>
                     Foto otomatis dikonversi ke JPG dan disimpan ke <code>asset/images/products/&lt;slug&gt;/</code>, dan data produk otomatis ditulis ke <code>asset/js/products.js</code>, saat produk disimpan (butuh folder project terhubung — tombol di kanan atas). Setelah itu tinggal <code>git add . && git commit && git push</code>.
                     Tanpa folder terhubung, unggah manual file <code>1.jpg</code>, dst ke folder tersebut dan edit <code>products.js</code> manual.
+                </p>
+
+                <p style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:16px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Masih melihat saran nama/ukuran lama saat mengetik? Itu riwayat autofill browser (bukan data produk). Arahkan mouse ke saran yang mau dibuang lalu tekan <strong>Shift+Delete</strong> (Chrome/Edge/Firefox) untuk menghapusnya satu per satu. Field ini sudah diatur agar tidak menyimpan saran baru lagi.
                 </p>
 
                 <p id="formError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-10px;margin-bottom:16px;"></p>
