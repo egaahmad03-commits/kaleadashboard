@@ -142,10 +142,11 @@ function renderCartPage() {
     var subtotal = product.price * item.qty;
     total += subtotal;
     var mainImage = product.image || (product.images && product.images[0]) || "";
+    var productCategory = getCategoryBySlug(product.category_slug);
 
     return (
       '<div class="cart-item">' +
-      '<div class="cart-item-photo">' + renderProductPhoto(mainImage, product.name, product.category) + '</div>' +
+      '<div class="cart-item-photo">' + renderProductPhoto(mainImage, product.name, productCategory ? productCategory.icon_svg : null) + '</div>' +
       '<div class="cart-item-info">' +
       '<h3>' + escapeHtml(product.name) + '</h3>' +
       '<p class="cart-item-price">' + formatRupiah(product.price) + '</p>' +
@@ -193,11 +194,21 @@ function buildCartWaMessage(cart, total) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // renderCartPage() dulu (baru getCart() pertama kali di page load ini,
-  // jadi ia yang "melihat" lastPrunedCount untuk notice) — baru
-  // updateCartBadge() setelahnya. Di halaman selain cart.html,
-  // renderCartPage() langsung return (tidak ada #cartItems) jadi urutan
-  // ini tidak berpengaruh sama sekali di sana.
-  renderCartPage();
+  // Badge count tidak butuh data produk (cuma jumlah item), jadi bisa
+  // langsung tampil duluan tanpa menunggu fetch Supabase selesai.
   updateCartBadge();
+
+  // renderCartPage() (dan getCart() di dalamnya, untuk pruning item yang
+  // produknya sudah dihapus) butuh PRODUCTS sudah terisi lebih dulu —
+  // tunggu loadCatalogData() selesai. Di halaman selain cart.html,
+  // renderCartPage() langsung return (tidak ada #cartItems) jadi ini
+  // aman dipanggil di semua halaman.
+  if (typeof loadCatalogData === "function") {
+    loadCatalogData().then(function () {
+      renderCartPage();
+      updateCartBadge();
+    }).catch(function (err) {
+      console.error("Gagal memuat data keranjang:", err);
+    });
+  }
 });

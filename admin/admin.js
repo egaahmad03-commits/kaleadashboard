@@ -1,85 +1,74 @@
 /* =========================================================
    Kalea Furniture — Admin Panel
-   - Login sederhana (client-side) untuk mengakses dashboard
-   - CRUD produk terhubung ke asset/js/products.js
-   - Perubahan disimpan di localStorage sehingga tetap ada
-     saat halaman dibuka lagi, dan otomatis tampil di
-     katalog toko (lihat bagian akhir asset/js/products.js)
+   - Login lewat Supabase Auth (bukan lagi client-side hardcode)
+   - Data produk & kategori dibaca/ditulis langsung ke Supabase
+     (tabel `products` & `categories`), lindungi lewat RLS:
+     publik cuma bisa baca, hanya user yang login (authenticated)
+     yang bisa insert/update/delete.
+   - Foto produk TETAP file statis di asset/images/products/<slug>/,
+     ditulis lewat File System Access API (folder project yang
+     dihubungkan sekali di kanan atas dashboard).
    ========================================================= */
 
-const ADMIN_SESSION_KEY = "kalea_admin_session";
-const LAST_CATEGORY_KEY = "kalea_admin_last_category";
-
-// Ingat kategori terakhir dipakai saat menambah produk, supaya form
-// "Tambah Produk" berikutnya langsung terisi kategori yang sama
-// (berguna saat input banyak produk berturut-turut dari kategori
-// yang sama), bukan selalu kembali ke kategori pertama di daftar.
-function getLastUsedCategory() {
-    return localStorage.getItem(LAST_CATEGORY_KEY) || null;
-}
-
-function setLastUsedCategory(category) {
-    if (category) localStorage.setItem(LAST_CATEGORY_KEY, category);
-}
-
-// Kredensial login demo. Ganti sesuai kebutuhan Anda.
-// PENTING: ini hanya proteksi sisi-klien (front-end saja),
-// karena situs ini tidak memiliki server/database.
-// Untuk keamanan sungguhan di produksi, login harus divalidasi
-// oleh backend, bukan oleh JavaScript di browser.
-const ADMIN_CREDENTIALS = {
-    username: "kalea",
-    password: "kaleaaja"
-};
-
-/* ==================== LOGIN ==================== */
-function handleLogin(event) {
+/* ==================== LOGIN (Supabase Auth) ==================== */
+async function handleLogin(event) {
     event.preventDefault();
-    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const rememberEl = document.getElementById('rememberMe');
-    const rememberMe = !!(rememberEl && rememberEl.checked);
     const errorEl = document.getElementById('loginError');
+    const submitBtn = document.getElementById('loginSubmitBtn');
 
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-        // "Ingat saya" dicentang -> localStorage (tetap login walau browser ditutup).
-        // Tidak dicentang -> sessionStorage (otomatis logout saat tab/browser ditutup).
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem(ADMIN_SESSION_KEY, username);
-        window.location.href = "admin.html";
-    } else if (errorEl) {
-        errorEl.textContent = "Username atau password salah.";
-        errorEl.style.display = "block";
+    if (errorEl) errorEl.style.display = 'none';
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...'; }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang'; }
+
+    if (error) {
+        if (errorEl) {
+            errorEl.textContent = "Email atau password salah.";
+            errorEl.style.display = "block";
+        }
+        return;
     }
+
+    window.location.href = "admin.html";
 }
 
-function handleLogout(event) {
+async function handleLogout(event) {
     if (event) event.preventDefault();
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    localStorage.removeItem(ADMIN_SESSION_KEY);
+    await supabaseClient.auth.signOut();
     window.location.href = "login.html";
 }
 
-// Lindungi halaman dashboard: lempar ke login jika belum masuk
-function requireAuth() {
-    if (!document.getElementById('productTableBody')) return; // bukan halaman dashboard
-    const user = localStorage.getItem(ADMIN_SESSION_KEY) || sessionStorage.getItem(ADMIN_SESSION_KEY);
-    if (!user) {
+// Lindungi halaman dashboard: lempar ke login jika belum masuk.
+// Mengembalikan session (truthy) kalau valid, atau null (dan sudah
+// redirect) kalau tidak.
+async function requireAuth() {
+    if (!document.getElementById('productTableBody')) return null; // bukan halaman dashboard
+
+    const { data } = await supabaseClient.auth.getSession();
+    const session = data && data.session;
+
+    if (!session) {
         window.location.href = "login.html";
-        return;
+        return null;
     }
+
     const userLabel = document.getElementById('loggedInUser');
-    if (userLabel) userLabel.textContent = user;
+    if (userLabel) userLabel.textContent = session.user.email;
+    return session;
 }
 
 /* =========================================================
    Koneksi Folder Project (File System Access API)
    ---------------------------------------------------------
-   Memungkinkan admin memilih folder project (hasil clone repo
-   GitHub) satu kali, lalu foto produk yang diunggah lewat form
-   otomatis dikonversi ke JPG dan ditulis langsung ke
-   asset/images/products/<slug>/ di folder tersebut — tinggal
-   di-commit & push dari terminal/GitHub Desktop.
+   Dipakai HANYA untuk menyimpan foto produk sebagai file statis
+   ke asset/images/products/<slug>/ di folder project (hasil clone
+   repo GitHub) — data produk sendiri (nama, harga, dst) sudah
+   langsung tersimpan ke Supabase begitu form disimpan, tidak lagi
+   lewat folder ini.
 
    Catatan penting:
    - Hanya didukung Chrome/Edge (browser berbasis Chromium),
@@ -93,8 +82,6 @@ function requireAuth() {
 const FS_SUPPORTED = typeof window !== "undefined" && "showDirectoryPicker" in window;
 let projectFolderHandle = null;
 
-// Penyimpanan handle folder di IndexedDB (localStorage tidak bisa
-// menyimpan objek handle, harus IndexedDB).
 function idbGetStore(mode) {
     return new Promise((resolve, reject) => {
         const req = indexedDB.open("kalea_admin_fs", 1);
@@ -128,20 +115,18 @@ function setFolderStatus(connected, message) {
     const note = document.getElementById('folderStatusNote');
     if (!btn || !label) return;
     btn.classList.toggle('is-connected', !!connected);
-    label.textContent = connected ? 'Folder Project Terhubung' : 'Hubungkan Folder Project';
+    label.textContent = connected ? 'Folder Foto Terhubung' : 'Hubungkan Folder untuk Foto';
     if (note) note.textContent = message || '';
 }
 
-// Dipanggil saat halaman dibuka: coba pulihkan folder yang pernah
-// dipilih sebelumnya, tanpa perlu user memilih ulang.
 async function restoreProjectFolder() {
     if (!FS_SUPPORTED) {
-        setFolderStatus(false, 'Fitur unggah foto otomatis butuh Chrome/Edge, dan halaman dibuka lewat http://localhost (bukan double-click file HTML).');
+        setFolderStatus(false, 'Fitur unggah foto otomatis butuh Chrome/Edge, dan halaman dibuka lewat http://localhost (bukan double-click file HTML). Tanpa ini, foto perlu ditambahkan manual ke folder asset/images/products/<slug>/.');
         return;
     }
     const handle = await idbLoadFolderHandle();
     if (!handle) {
-        setFolderStatus(false, 'Belum terhubung ke folder project. Klik tombol di kanan atas agar foto bisa otomatis tersimpan ke folder repo Anda.');
+        setFolderStatus(false, 'Belum terhubung ke folder project. Klik tombol di kanan atas agar foto produk otomatis tersimpan ke folder repo Anda.');
         return;
     }
     try {
@@ -164,8 +149,6 @@ async function connectProjectFolder() {
     }
     try {
         const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        // Validasi ringan: pastikan ini folder project yang benar
-        // (harus punya folder "asset" di dalamnya).
         try {
             await handle.getDirectoryHandle('asset');
         } catch (e) {
@@ -188,9 +171,7 @@ async function connectProjectFolder() {
    ---------------------------------------------------------
    Foto yang dipilih di form (klik atau drag & drop) langsung
    digambar ulang ke <canvas> lalu di-export sebagai JPEG
-   (kualitas 85%, sisi terpanjang dibatasi 1200px) — berlaku
-   untuk file PNG, WebP, maupun JPG sekalipun, supaya semua
-   foto produk konsisten ringan untuk web.
+   (kualitas 85%, sisi terpanjang dibatasi 1200px).
    ========================================================= */
 const MAX_PRODUCT_PHOTOS = typeof PRODUCT_IMAGE_COUNT !== 'undefined' ? PRODUCT_IMAGE_COUNT : 6;
 const PHOTO_MAX_DIMENSION = 1200;
@@ -217,8 +198,6 @@ function convertImageFileToJpeg(file) {
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
-            // Latar putih dulu (JPEG tidak mendukung transparansi;
-            // PNG dengan area transparan akan jadi putih, bukan hitam).
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, width, height);
             ctx.drawImage(img, 0, 0, width, height);
@@ -267,21 +246,9 @@ function resetPendingPhotos() {
     if (input) input.value = '';
 }
 
-/* BUG FIX — Muat foto yang SUDAH tersimpan di folder project ke
-   pendingPhotoBlobs saat membuka form Edit Produk.
-   Sebelumnya, buka form Edit selalu mulai dari pendingPhotoBlobs
-   kosong (lihat resetPendingPhotos() di openModal). Akibatnya, kalau
-   user menambah foto baru lewat form Edit tanpa mengunggah ulang
-   foto lama, writePhotosToProjectFolder() menulis foto baru itu
-   mulai dari 1.jpg lagi — MENIMPA foto lama yang bernomor sama, dan
-   foto lama bernomor lebih besar (mis. 3.jpg–6.jpg) jadi file "yatim"
-   yang tidak lagi dirujuk kapan pun produk diedit ulang. Ini yang
-   menyebabkan produk yang aslinya diunggah dengan 6 foto akhirnya
-   cuma tersisa 2 foto di katalog.
-   Foto lama sekarang dibaca balik dari folder project (kalau folder
-   sedang terhubung) dan dimasukkan ke pendingPhotoBlobs, sehingga
-   muncul di preview form Edit dan tidak akan tertimpa/hilang kecuali
-   user sengaja menghapusnya lewat tombol hapus di preview. */
+/* Muat foto yang SUDAH tersimpan di folder project ke pendingPhotoBlobs
+   saat membuka form Edit Produk, supaya tidak tertimpa/hilang kalau user
+   menambah foto baru tanpa mengunggah ulang foto lama. */
 async function loadExistingPhotosIntoPending(product) {
     if (!product || !product.slug || !projectFolderHandle) return;
 
@@ -336,7 +303,6 @@ async function handlePhotoFilesSelected(fileList) {
     if (input) input.value = '';
 }
 
-// Drag & drop di area dropzone
 document.addEventListener('DOMContentLoaded', () => {
     const dropzone = document.getElementById('photoDropzone');
     if (!dropzone) return;
@@ -381,101 +347,7 @@ async function writePhotosToProjectFolder(slug) {
     }
 }
 
-/* =========================================================
-   Tulis ulang array DEFAULT_PRODUCTS di asset/js/products.js
-   di folder project yang terhubung, supaya data produk (bukan
-   cuma foto) juga otomatis ada di file — tinggal di-commit &
-   push ke GitHub, tidak perlu edit manual.
-   Menimpa HANYA teks di antara penanda KALEA_PRODUCTS_DATA_START
-   dan KALEA_PRODUCTS_DATA_END, jadi bagian lain file (ikon
-   kategori, dst) tidak tersentuh.
-   ========================================================= */
-const PRODUCTS_DATA_START_MARKER = '/* === KALEA_PRODUCTS_DATA_START ===';
-const PRODUCTS_DATA_END_MARKER = '/* === KALEA_PRODUCTS_DATA_END === */';
-
-async function writeProductsFileToProjectFolder() {
-    // PENTING: sebelumnya fungsi ini "return" diam-diam di sini kalau folder
-    // project belum terhubung — localStorage tetap ter-update (makanya dashboard
-    // tampil benar), tapi file asset/js/products.js di disk TIDAK ikut diperbarui,
-    // dan tidak ada pesan apa pun yang memberi tahu hal ini. Akibatnya file di
-    // disk/GitHub bisa diam-diam menjadi basi (stale) dibanding localStorage,
-    // tanpa disadari sampai di-cek manual. Sekarang fungsi ini mengembalikan
-    // status eksplisit { written: false, reason: 'not_connected' } supaya
-    // pemanggil (saveProduct/deleteProduct/bulkDeleteProducts) bisa menampilkan
-    // peringatan ke user, bukan gagal secara senyap.
-    if (!projectFolderHandle) return { written: false, reason: 'not_connected' };
-
-    const perm = await projectFolderHandle.queryPermission({ mode: 'readwrite' });
-    if (perm !== 'granted') {
-        const req = await projectFolderHandle.requestPermission({ mode: 'readwrite' });
-        if (req !== 'granted') throw new Error('Izin akses folder ditolak.');
-    }
-
-    const assetDir = await projectFolderHandle.getDirectoryHandle('asset', { create: true });
-    const jsDir = await assetDir.getDirectoryHandle('js', { create: true });
-    const fileHandle = await jsDir.getFileHandle('products.js', { create: false });
-    const file = await fileHandle.getFile();
-    const currentText = await file.text();
-
-    const startIdx = currentText.indexOf(PRODUCTS_DATA_START_MARKER);
-    const endIdx = currentText.indexOf(PRODUCTS_DATA_END_MARKER);
-    if (startIdx === -1 || endIdx === -1) {
-        throw new Error('Penanda data produk tidak ditemukan di asset/js/products.js (mungkin filenya versi lama/dimodifikasi). Update manual dulu file products.js ke versi terbaru.');
-    }
-
-    // Hanya field data produk yang ditulis ke DEFAULT_PRODUCTS;
-    // field "images"/"image" dibangun otomatis dari slug saat load
-    // (lihat rebuildProductImages), jadi tidak perlu disimpan di sini.
-    const cleanProducts = PRODUCTS.map(p => ({
-        id: p.id,
-        name: p.name,
-        category: p.category,
-        price: p.price,
-        description: p.description,
-        material: p.material,
-        color: p.color,
-        dimensions: p.dimensions,
-        slug: p.slug
-    }));
-
-    const productLines = cleanProducts.map(p => '  ' + JSON.stringify(p) + ',');
-    const newBlock =
-        PRODUCTS_DATA_START_MARKER + '\n' +
-        '   JANGAN edit dua baris penanda ini atau hapus koma di akhir tiap\n' +
-        '   baris produk — Panel Admin menulis ulang isi di antara penanda\n' +
-        '   ini secara otomatis (satu baris per produk) setiap kali produk\n' +
-        '   disimpan/dihapus lewat admin (kalau folder project terhubung). */\n' +
-        'const DEFAULT_PRODUCTS = [\n' +
-        productLines.join('\n') + '\n' +
-        '];\n' +
-        PRODUCTS_DATA_END_MARKER;
-
-    const newText = currentText.slice(0, startIdx) + newBlock + currentText.slice(endIdx + PRODUCTS_DATA_END_MARKER.length);
-
-    const writable = await fileHandle.createWritable();
-    await writable.write(newText);
-    await writable.close();
-
-    return { written: true };
-}
-
-/* Pesan peringatan standar dipakai di saveProduct/deleteProduct/bulkDeleteProducts
-   ketika writeProductsFileToProjectFolder() melewati penulisan ke disk karena
-   folder project belum terhubung. Ditampilkan lewat alert() supaya tidak
-   mungkin terlewat oleh user (beda dengan showFormError yang hanya terlihat
-   di dalam modal produk). */
-function warnProductsFileNotWritten() {
-    alert(
-        'Perubahan sudah tersimpan di browser (dashboard sudah menampilkan data terbaru), ' +
-        'TAPI folder project belum terhubung, jadi file asset/js/products.js di disk BELUM ' +
-        'diperbarui dan belum siap di-push ke GitHub.\n\n' +
-        'Klik "Hubungkan Folder Project" di kanan atas, lalu edit & simpan ulang produk yang ' +
-        'baru saja diubah (atau hapus ulang untuk produk yang dihapus) supaya file di disk ikut diperbarui.'
-    );
-}
-
 /* ==================== RENDER TABEL PRODUK ==================== */
-// Placeholder abu-abu (data URI, tidak butuh internet) untuk produk tanpa foto
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45"><rect width="45" height="45" fill="#e2e8f0"/></svg>'
 );
@@ -486,9 +358,8 @@ let selectedProductIds = new Set();
 function populateCategoryFilterOptions() {
     const select = document.getElementById('categoryFilter');
     if (!select) return;
-    const categories = Object.keys(CATEGORY_SLUGS);
     select.innerHTML = '<option value="all">Semua Kategori</option>' +
-        categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        CATEGORIES.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
     select.value = currentCategoryFilter;
 }
 
@@ -501,7 +372,7 @@ function onCategoryFilterChange() {
 
 function getFilteredProducts() {
     if (currentCategoryFilter === 'all') return PRODUCTS;
-    return PRODUCTS.filter(p => p.category === currentCategoryFilter);
+    return PRODUCTS.filter(p => String(p.category_id) === String(currentCategoryFilter));
 }
 
 function updateBulkDeleteBar() {
@@ -542,20 +413,18 @@ async function bulkDeleteProducts() {
     if (count === 0) return;
     if (!confirm(`Hapus ${count} produk terpilih? Tindakan ini tidak bisa dibatalkan.`)) return;
 
-    PRODUCTS = PRODUCTS.filter(p => !selectedProductIds.has(p.id));
-    selectedProductIds.clear();
-    persistProducts();
+    const ids = Array.from(selectedProductIds);
+    const { error } = await supabaseClient.from('products').delete().in('id', ids);
 
-    try {
-        const writeResult = await writeProductsFileToProjectFolder();
-        if (writeResult && writeResult.written === false) {
-            warnProductsFileNotWritten();
-        }
-    } catch (e) {
-        console.error('Gagal menulis products.js:', e);
-        alert('Produk terhapus di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
+    if (error) {
+        console.error('Gagal menghapus produk:', error);
+        alert('Gagal menghapus produk: ' + error.message);
+        return;
     }
 
+    selectedProductIds.clear();
+    invalidateCatalogCache();
+    await loadCatalogData();
     renderProducts();
 }
 
@@ -605,11 +474,7 @@ function updateStats() {
     const statAvgPrice = document.getElementById('statAvgPrice');
 
     if (statTotal) statTotal.innerText = PRODUCTS.length;
-
-    if (statCategories) {
-        const categories = new Set(PRODUCTS.map(p => p.category));
-        statCategories.innerText = categories.size;
-    }
+    if (statCategories) statCategories.innerText = CATEGORIES.length;
 
     if (statAvgPrice) {
         const avg = PRODUCTS.length ? Math.round(PRODUCTS.reduce((sum, p) => sum + p.price, 0) / PRODUCTS.length) : 0;
@@ -617,17 +482,15 @@ function updateStats() {
     }
 }
 
-/* ==================== MODAL TAMBAH / EDIT ==================== */
-function populateCategoryOptions(selected) {
+/* ==================== MODAL TAMBAH / EDIT PRODUK ==================== */
+function populateCategoryOptions(selectedId) {
     const select = document.getElementById('productCategory');
     if (!select) return;
-    const categories = Object.keys(CATEGORY_SLUGS);
-    select.innerHTML = categories.map(cat =>
-        `<option value="${cat}" ${cat === selected ? 'selected' : ''}>${cat}</option>`
+    select.innerHTML = CATEGORIES.map(c =>
+        `<option value="${c.id}" ${String(c.id) === String(selectedId) ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
     ).join('');
 }
 
-/* Tampilkan/sembunyikan pesan error di form modal produk. */
 function showFormError(message) {
     const el = document.getElementById('formError');
     if (!el) return;
@@ -648,6 +511,11 @@ async function openModal(mode, id = null) {
     const form = document.getElementById('productForm');
     const status = document.getElementById('photoStatusNote');
 
+    if (CATEGORIES.length === 0) {
+        alert('Belum ada kategori. Tambahkan kategori dulu di menu "Kategori" sebelum menambah produk.');
+        return;
+    }
+
     clearFormError();
     resetPendingPhotos();
     modal.style.display = 'flex';
@@ -663,16 +531,13 @@ async function openModal(mode, id = null) {
             document.getElementById('productColor').value = product.color || '';
             document.getElementById('productDimensions').value = product.dimensions || '';
             document.getElementById('productDescription').value = product.description || '';
-            populateCategoryOptions(product.category);
+            populateCategoryOptions(product.category_id);
 
             if (projectFolderHandle) {
                 if (status) status.textContent = 'Memuat foto yang sudah tersimpan...';
                 await loadExistingPhotosIntoPending(product);
                 renderPhotoPreviews();
             } else if (status) {
-                // Folder belum terhubung -> foto lama TIDAK bisa dimuat balik ke form ini.
-                // Beri tahu user secara eksplisit supaya tidak menambah foto baru dengan
-                // asumsi foto lama otomatis dipertahankan (itu penyebab foto lama hilang).
                 status.textContent = 'Folder project belum terhubung, jadi foto lama produk ini tidak bisa ditampilkan di sini. Hubungkan folder project dulu (tombol di kanan atas) sebelum menambah/mengganti foto, supaya foto lama tidak tertimpa.';
             }
         }
@@ -680,9 +545,7 @@ async function openModal(mode, id = null) {
         modalTitle.innerText = "Tambah Produk Baru";
         form.reset();
         document.getElementById('productId').value = '';
-        const lastCategory = getLastUsedCategory();
-        const defaultCategory = (lastCategory && CATEGORY_SLUGS.hasOwnProperty(lastCategory)) ? lastCategory : null;
-        populateCategoryOptions(defaultCategory);
+        populateCategoryOptions(null);
     }
 }
 
@@ -690,15 +553,7 @@ function closeModal() {
     document.getElementById('productModal').style.display = 'none';
 }
 
-/* ==================== SIMPAN (CREATE / UPDATE) ==================== */
-function slugify(text) {
-    return text.toString().toLowerCase().trim()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/(^-|-$)/g, '');
-}
-
+/* ==================== SIMPAN (CREATE / UPDATE) PRODUK ==================== */
 function makeUniqueSlug(baseSlug, excludeId) {
     let slug = baseSlug || 'produk';
     let counter = 2;
@@ -709,43 +564,17 @@ function makeUniqueSlug(baseSlug, excludeId) {
     return slug;
 }
 
-/* Validasi data form produk sebelum disimpan ke PRODUCTS.
-   Mengembalikan pesan error (string) apabila ada masalah, atau
-   null kalau semua data valid. Dijalankan di JS supaya tidak
-   bisa dilewati hanya dengan mengandalkan atribut HTML
-   (required, min, dsb.) yang bisa saja gagal tervalidasi
-   browser atau di-bypass. */
 function validateProductForm(data) {
-    if (!data.name) {
-        return "Nama produk tidak boleh kosong.";
-    }
-    if (data.name.length > 100) {
-        return "Nama produk maksimal 100 karakter.";
-    }
-    if (!data.category || !CATEGORY_SLUGS.hasOwnProperty(data.category)) {
-        return "Pilih kategori yang valid.";
-    }
-    if (!Number.isFinite(data.price) || data.price <= 0) {
-        return "Harga harus berupa angka lebih besar dari 0.";
-    }
-    if (data.price > 1000000000) {
-        return "Harga tidak masuk akal (maksimal Rp 1.000.000.000).";
-    }
-    if (!data.material) {
-        return "Material tidak boleh kosong.";
-    }
-    if (!data.color) {
-        return "Warna tidak boleh kosong.";
-    }
-    if (!data.dimensions) {
-        return "Dimensi tidak boleh kosong.";
-    }
-    if (!data.description) {
-        return "Deskripsi tidak boleh kosong.";
-    }
-    if (data.description.length > 500) {
-        return "Deskripsi maksimal 500 karakter.";
-    }
+    if (!data.name) return "Nama produk tidak boleh kosong.";
+    if (data.name.length > 100) return "Nama produk maksimal 100 karakter.";
+    if (!data.category_id) return "Pilih kategori yang valid.";
+    if (!Number.isFinite(data.price) || data.price <= 0) return "Harga harus berupa angka lebih besar dari 0.";
+    if (data.price > 1000000000) return "Harga tidak masuk akal (maksimal Rp 1.000.000.000).";
+    if (!data.material) return "Material tidak boleh kosong.";
+    if (!data.color) return "Warna tidak boleh kosong.";
+    if (!data.dimensions) return "Dimensi tidak boleh kosong.";
+    if (!data.description) return "Deskripsi tidak boleh kosong.";
+    if (data.description.length > 500) return "Deskripsi maksimal 500 karakter.";
     return null;
 }
 
@@ -753,9 +582,6 @@ async function saveProduct(event) {
     event.preventDefault();
     clearFormError();
 
-    // Kalau ada foto yang menunggu diunggah tapi folder project belum
-    // terhubung, hentikan dulu di sini — supaya foto tidak "hilang diam-diam"
-    // (data produk tersimpan tapi fotonya tidak pernah tertulis ke disk).
     if (pendingPhotoBlobs.length > 0 && !projectFolderHandle) {
         showFormError('Ada foto yang belum tersimpan: hubungkan folder project dulu (tombol di kanan atas), atau hapus foto dan unggah manual nanti.');
         return;
@@ -763,7 +589,7 @@ async function saveProduct(event) {
 
     const id = document.getElementById('productId').value;
     const name = document.getElementById('productName').value.trim();
-    const category = document.getElementById('productCategory').value;
+    const category_id = document.getElementById('productCategory').value;
     const priceRaw = document.getElementById('productPrice').value.trim();
     const price = priceRaw === '' ? NaN : Number(priceRaw);
     const material = document.getElementById('productMaterial').value.trim();
@@ -771,114 +597,205 @@ async function saveProduct(event) {
     const dimensions = document.getElementById('productDimensions').value.trim();
     const description = document.getElementById('productDescription').value.trim();
 
-    const errorMessage = validateProductForm({ name, category, price, material, color, dimensions, description });
+    const errorMessage = validateProductForm({ name, category_id, price, material, color, dimensions, description });
     if (errorMessage) {
         showFormError(errorMessage);
         return;
     }
     const finalPrice = Math.round(price);
-    setLastUsedCategory(category);
 
-    if (id) {
-        // Edit produk yang ada.
-        // PENTING: slug produk yang sudah ada TIDAK diubah otomatis di sini,
-        // walaupun namanya diedit. Foto produk disimpan manual di folder
-        // asset/images/products/<slug>/, jadi kalau slug ikut berubah saat
-        // nama diedit, koneksi ke foto yang sudah diunggah akan putus.
-        const index = PRODUCTS.findIndex(p => p.id === parseInt(id, 10));
-        if (index !== -1) {
-            const existing = PRODUCTS[index];
-            PRODUCTS[index] = {
-                ...existing,
-                name, category, price: finalPrice, material, color, dimensions, description
-            };
-            rebuildProductImages(PRODUCTS[index]);
+    const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    let savedSlug = null;
+
+    try {
+        if (id) {
+            // Edit produk. Slug TIDAK diubah otomatis walau nama diedit —
+            // foto produk disimpan manual di folder asset/images/products/<slug>/,
+            // jadi kalau slug ikut berubah, koneksi ke foto yang sudah
+            // diunggah akan putus.
+            const existing = PRODUCTS.find(p => p.id === parseInt(id, 10));
+            savedSlug = existing ? existing.slug : null;
+
+            const { error } = await supabaseClient.from('products').update({
+                name, category_id, price: finalPrice, material, color, dimensions, description
+            }).eq('id', id);
+
+            if (error) throw error;
+        } else {
+            const slug = makeUniqueSlug(slugify(name), null);
+            const { data, error } = await supabaseClient.from('products').insert([{
+                name, category_id, price: finalPrice, material, color, dimensions, description, slug
+            }]).select().single();
+
+            if (error) throw error;
+            savedSlug = data.slug;
         }
-    } else {
-        // Tambah produk baru — ID selalu naik dan tidak pernah dipakai
-        // ulang, walaupun ada produk lama yang sudah dihapus (lihat
-        // getNextProductId di asset/js/products.js).
-        const newId = getNextProductId();
-        const slug = makeUniqueSlug(slugify(name), null);
-        const newProduct = { id: newId, name, category, price: finalPrice, description, material, color, dimensions, slug };
-        rebuildProductImages(newProduct);
-        PRODUCTS.push(newProduct);
+    } catch (e) {
+        console.error('Gagal menyimpan produk:', e);
+        showFormError('Gagal menyimpan produk ke database: ' + e.message);
+        if (submitBtn) submitBtn.disabled = false;
+        return;
     }
-
-    // Tentukan slug produk yang baru saja disimpan (untuk lokasi folder foto).
-    const savedSlug = id
-        ? PRODUCTS.find(p => p.id === parseInt(id, 10))?.slug
-        : PRODUCTS[PRODUCTS.length - 1].slug;
-
-    // PENTING — urutan di bawah ini disengaja:
-    // localStorage ditulis & tabel di-render DULU, SEBELUM ada file apa pun
-    // ditulis ke folder project. Kalau folder itu sedang dipantau Live Server
-    // (atau tool sejenis), menulis foto/products.js ke dalamnya memicu
-    // auto-reload halaman — dan reload menghapus semua state JS yang belum
-    // sempat disimpan. Dengan localStorage ditulis di awal, produk baru tetap
-    // aman & tetap tampil di dashboard walau reload itu terjadi di tengah
-    // proses penulisan foto/products.js di bawah.
-    persistProducts();
-    renderProducts();
 
     if (pendingPhotoBlobs.length > 0 && savedSlug) {
         try {
             await writePhotosToProjectFolder(savedSlug);
         } catch (e) {
             console.error('Gagal menyimpan foto:', e);
-            showFormError('Produk tersimpan, tapi foto GAGAL ditulis ke folder: ' + e.message);
+            showFormError('Produk tersimpan di database, tapi foto GAGAL ditulis ke folder: ' + e.message);
+            if (submitBtn) submitBtn.disabled = false;
             return;
         }
     }
 
-    let writeResult;
-    try {
-        writeResult = await writeProductsFileToProjectFolder();
-    } catch (e) {
-        console.error('Gagal menulis products.js:', e);
-        showFormError('Produk tersimpan di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
-        return;
-    }
-
+    invalidateCatalogCache();
+    await loadCatalogData();
+    renderProducts();
     resetPendingPhotos();
     closeModal();
-
-    if (writeResult && writeResult.written === false) {
-        warnProductsFileNotWritten();
-    }
+    if (submitBtn) submitBtn.disabled = false;
 }
 
 async function deleteProduct(id) {
-    if (confirm("Apakah Anda yakin ingin menghapus produk ini?")) {
-        const index = PRODUCTS.findIndex(p => p.id === id);
-        if (index !== -1) PRODUCTS.splice(index, 1);
-        selectedProductIds.delete(id);
-        persistProducts();
+    if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
 
-        try {
-            const writeResult = await writeProductsFileToProjectFolder();
-            if (writeResult && writeResult.written === false) {
-                warnProductsFileNotWritten();
-            }
-        } catch (e) {
-            console.error('Gagal menulis products.js:', e);
-            alert('Produk terhapus di browser, tapi GAGAL ditulis ke asset/js/products.js: ' + e.message + ' — data belum siap di-push ke GitHub.');
-        }
-
-        renderProducts();
+    const { error } = await supabaseClient.from('products').delete().eq('id', id);
+    if (error) {
+        console.error('Gagal menghapus produk:', error);
+        alert('Gagal menghapus produk: ' + error.message);
+        return;
     }
+
+    selectedProductIds.delete(id);
+    invalidateCatalogCache();
+    await loadCatalogData();
+    renderProducts();
 }
 
 function editProduct(id) {
     openModal('edit', id);
 }
 
-/* ==================== INISIALISASI ==================== */
-document.addEventListener('DOMContentLoaded', () => {
-    requireAuth();
-    if (typeof PRODUCTS !== 'undefined') {
-        populateCategoryFilterOptions();
-        renderProducts();
+/* ==================== KATEGORI ==================== */
+function renderCategoryTable() {
+    const tableBody = document.getElementById('categoryTableBody');
+    if (!tableBody) return;
+
+    if (CATEGORIES.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;">Belum ada kategori.</td></tr>';
+        return;
     }
+
+    tableBody.innerHTML = CATEGORIES.map(c => {
+        const count = PRODUCTS.filter(p => String(p.category_id) === String(c.id)).length;
+        return `
+            <tr>
+                <td><strong>${escapeHtml(c.name)}</strong></td>
+                <td>${escapeHtml(c.slug)}</td>
+                <td>${count}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-delete" onclick="deleteCategory('${c.id}')"><i class="fa-solid fa-trash"></i> Hapus</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function openCategoryModal() {
+    document.getElementById('categoryForm').reset();
+    const errEl = document.getElementById('categoryFormError');
+    if (errEl) errEl.style.display = 'none';
+    document.getElementById('categoryModal').style.display = 'flex';
+}
+
+function closeCategoryModal() {
+    document.getElementById('categoryModal').style.display = 'none';
+}
+
+async function saveCategory(event) {
+    event.preventDefault();
+    const errEl = document.getElementById('categoryFormError');
+    if (errEl) errEl.style.display = 'none';
+
+    const name = document.getElementById('categoryName').value.trim();
+    if (!name) {
+        if (errEl) { errEl.textContent = 'Nama kategori tidak boleh kosong.'; errEl.style.display = 'block'; }
+        return;
+    }
+    if (name.length > 50) {
+        if (errEl) { errEl.textContent = 'Nama kategori maksimal 50 karakter.'; errEl.style.display = 'block'; }
+        return;
+    }
+
+    const slug = slugify(name);
+    const saveBtn = document.getElementById('categorySaveBtn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    const { error } = await supabaseClient.from('categories').insert([{
+        name, slug, sort_order: CATEGORIES.length + 1
+    }]);
+
+    if (saveBtn) saveBtn.disabled = false;
+
+    if (error) {
+        console.error('Gagal menambah kategori:', error);
+        const message = (error.code === '23505')
+            ? 'Kategori dengan nama/slug yang sama sudah ada.'
+            : 'Gagal menambah kategori: ' + error.message;
+        if (errEl) { errEl.textContent = message; errEl.style.display = 'block'; }
+        return;
+    }
+
+    invalidateCatalogCache();
+    await loadCatalogData();
+    renderCategoryTable();
+    populateCategoryFilterOptions();
+    closeCategoryModal();
+}
+
+async function deleteCategory(id) {
+    const count = PRODUCTS.filter(p => String(p.category_id) === String(id)).length;
+    if (count > 0) {
+        alert(`Kategori ini masih punya ${count} produk. Pindahkan atau hapus produk-produk itu dulu (lewat menu Produk) sebelum menghapus kategorinya.`);
+        return;
+    }
+    if (!confirm('Hapus kategori ini? Tindakan ini tidak bisa dibatalkan.')) return;
+
+    const { error } = await supabaseClient.from('categories').delete().eq('id', id);
+    if (error) {
+        console.error('Gagal menghapus kategori:', error);
+        alert('Gagal menghapus kategori: ' + error.message);
+        return;
+    }
+
+    invalidateCatalogCache();
+    await loadCatalogData();
+    renderCategoryTable();
+    populateCategoryFilterOptions();
+    if (currentCategoryFilter === String(id)) {
+        currentCategoryFilter = 'all';
+    }
+    renderProducts();
+}
+
+/* ==================== INISIALISASI ==================== */
+document.addEventListener('DOMContentLoaded', async () => {
+    const session = await requireAuth();
+    if (!session) return; // sudah diarahkan ke login.html
+
+    try {
+        await loadCatalogData();
+    } catch (e) {
+        console.error('Gagal memuat data dari Supabase:', e);
+        alert('Gagal memuat data dari Supabase: ' + e.message);
+    }
+
+    populateCategoryFilterOptions();
+    renderProducts();
+    renderCategoryTable();
     restoreProjectFolder();
 });
