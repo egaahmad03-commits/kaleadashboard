@@ -1,109 +1,101 @@
 /* =========================================================
-   Kalea Furniture — Sumber Data Produk (Dummy/Local)
-   Satu-satunya sumber data produk untuk seluruh halaman katalog.
-   Tambah/ubah produk cukup di array PRODUCTS di bawah ini.
+   Kalea Furniture — Sumber Data Produk & Kategori (Supabase)
+   Data TIDAK lagi hardcode di file ini. Setiap halaman memanggil
+   loadCatalogData() sekali di awal, hasilnya di-cache di memori
+   (CATEGORIES / PRODUCTS) untuk dipakai fungsi-fungsi lain di
+   bawah dan oleh catalog-render.js.
    ========================================================= */
 
-/* Ikon per kategori — TIDAK lagi dipakai sebagai foto produk.
-   Dipertahankan sebagai cadangan/placeholder visual apabila
-   suatu produk belum memiliki file gambar (lihat renderProductPhoto
-   di catalog-render.js) dan untuk kebutuhan lain di masa depan. */
-const CATEGORY_ICONS = {
-  "Kursi Makan": '<path d="M6 3h12v9H6z"></path><path d="M6 12v9"></path><path d="M18 12v9"></path><path d="M6 17h12"></path>',
-  "Kursi Bar": '<path d="M8 3h8v6H8z"></path><path d="M9 9l-1 12"></path><path d="M15 9l1 12"></path><path d="M7 21h10"></path>',
-  "Kursi Santai": '<path d="M4 19V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v10"></path><path d="M4 14h8"></path><path d="M12 11h6a2 2 0 0 1 2 2v6"></path><path d="M2 19h20"></path>',
-  "Sofa": '<path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5H3z"></path><path d="M3 14v5"></path><path d="M21 14v5"></path><path d="M3 19h18"></path><path d="M5 9V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v2"></path>',
-  "Meja Kopi": '<ellipse cx="12" cy="7" rx="9" ry="3"></ellipse><path d="M6 9v6"></path><path d="M18 9v6"></path><path d="M4 15h16"></path>',
-  "Meja Samping": '<rect x="6" y="4" width="12" height="4" rx="1"></rect><path d="M8 8v12"></path><path d="M16 8v12"></path>',
-  "Meja Makan": '<rect x="3" y="8" width="18" height="3" rx="1"></rect><path d="M5 11v9"></path><path d="M19 11v9"></path>',
-  "Meja Kerja": '<rect x="3" y="4" width="18" height="3" rx="1"></rect><path d="M5 7v13"></path><path d="M19 7v13"></path><path d="M5 16h6"></path>',
-  "Meja Konsol": '<rect x="4" y="5" width="16" height="3" rx="1"></rect><path d="M6 8v11"></path><path d="M18 8v11"></path><path d="M4 19h16"></path>',
-  "Kabinet": '<rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="M4 12h16"></path><path d="M9 7v3"></path><path d="M9 16v3"></path>',
-  "Lemari": '<rect x="4" y="2" width="16" height="20" rx="1"></rect><path d="M12 2v20"></path><path d="M9 12v.01"></path><path d="M15 12v.01"></path>',
-  "Rangka Tempat Tidur": '<path d="M2 18v-6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v6"></path><path d="M2 18v3"></path><path d="M22 18v3"></path><path d="M2 12V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4"></path><path d="M2 18h20"></path>',
-  "Furnitur Luar Ruangan": '<path d="M12 2v6"></path><path d="M5 10h14l-1.5 4h-11z"></path><path d="M9 14v7"></path><path d="M15 14v7"></path><path d="M6 21h12"></path>'
-};
+/* Ikon generik dipakai sebagai cadangan untuk kategori yang belum
+   punya ikon_svg sendiri di database (misalnya kategori baru yang
+   ditambah lewat Panel Admin tanpa pilih ikon khusus). */
+const GENERIC_CATEGORY_ICON =
+  '<rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M4 10h16"></path>';
 
-/* Peta nama kategori -> slug file halaman kategori di /produk/ */
-const CATEGORY_SLUGS = {
-  "Kursi Makan": "kursi-makan",
-  "Kursi Bar": "kursi-bar",
-  "Kursi Santai": "kursi-santai",
-  "Sofa": "sofa",
-  "Meja Kopi": "meja-kopi",
-  "Meja Samping": "meja-samping",
-  "Meja Makan": "meja-makan",
-  "Meja Kerja": "meja-kerja",
-  "Meja Konsol": "meja-konsol",
-  "Kabinet": "kabinet",
-  "Lemari": "lemari",
-  "Rangka Tempat Tidur": "rangka-tempat-tidur",
-  "Furnitur Luar Ruangan": "furnitur-luar-ruangan"
-};
+var CATEGORIES = [];
+var PRODUCTS = [];
+var _catalogDataPromise = null;
 
-/* === KALEA_PRODUCTS_DATA_START ===
-   JANGAN edit dua baris penanda ini atau hapus koma di akhir tiap
-   baris produk — Panel Admin menulis ulang isi di antara penanda
-   ini secara otomatis (satu baris per produk) setiap kali produk
-   disimpan/dihapus lewat admin (kalau folder project terhubung). */
-const DEFAULT_PRODUCTS = [
-  {"id":1,"name":"Kursi Makan Fyn","category":"Kursi Makan","price":1200000,"description":"Fyn menghadirkan kualitas dan gaya khas Italia pada kursi wishbone bergaya mid-century modern yang ikonik. Dibalut dengan sentuhan akhir kayu walnut, kursi makan kayu ini merayakan siluet abadi melalui kaki-kaki yang meruncing, palang penyangga yang halus, sandaran melengkung beraksen bilah, serta dudukan yang dipahat rapi. Dirancang untuk kenyamanan di meja makan, Fyn mempercantik dekorasi ruang makan Anda dengan keanggunan yang bersahaja.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"52 cm x 53 cm x 76,5 cm","slug":"kursi-makan-via"},
-  {"id":2,"name":"Kursi Makan Via","category":"Kursi Makan","price":1800000,"description":"Terinspirasi oleh desain vintage Italia, kursi skulptural Via memanjakan ruang makan Anda dengan tampilan menawan layaknya di galeri desain serta kenyamanan yang melimpah. Kayu walnut dari sumber berkelanjutan membentuk rangkanya dengan lekukan organik dan garis-garis mengalir yang membentuk dudukan silang serta kaki-kaki belakang yang memanjang. Bantal sandaran oval yang melengkung dan dudukan empuk memikat dengan balutan kain beludru (velvet) berwarna toffee brown.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"46 cm x 57,5 cm x 75 cm","slug":"kursi-makan-via-2"},
-  {"id":3,"name":"Kursi Makan Paolo","category":"Kursi Makan","price":1200000,"description":"Kursi makan Paolo menghadirkan lengkungan paddle-back klasik ala mid-century modern.  Dudukan berkonturnya nyaman untuk santap santai. Warna ebonized hitam memberi kesan dramatis pada siluetnya yang santai, menjadikannya pasangan ideal untuk meja makan modern Anda.","material":"Kayu Jati Solid","color":"Hitam Doff","dimensions":"47 cm x 54 cm x 76 cm","slug":"kursi-makan-paolo"},
-  {"id":4,"name":"Kursi Makan Athene","category":"Kursi Makan","price":1800000,"description":"Dinamai dari ritual penting makan bersama, kursi Ceremonie mengajak Anda bersantai di meja makan dengan kenyamanan dan tampilan menawan. Kursi ini menginterpretasikan ulang gaya wishbone modern tanpa lengan lewat garis vertikal dan struktur sandaran ganda yang memikat. Rangka oak ber-finishing hazelnut brown dipadukan dengan dudukan serta sandaran U empuk berbalut kain bouclé tekstur warna oat.","material":"Kayu Jati Solid","color":"Natural","dimensions":"62 cm x 53 cm x 72,5 cm","slug":"kursi-makan-libby"},
-  {"id":5,"name":"Kursi Makan Libby","category":"Kursi Makan","price":1600000,"description":"Gaya modern berpadu retro pada desain ramping kursi makan Odelle. Dilengkapi kaki meruncing dan sandaran anyaman rotan, kursi ini memberi tampilan menawan lewat rangka nettlewood bernuansa light-toasted brown atau brushed ebony. Dibalut dudukan kain campuran linen netral berkualitas tinggi, kursi ini memadukan kenyamanan dan kesan elegan.","material":"Kayu Jati Solid","color":"Hitam Doff","dimensions":"50 cm x 63 cm x 91 cm","slug":"kursi-makan-libby-2"},
-  {"id":6,"name":"Kursi Makan Athena","category":"Kursi Makan","price":1600000,"description":"Dinamai dari ritual penting makan bersama, kursi Ceremonie mengajak Anda bersantai di meja makan dengan kenyamanan dan tampilan menawan. Kursi ini menginterpretasikan ulang gaya wishbone modern tanpa lengan lewat garis vertikal dan struktur sandaran ganda yang memikat. Rangka oak ber-finishing hazelnut brown dipadukan dengan dudukan serta sandaran U empuk berbalut kain bouclé tekstur warna natural.","material":"Kayu Jati Solid","color":"Natural","dimensions":"49 cm x 53 cm x 78 cm","slug":"kursi-makan-athena"},
-  {"id":7,"name":"Kursi Makan Camille","category":"Kursi Makan","price":1600000,"description":"Mengusung apresiasi mendalam atas kriya dan material pilihan, kursi CAMILLE menghadirkan keanggunan tenang di setiap ruangan. Terbuat dari kayu jati solid, rangkanya yang ringan memancarkan kesederhanaan dan kekuatan alami. Dengan sandaran melengkung lembut bernuansa netral serta garis desain yang mengalir, CAMILLE menawarkan kenyamanan nan elegan untuk ruang makan maupun sudut hunian Anda.","material":"Kayu Jati Solid","color":"natural Bleach","dimensions":"58 cm x 56 cm x 80 cm","slug":"kursi-makan-camille"},
-  {"id":8,"name":"Kursi Makan Camill","category":"Kursi Makan","price":1600000,"description":"Berakar dari apresiasi mendalam terhadap keahlian kriya dan material alami, kursi lengan CAMILL menghadirkan keanggunan tenang di setiap sudut ruangan. Terbuat dari kayu jati solid, rangkanya yang ringan memancarkan serat halus dan kehangatan alami. Dilengkapi sandaran melengkung lembut dan dudukan empuk bernuansa netral, kursi ini menawarkan kenyamanan nan elegan tanpa kesan berlebihan.","material":"Kayu Jati Solid","color":"Hitam Doff","dimensions":"58 cm x 56 cm x 80 cm","slug":"kursi-makan-camill"},
-  {"id":9,"name":"Kursi Makan Nemo","category":"Kursi Makan","price":1800000,"description":"Sebuah perayaan atas kriya dan kejelasan desain, kursi lengan NEMO menyaring keindahan dalam bentuk termurninya. Dengan siluet anggun dari kayu jati solid, NEMO menawarkan pesona skulptural yang abadi sekaligus kontemporer. Dudukan berbalut kain memberikan kelembutan ekstra pada rangka arsitekturalnya, menghadirkan kenyamanan sempurna tanpa mengurangi kesan minimalis. Pasangan ideal untuk meja makan maupun sudut ruangan Anda.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"63 cm x 55 cm x 81 cm","slug":"kursi-makan-nemo"},
-  {"id":10,"name":"Kursi Makan Sissi","category":"Kursi Makan","price":1600000,"description":"Terinspirasi oleh kursi kantor ikonik era 1950-an karya Pierre Jeanneret, seri SISSI memadukan desain modern dengan kriya tradisional. Mengusung estetika kontemporer yang elegan dan abadi, bentuk SISSI yang khas mampu mempercantik setiap ruangan lewat kekuatan minimalis serta desainnya yang ekspresif. Hadir dengan dudukan empuk yang nyaman, kursi ini siap memberikan sentuhan gaya berkelas pada hunian Anda.","material":"Kayu Jati Solid","color":"Natural","dimensions":"58 cm x 52 cm x 83 cm","slug":"kursi-makan-sissi"},
-  {"id":11,"name":"Kursi Makan  Kantilever","category":"Kursi Makan","price":2800000,"description":"kursi kantilever yang memadukan kesederhanaan dengan keanggunan abadi. Dilengkapi rangka logam berlapis krom beraksen Bauhaus yang halus, kursi ini menghadirkan sentuhan modern pada ruang makan Anda. Dibalut pilihan kulit atau kain yang elegan, pilihan sempurna bagi para pecinta desain.","material":"Stainless","color":"Silver","dimensions":"53 cm x 56 cm x 80 cm","slug":"kursi-makan-kantilever"},
-  {"id":12,"name":"Kursi Makan Alani","category":"Kursi Makan","price":1800000,"description":"Nikmati kenyamanan kursi lengan ALANI yang memadukan kehangatan ekstra dan desain modern secara sempurna. Dilengkapi dudukan empuk serta sandaran tangan melengkung, ALANI menawarkan pengalaman duduk yang sangat menyenangkan. Kaki logamnya yang ramping memberi kesan ringan nan elegan, sementara balutan kain bernuansa netral menjadikannya pas diletakkan di ruang makan, ruang kerja, maupun ruang keluarga.","material":"Besi","color":"Hitam Doff","dimensions":"58 cm x 58 cm x 78 cm","slug":"kursi-makan-alani"},
-  {"id":13,"name":"Kursi Makan Felici","category":"Kursi Makan","price":1600000,"description":"Kursi FELICIA menghadirkan kenyamanan yang santai ke meja makan Anda. Busa tebal pada dudukan dan sandarannya mengundang Anda untuk bersantai lebih lama. Kaki-kakinya yang ramping serta siluet modern memberikan tampilan ringan dan elegan yang mudah dipadukan. FELICIA siap mempercantik momen santap malam hingga percakapan hangat dengan keanggunan yang bersahaja.","material":"Besi","color":"Custom","dimensions":"51 cm x 54 cm x 84 cm","slug":"kursi-makan-felici"},
-  {"id":14,"name":"Kursi Makan Adrien","category":"Kursi Makan","price":1600000,"description":"Kursi lengan ADRIEN memadukan pengaruh mid-century dengan minimalis kontemporer, menciptakan tampilan abadi sekaligus modern. Siluetnya yang melengkung nyaman dibalut kain bouclé bertekstur lembut, memberikan sentuhan kemewahan nan tenang pada garis geometrisnya yang tegas. Sempurna untuk mempercantik sudut ruang makan atau hunian Anda.","material":"Kayu Jati Solid","color":"Hitam Doff","dimensions":"56 cm x 51 cm x 82 cm","slug":"kursi-makan-adrien"},
-  {"id":15,"name":"Kursi Makan Celia","category":"Kursi Makan","price":1800000,"description":"Kursi makan CELIA menghadirkan perpaduan sempurna antara desain mid-century dan kenyamanan ekstra. Dilengkapi sandaran berbentuk setengah lingkaran serta lapisan busa di sekelilingnya untuk bersandar santai. Kaki-kakinya yang sedikit mekar memberi sentuhan gaya khas era 50-an dan 60-an yang elegan pada ruang makan Anda.","material":"Kayu Jati Solid","color":"Hitam Doff","dimensions":"61 cm x 59 cm x 80 cm","slug":"kursi-makan-celia"},
-  {"id":16,"name":"Kursi Bar Arno","category":"Kursi Bar","price":1500000,"description":"Pesona Arno terletak pada detail desainnya yang halus. Melengkung sempurna, sandaran bilahnya menopang punggung dengan nyaman, sementara dudukan yang dipahat pas untuk meja counter atau meja makan tinggi. Dilengkapi fitur putar 180° dengan mekanisme otomatis yang mengembalikan posisi dudukan agar tampilan tetap rapi.","material":"Kayu Jati Solid","color":"Natural","dimensions":"53 cm x 47 cm x 103 cm","slug":"kursi-bar-arno"},
-  {"id":17,"name":"Kursi Bar Vegan","category":"Kursi Bar","price":1600000,"description":"Dibuat dengan dudukan kulit warna tan yang mewah, kursi bar ini memadukan pesona rustic dan keanggunan modern. Konstruksi kayu solidnya menjamin ketahanan jangka panjang, sementara dudukan kulitnya yang empuk memberikan kenyamanan ekstra. Pilihan tepat untuk membawa kehangatan dan gaya abadi ke Dapur Anda.","material":"Kayu Jati Solid","color":"Natural","dimensions":"52 cm x 48 cm x 98 cm","slug":"kursi-makan-vegan"},
-  {"id":18,"name":"Kursi Bar Tempo","category":"Kursi Bar","price":1600000,"description":"Kursi bar Tempo memadukan desain modern yang ramping dengan kenyamanan ergonomis. Dilengkapi dasar yang kokoh dan dudukan berlekuk nan elegan, kursi ini menjadi pilihan ideal untuk hunian maupun area komersial yang menginginkan sentuhan gaya kontemporer serta fungsionalitas yang praktis.","material":"Kayu Jati Solid","color":"Natural","dimensions":"49 cm x 53 cm x 94,5 cm","slug":"kursi-makan-tempo"},
-  {"id":19,"name":"Kursi Bar Vermore","category":"Kursi Bar","price":1400000,"description":"Kursi bar Vermore memadukan desain bergaya dengan kenyamanan optimal. Menampilkan garis-garis tegas dari kayu jati, serta dudukan elegan berbalut tekstil kulit yang tahan lama, kursi ini tampak modern sekaligus abadi. Sangat cocok untuk kitchen island atau meja bar Anda.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"40 cm x 40 cm x 68 cm","slug":"kursi-bar-vermore"},
-  {"id":20,"name":"Kursi Bar Sissi","category":"Kursi Bar","price":1400000,"description":"Terinspirasi oleh kursi kantor ikonik era 1950-an karya Pierre Jeanneret, seri SISSI memadukan desain modern dengan kriya tradisional. Mengusung estetika kontemporer yang elegan dan abadi khas Westwing Collection, bentuk SISSI yang khas mampu mempercantik ruangan Anda lewat kekuatan minimalis serta desainnya yang penuh karakter.","material":"Kayu Jati Solid","color":"Natural","dimensions":"46 cm x 45 cm x 65 cm","slug":"kursi-bar-sissi"},
-  {"id":21,"name":"Tempat Tidur Sato","category":"Rangka Tempat Tidur","price":8000000,"description":"Tempat tidur kayu bergaya modern minimalis ini menghadirkan perpaduan sempurna antara fungsionalitas dan estetika yang elegan. Dibuat dari material kayu berkualitas dengan sentuhan finishing cokelat medium yang hangat, ranjang ini memancarkan nuansa alami yang menenangkan ke dalam kamar tidur Anda.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"160 x 200 cm","slug":"tempat-tidur-sato"},
-  {"id":22,"name":"Tempat Tidur Nanto","category":"Rangka Tempat Tidur","price":12500000,"description":"Hadirkan tempat tidur Nanto sebagai solusi sempurna untuk kamar tidur yang modern dan rapi. Headboard kayu berukuran ekstra luas tidak hanya memberikan kesan estetis yang menawan, tetapi juga dilengkapi dengan meja samping (bedside table) terintegrasi dan fungsi penyimpanan yang praktis.","material":"Kayu Jati Slodi","color":"Walnut Doff","dimensions":"180 x 200 cm","slug":"tempat-tidur-nanto"},
-  {"id":23,"name":"Tempat Tidur Lennon","category":"Rangka Tempat Tidur","price":14000000,"description":"Temukan kenyamanan maksimal dengan tempat tidur LENNON, bagian dari seri terlaris yang menghadirkan wujud sejati dari rasa hangat dan bersahaja. Dilengkapi dengan rangka berbusa tebal yang luas, tempat tidur ini sangat praktis untuk menaruh ponsel maupun remote control. Sandaran kepala (headboard) yang empuk juga memberikan kenyamanan ekstra saat Anda membaca, menonton TV, atau menikmati sarapan di atas tempat tidur.","material":"Kayu Jati Solid","color":"Custom","dimensions":"180 x 200 cm","slug":"tempat-tidur-lennon"},
-  {"id":24,"name":"Tempat Tidur Cloud","category":"Rangka Tempat Tidur","price":13000000,"description":"Rasakan sensasi tidur yang nyenyak layaknya di atas awan sekaligus menghemat ruang dengan tempat tidur upholstered CLOUD. Sandaran kepala (headboard) berbusa empuk sangat nyaman untuk bersandar saat membaca, menonton TV, atau menikmati sarapan di atas tempat tidur.","material":"Kayu Jati Solid","color":"Custom","dimensions":"180 x 200 cm","slug":"tempat-tidur-cloud"},
-  {"id":25,"name":"Tempat Tidur Sofia","category":"Rangka Tempat Tidur","price":13000000,"description":"Hadirkan kenyamanan maksimal di kamar tidur Anda dengan tempat tidur SOFIA. Menampilkan desain lembut nan empuk layaknya awan, tempat tidur ini mengusung garis khas dari koleksi sofa SOFIA untuk menciptakan suasana ruangan yang harmonis dan penuh gaya. Rangka berbusa (upholstered) memberikan kenyamanan ekstra, sementara sandaran kepala (headboard) berlekuk anggun memberikan sentuhan unik yang menawan. Sebuah statement piece bagi Anda yang mengutamakan kenyamanan dan estetika.","material":"Kayu Jati Solid","color":"Custom","dimensions":"180 x 200 cm","slug":"tempat-tidur-sofia"},
-  {"id":26,"name":"Kursi Makan Nik","category":"Kursi Makan","price":1600000,"description":"Kursi makan NIK menghadirkan perpaduan sempurna antara desain dinamis dan keanggunan yang abadi. Dilengkapi sandaran melayang yang unik serta bantalan empuk untuk kenyamanan ekstra. Struktur kayunya yang tegas dan dipadukan dengan meja makan NIK memberi sentuhan elegan pada ruang makan, kantor, maupun ruang keluarga Anda.","material":"Kayu Jati Solid","color":"Natural","dimensions":"58 cm x 54 cm x 80 cm","slug":"kursi-makan-nik"},
-  {"id":27,"name":"Kursi Makan Gali","category":"Kursi Makan","price":1600000,"description":"Kursi makan GALI menghadirkan perpaduan sempurna antara keberlanjutan dan gaya yang tak lekang oleh waktu. Dibuat dari bahan ramah lingkungan dengan pengerjaan teliti, kursi ini menawarkan kenyamanan ekstra dan nilai estetika tinggi. Desainnya yang elegan menjadikannya daya tarik utama yang cocok untuk ruang makan, kantor, maupun ruang keluarga Anda.","material":"Kayu Jati Solid","color":"Natural","dimensions":"56 cm x 55 cm x 81 cm","slug":"kursi-makan-gali"},
-  {"id":28,"name":"Kursi Makan Maia","category":"Kursi Makan","price":1800000,"description":"Kursi makan MAIA menghadirkan perpaduan sempurna antara keanggunan gaya barok dan sentuhan modern yang memikat. Dilengkapi sandaran khas medaillon serta lapisan kain bouclé yang lembut untuk kenyamanan ekstra. Rangka kayunya yang edel memberi sentuhan gaya yang elegan dan menjadi daya tarik utama pada ruang makan, ruang keluarga, maupun kamar tidur Anda.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"59 cm x 57 cm x 88 cm","slug":"kursi-makan-maia"},
-  {"id":29,"name":"Kursi Makan Katya","category":"Kursi Makan","price":1600000,"description":"Kursi makan KATYA menghadirkan perpaduan sempurna antara bentuk yang anggun dan karakter yang memikat. Dilengkapi konstruksi tiga kaki yang futuristik serta sandaran terbuka yang memberikan kesan ringan. Material kayu jati solid dan proporsinya yang kompak memberi sentuhan gaya yang elegan dan sangat ideal untuk ruang berukuran minimalis maupun tata letak yang dinamis.","material":"Kayu Jati Solid","color":"Natural","dimensions":"49 cm x 51 cm x 82 cm","slug":"kursi-makan-katya"},
-  {"id":30,"name":"Kursi Makan Bodrum","category":"Kursi Makan","price":1600000,"description":"Kursi makan Bodrum menghadirkan perpaduan sempurna antara keanggunan klasik dan sentuhan desain alami yang modern. Dilengkapi aksen kayu terekspos pada sandaran untuk memberikan kesan mewah, serta rangka kayu jati solid yang kokoh dan tahan lama. Desainnya yang elegan dan fungsional membuatnya menjadi daya tarik utama yang sempurna untuk santap sehari-hari maupun acara spesial Anda.","material":"Kayu Jati Solid","color":"Walnut Doff","dimensions":"53 cm x 56 cm x 84 cm","slug":"kursi-makan-bodrum"},
-];
-/* === KALEA_PRODUCTS_DATA_END === */
+/* Panggil ini di awal setiap halaman (sebelum render apa pun yang
+   butuh data produk/kategori). Aman dipanggil berkali-kali — fetch
+   Supabase hanya terjadi sekali per pemuatan halaman (cached). */
+function loadCatalogData() {
+  if (_catalogDataPromise) return _catalogDataPromise;
+
+  _catalogDataPromise = Promise.all([
+    supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("products").select("*, categories(name, slug)").order("id", { ascending: true })
+  ]).then(function (results) {
+    var catRes = results[0];
+    var prodRes = results[1];
+
+    if (catRes.error) throw catRes.error;
+    if (prodRes.error) throw prodRes.error;
+
+    CATEGORIES = catRes.data || [];
+    PRODUCTS = (prodRes.data || []).map(function (p) {
+      p.category = p.categories ? p.categories.name : "";
+      p.category_slug = p.categories ? p.categories.slug : "";
+      rebuildProductImages(p);
+      return p;
+    });
+
+    return { categories: CATEGORIES, products: PRODUCTS };
+  });
+
+  return _catalogDataPromise;
+}
+
+/* Reset cache setelah Panel Admin menambah/mengubah/menghapus data,
+   supaya pemanggilan loadCatalogData() berikutnya ambil data segar. */
+function invalidateCatalogCache() {
+  _catalogDataPromise = null;
+}
+
+function formatRupiah(number) {
+  return "Rp " + Number(number).toLocaleString("id-ID");
+}
+
+/* Escape karakter HTML sensitif (&, <, >, ", ') sebelum data produk
+   (nama, deskripsi, dll) dimasukkan ke innerHTML/atribut HTML. */
+function escapeHtml(value) {
+  var map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+    return map[ch];
+  });
+}
+
+function getProductsByCategorySlug(slug) {
+  return PRODUCTS.filter(function (p) { return p.category_slug === slug; });
+}
+
+function getProductById(id) {
+  return PRODUCTS.find(function (p) { return p.id === Number(id); });
+}
+
+function getCategoryBySlug(slug) {
+  return CATEGORIES.find(function (c) { return c.slug === slug; });
+}
+
+function getCategoryIcon(category) {
+  if (category && category.icon_svg) return category.icon_svg;
+  return GENERIC_CATEGORY_ICON;
+}
 
 /* =========================================================
    Gambar Produk
    ---------------------------------------------------------
    Setiap produk memiliki folder sendiri di:
-     asset/images/products/<slug>/1.jpg .. 4.jpg
-   Path dibangun otomatis dari `slug` (satu sumber, tidak
-   perlu ditulis manual per produk). Cukup masukkan file
-   1.jpg, 2.jpg, 3.jpg, 4.jpg ke folder slug terkait —
-   tidak perlu mengubah kode apa pun.
-
-   Halaman yang memakai data ini (produk/*.html dan
-   produk/produk-detail.html) berada di dalam folder
-   /produk/, sehingga base path dimulai dari "../".
+     asset/images/products/<slug>/1.jpg .. 6.jpg
+   Path dibangun otomatis dari kolom `slug` di database (satu
+   sumber, tidak perlu ditulis manual per produk). Foto TETAP
+   file statis (tidak dipindah ke Supabase Storage) — cukup
+   masukkan file 1.jpg..6.jpg ke folder slug terkait.
    ========================================================= */
 const PRODUCT_IMAGE_BASE = (typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../") + "asset/images/products/";
 const PRODUCT_IMAGE_COUNT = 6;
-const PRODUCT_IMAGE_EXT = "jpg"; // gunakan .jpg untuk foto produk (ukuran file jauh lebih kecil dari .png untuk foto)
+const PRODUCT_IMAGE_EXT = "jpg";
 
-/*
- * Path gambar dibangun otomatis dari slug produk.
- * Untuk mengunggah foto baru: simpan sebagai 1.jpg, 2.jpg, dst
- * di folder asset/images/products/<slug>/ (maks ~1200px sisi terpanjang,
- * kualitas JPEG 80-85% sudah cukup tajam untuk web dan jauh lebih ringan).
- */
 function rebuildProductImages(p) {
   var images = [];
   for (var i = 1; i <= PRODUCT_IMAGE_COUNT; i++) {
@@ -114,106 +106,12 @@ function rebuildProductImages(p) {
   return p;
 }
 
-/* =========================================================
-   Penyimpanan Perubahan Admin (localStorage)
-   ---------------------------------------------------------
-   Situs ini murni statis (tanpa server/database), sehingga
-   perubahan yang dibuat lewat Panel Admin (admin/admin.html)
-   disimpan di localStorage browser. Saat halaman mana pun
-   dimuat, data ini dibaca lebih dulu; jika belum ada,
-   data bawaan (DEFAULT_PRODUCTS) yang dipakai.
-
-   Catatan: localStorage bersifat per-browser/per-perangkat, jadi
-   perubahan admin hanya "aktif" langsung di browser tempat admin
-   login. TAPI kalau folder project dihubungkan di Panel Admin
-   (tombol kanan atas), setiap simpan/hapus produk juga otomatis
-   menulis ulang array DEFAULT_PRODUCTS di file ini ke disk —
-   tinggal commit & push ke GitHub agar semua pengunjung melihat
-   data terbaru (lihat writeProductsFileToProjectFolder di admin.js).
-   ========================================================= */
-const PRODUCTS_STORAGE_KEY = "kalea_products_data";
-
-var PRODUCTS;
-try {
-  var savedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
-  PRODUCTS = savedProducts ? JSON.parse(savedProducts) : DEFAULT_PRODUCTS.slice();
-} catch (e) {
-  PRODUCTS = DEFAULT_PRODUCTS.slice();
-}
-
-function persistProducts() {
-  try {
-    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(PRODUCTS));
-  } catch (e) {
-    console.error("Gagal menyimpan data produk ke localStorage:", e);
-  }
-}
-
-PRODUCTS.forEach(rebuildProductImages);
-
-/* =========================================================
-   Penomoran ID Produk (selalu naik, tidak pernah dipakai ulang)
-   ---------------------------------------------------------
-   ID produk berikutnya disimpan terpisah di localStorage dan
-   HANYA bertambah naik. Ini penting supaya kalau sebuah produk
-   dihapus lewat Panel Admin, ID bekasnya tidak pernah dipakai
-   lagi oleh produk baru — mencegah ID "nyasar" ke produk lain
-   (misalnya kalau ada link, riwayat pesanan, atau data lama yang
-   masih mengacu ke ID tersebut).
-   ========================================================= */
-const PRODUCTS_NEXT_ID_KEY = "kalea_products_next_id";
-
-function getStoredNextId() {
-  try {
-    var stored = localStorage.getItem(PRODUCTS_NEXT_ID_KEY);
-    return stored ? parseInt(stored, 10) : null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function persistNextId(id) {
-  try {
-    localStorage.setItem(PRODUCTS_NEXT_ID_KEY, String(id));
-  } catch (e) {
-    console.error("Gagal menyimpan counter ID produk ke localStorage:", e);
-  }
-}
-
-var maxExistingProductId = PRODUCTS.reduce(function (max, p) { return Math.max(max, p.id); }, 0);
-var storedNextProductId = getStoredNextId();
-var nextProductIdCounter = Math.max(storedNextProductId || 0, maxExistingProductId + 1, 1);
-persistNextId(nextProductIdCounter);
-
-/* Ambil ID unik untuk produk baru. Selalu naik — tidak pernah
-   mengisi ulang ID bekas produk yang sudah dihapus. */
-function getNextProductId() {
-  var id = nextProductIdCounter;
-  nextProductIdCounter += 1;
-  persistNextId(nextProductIdCounter);
-  return id;
-}
-
-function formatRupiah(number) {
-  return "Rp " + number.toLocaleString("id-ID");
-}
-
-/* Escape karakter HTML sensitif (&, <, >, ", ') sebelum data produk
-   (nama, deskripsi, dll — yang diinput bebas lewat form admin)
-   dimasukkan ke innerHTML/atribut HTML di halaman publik maupun admin.
-   Mencegah karakter seperti < atau " merusak tampilan atau
-   menyisipkan HTML/script yang tidak diinginkan. */
-function escapeHtml(value) {
-  var map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-  return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
-    return map[ch];
-  });
-}
-
-function getProductsByCategory(category) {
-  return PRODUCTS.filter(function (p) { return p.category === category; });
-}
-
-function getProductById(id) {
-  return PRODUCTS.find(function (p) { return p.id === Number(id); });
+/* Bantu bikin slug otomatis dari nama (dipakai Panel Admin saat
+   menambah produk/kategori baru, supaya tidak perlu diisi manual). */
+function slugify(text) {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }

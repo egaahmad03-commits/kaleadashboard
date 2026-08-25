@@ -20,6 +20,7 @@
             <nav class="sidebar-menu">
                 <a href="admin.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
                 <a href="admin.html#productSection"><i class="fa-solid fa-box"></i> Produk</a>
+                <a href="admin.html#categorySection"><i class="fa-solid fa-tags"></i> Kategori</a>
                 <a href="../katalog.html" target="_blank"><i class="fa-solid fa-store"></i> Lihat Toko</a>
             </nav>
             <div class="sidebar-footer">
@@ -102,7 +103,50 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Category Table -->
+            <div class="content-section" id="categorySection">
+                <div class="section-header">
+                    <h2>Daftar Kategori</h2>
+                    <button class="btn-primary" onclick="openCategoryModal()"><i class="fa-solid fa-plus"></i> Tambah Kategori</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Kategori</th>
+                                <th>Slug (URL)</th>
+                                <th>Jumlah Produk</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </main>
+    </div>
+
+    <!-- Modal Tambah Kategori -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tambah Kategori Baru</h2>
+                <button class="modal-close" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <form id="categoryForm" onsubmit="saveCategory(event)">
+                <div class="form-group">
+                    <label for="categoryName">Nama Kategori</label>
+                    <input type="text" id="categoryName" placeholder="Contoh: Rak Sepatu" autocomplete="off" required>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Slug URL dibuat otomatis dari nama (misalnya "Rak Sepatu" &rarr; "rak-sepatu"). Kategori baru memakai ikon generik.</p>
+                </div>
+                <p id="categoryFormError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-10px;margin-bottom:16px;"></p>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeCategoryModal()">Batal</button>
+                    <button type="submit" class="btn-primary" id="categorySaveBtn"><i class="fa-solid fa-check"></i> Simpan Kategori</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal Tambah / Edit Produk -->
@@ -184,6 +228,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../asset/js/supabase-client.js"></script>
     <script src="../asset/js/products.js"></script>
     <script src="admin.js"></script>
 </body>
