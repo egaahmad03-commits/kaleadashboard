@@ -506,6 +506,14 @@ a {
 
 .gallery-main-wrap .product-photo-main {
   aspect-ratio: 3 / 4;
+  background: var(--surface-alt);
+}
+
+/* Foto utama galeri produk: tampilkan utuh (tidak dipotong).
+   Ini beda dari thumbnail/katalog/cart yang tetap pakai object-fit: cover di atas. */
+.gallery-main-wrap .product-photo-main img {
+  object-fit: contain;
+  cursor: zoom-in;
 }
 
 .gallery-nav {
