@@ -505,7 +505,11 @@ a {
 }
 
 .gallery-main-wrap .product-photo-main {
-  aspect-ratio: 3 / 4;
+  /* FIX: sebelumnya 3 / 4 (potret) membuat kotak terlalu tinggi untuk foto
+     produk yang umumnya landscape (mis. sofa), sehingga muncul ruang kosong
+     besar di atas & bawah foto pada tampilan mobile. 4 / 3 (landscape)
+     jauh mengurangi ruang kosong tersebut. */
+  aspect-ratio: 4 / 3;
   background: var(--surface-alt);
 }
 
@@ -1776,6 +1780,12 @@ a {
 
   .product-spec-table th {
     width: 110px;
+  }
+
+  /* FIX: pada layar sangat sempit, foto galeri utama dibuat lebih persegi
+     supaya ruang kosong (letterbox) di atas & bawah semakin minimal. */
+  .gallery-main-wrap .product-photo-main {
+    aspect-ratio: 1 / 1;
   }
 }
 
