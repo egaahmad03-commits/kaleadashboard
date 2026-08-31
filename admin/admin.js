@@ -5,9 +5,12 @@
      (tabel `products` & `categories`), lindungi lewat RLS:
      publik cuma bisa baca, hanya user yang login (authenticated)
      yang bisa insert/update/delete.
-   - Foto produk TETAP file statis di asset/images/products/<slug>/,
-     ditulis lewat File System Access API (folder project yang
-     dihubungkan sekali di kanan atas dashboard).
+   - Foto produk disimpan di Supabase Storage (bucket
+     'product-images'), bukan lagi lewat File System Access API.
+     Ini artinya admin panel bisa dipakai untuk tambah/edit produk
+     LENGKAP DENGAN FOTO dari browser mana pun, termasuk HP —
+     tidak perlu Chrome/Edge desktop, tidak perlu git push untuk
+     foto.
    ========================================================= */
 
 /* ==================== LOGIN (Supabase Auth) ==================== */
@@ -43,8 +46,6 @@ async function handleLogout(event) {
 }
 
 // Lindungi halaman dashboard: lempar ke login jika belum masuk.
-// Mengembalikan session (truthy) kalau valid, atau null (dan sudah
-// redirect) kalau tidak.
 async function requireAuth() {
     if (!document.getElementById('productTableBody')) return null; // bukan halaman dashboard
 
@@ -62,122 +63,23 @@ async function requireAuth() {
 }
 
 /* =========================================================
-   Koneksi Folder Project (File System Access API)
-   ---------------------------------------------------------
-   Dipakai HANYA untuk menyimpan foto produk sebagai file statis
-   ke asset/images/products/<slug>/ di folder project (hasil clone
-   repo GitHub) — data produk sendiri (nama, harga, dst) sudah
-   langsung tersimpan ke Supabase begitu form disimpan, tidak lagi
-   lewat folder ini.
-
-   Catatan penting:
-   - Hanya didukung Chrome/Edge (browser berbasis Chromium),
-     dan halaman ini harus dibuka lewat http://localhost, bukan
-     dibuka langsung sebagai file (file://).
-   - Izin akses folder disimpan browser per-origin. Setelah
-     restart browser, mungkin perlu klik "Hubungkan" sekali lagi
-     untuk memberi izin ulang (dialog konfirmasi singkat, folder
-     yang sama tidak perlu dipilih ulang).
-   ========================================================= */
-const FS_SUPPORTED = typeof window !== "undefined" && "showDirectoryPicker" in window;
-let projectFolderHandle = null;
-
-function idbGetStore(mode) {
-    return new Promise((resolve, reject) => {
-        const req = indexedDB.open("kalea_admin_fs", 1);
-        req.onupgradeneeded = () => req.result.createObjectStore("handles");
-        req.onsuccess = () => resolve(req.result.transaction("handles", mode).objectStore("handles"));
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function idbSaveFolderHandle(handle) {
-    const store = await idbGetStore("readwrite");
-    return new Promise((resolve, reject) => {
-        const req = store.put(handle, "projectFolder");
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function idbLoadFolderHandle() {
-    const store = await idbGetStore("readonly");
-    return new Promise((resolve) => {
-        const req = store.get("projectFolder");
-        req.onsuccess = () => resolve(req.result || null);
-        req.onerror = () => resolve(null);
-    });
-}
-
-function setFolderStatus(connected, message) {
-    const btn = document.getElementById('folderConnectBtn');
-    const label = document.getElementById('folderConnectLabel');
-    const note = document.getElementById('folderStatusNote');
-    if (!btn || !label) return;
-    btn.classList.toggle('is-connected', !!connected);
-    label.textContent = connected ? 'Folder Foto Terhubung' : 'Hubungkan Folder untuk Foto';
-    if (note) note.textContent = message || '';
-}
-
-async function restoreProjectFolder() {
-    if (!FS_SUPPORTED) {
-        setFolderStatus(false, 'Fitur unggah foto otomatis butuh Chrome/Edge, dan halaman dibuka lewat http://localhost (bukan double-click file HTML). Tanpa ini, foto perlu ditambahkan manual ke folder asset/images/products/<slug>/.');
-        return;
-    }
-    const handle = await idbLoadFolderHandle();
-    if (!handle) {
-        setFolderStatus(false, 'Belum terhubung ke folder project. Klik tombol di kanan atas agar foto produk otomatis tersimpan ke folder repo Anda.');
-        return;
-    }
-    try {
-        const perm = await handle.queryPermission({ mode: 'readwrite' });
-        if (perm === 'granted') {
-            projectFolderHandle = handle;
-            setFolderStatus(true, 'Folder "' + handle.name + '" terhubung. Foto akan otomatis tersimpan saat produk disimpan.');
-        } else {
-            setFolderStatus(false, 'Folder "' + handle.name + '" pernah terhubung, tapi izin perlu dikonfirmasi ulang — klik tombol di kanan atas.');
-        }
-    } catch (e) {
-        setFolderStatus(false, 'Belum terhubung ke folder project.');
-    }
-}
-
-async function connectProjectFolder() {
-    if (!FS_SUPPORTED) {
-        alert('Fitur ini hanya didukung di Chrome/Edge, dan halaman admin harus dibuka lewat http://localhost (server lokal), bukan dibuka langsung sebagai file.');
-        return;
-    }
-    try {
-        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        try {
-            await handle.getDirectoryHandle('asset');
-        } catch (e) {
-            const proceed = confirm('Folder yang dipilih sepertinya bukan folder root project (tidak ada folder "asset" di dalamnya). Lanjutkan memakai folder ini?');
-            if (!proceed) return;
-        }
-        projectFolderHandle = handle;
-        await idbSaveFolderHandle(handle);
-        setFolderStatus(true, 'Folder "' + handle.name + '" terhubung. Foto akan otomatis tersimpan saat produk disimpan.');
-    } catch (e) {
-        if (e && e.name !== 'AbortError') {
-            console.error('Gagal menghubungkan folder:', e);
-            alert('Gagal menghubungkan folder: ' + e.message);
-        }
-    }
-}
-
-/* =========================================================
-   Upload & Konversi Foto Produk
+   Upload & Konversi Foto Produk (Supabase Storage)
    ---------------------------------------------------------
    Foto yang dipilih di form (klik atau drag & drop) langsung
    digambar ulang ke <canvas> lalu di-export sebagai JPEG
-   (kualitas 85%, sisi terpanjang dibatasi 1200px).
+   (kualitas 85%, sisi terpanjang dibatasi 1200px), lalu diupload
+   ke bucket 'product-images' di Supabase Storage. URL publiknya
+   disimpan ke kolom `images` (jsonb) di tabel `products`.
    ========================================================= */
+const STORAGE_BUCKET = 'product-images';
 const MAX_PRODUCT_PHOTOS = typeof PRODUCT_IMAGE_COUNT !== 'undefined' ? PRODUCT_IMAGE_COUNT : 6;
 const PHOTO_MAX_DIMENSION = 1200;
 const PHOTO_JPEG_QUALITY = 0.85;
 
-let pendingPhotoBlobs = []; // { blob, previewUrl } dalam urutan tampil (index 0 = 1.jpg, dst)
+// Setiap item: { blob, previewUrl, isExisting, existingUrl }
+// - isExisting=true  -> foto lama yang sudah tersimpan di Storage (dimuat saat Edit)
+// - isExisting=false -> foto baru yang baru saja dipilih user, sudah dikonversi ke JPEG blob
+let pendingPhotoBlobs = [];
 
 function convertImageFileToJpeg(file) {
     return new Promise((resolve, reject) => {
@@ -234,45 +136,28 @@ function renderPhotoPreviews() {
 
 function removePendingPhoto(index) {
     const removed = pendingPhotoBlobs.splice(index, 1);
-    removed.forEach(p => URL.revokeObjectURL(p.previewUrl));
+    removed.forEach(p => { if (!p.isExisting) URL.revokeObjectURL(p.previewUrl); });
     renderPhotoPreviews();
 }
 
 function resetPendingPhotos() {
-    pendingPhotoBlobs.forEach(p => URL.revokeObjectURL(p.previewUrl));
+    pendingPhotoBlobs.forEach(p => { if (!p.isExisting) URL.revokeObjectURL(p.previewUrl); });
     pendingPhotoBlobs = [];
     renderPhotoPreviews();
     const input = document.getElementById('productPhotoInput');
     if (input) input.value = '';
 }
 
-/* Muat foto yang SUDAH tersimpan di folder project ke pendingPhotoBlobs
-   saat membuka form Edit Produk, supaya tidak tertimpa/hilang kalau user
-   menambah foto baru tanpa mengunggah ulang foto lama. */
-async function loadExistingPhotosIntoPending(product) {
-    if (!product || !product.slug || !projectFolderHandle) return;
-
-    try {
-        const perm = await projectFolderHandle.queryPermission({ mode: 'read' });
-        if (perm === 'denied') return;
-
-        const assetDir = await projectFolderHandle.getDirectoryHandle('asset');
-        const imagesDir = await assetDir.getDirectoryHandle('images');
-        const productsDir = await imagesDir.getDirectoryHandle('products');
-        const slugDir = await productsDir.getDirectoryHandle(product.slug);
-
-        for (let i = 1; i <= MAX_PRODUCT_PHOTOS; i++) {
-            try {
-                const fileHandle = await slugDir.getFileHandle(i + '.jpg');
-                const file = await fileHandle.getFile();
-                pendingPhotoBlobs.push({ blob: file, previewUrl: URL.createObjectURL(file) });
-            } catch (e) {
-                break; // nomor foto ini tidak ada -> foto berikutnya juga tidak ada (urutan selalu rapat)
-            }
-        }
-    } catch (e) {
-        // Folder foto produk ini belum ada (produk lama tanpa foto tersimpan) — aman diabaikan.
-    }
+/* Muat foto yang SUDAH tersimpan di Supabase Storage (dari kolom
+   `images` produk) ke pendingPhotoBlobs saat membuka form Edit Produk,
+   supaya tidak tertimpa/hilang kalau user menambah foto baru tanpa
+   mengunggah ulang foto lama. Ini jalan dari browser MANA PUN (termasuk
+   HP) karena baca dari cloud, bukan folder lokal. */
+function loadExistingPhotosIntoPending(product) {
+    if (!product || !Array.isArray(product.images)) return;
+    product.images.forEach((url) => {
+        pendingPhotoBlobs.push({ blob: null, previewUrl: url, isExisting: true, existingUrl: url });
+    });
 }
 
 async function handlePhotoFilesSelected(fileList) {
@@ -292,7 +177,7 @@ async function handlePhotoFilesSelected(fileList) {
     for (const file of toProcess) {
         try {
             const jpegBlob = await convertImageFileToJpeg(file);
-            pendingPhotoBlobs.push({ blob: jpegBlob, previewUrl: URL.createObjectURL(jpegBlob) });
+            pendingPhotoBlobs.push({ blob: jpegBlob, previewUrl: URL.createObjectURL(jpegBlob), isExisting: false });
         } catch (e) {
             console.error(e);
             alert(e.message);
@@ -323,28 +208,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Tulis foto (pendingPhotoBlobs) ke asset/images/products/<slug>/N.jpg
-// di folder project yang terhubung.
-async function writePhotosToProjectFolder(slug) {
-    if (!projectFolderHandle) throw new Error('Folder project belum terhubung.');
-
-    const perm = await projectFolderHandle.queryPermission({ mode: 'readwrite' });
-    if (perm !== 'granted') {
-        const req = await projectFolderHandle.requestPermission({ mode: 'readwrite' });
-        if (req !== 'granted') throw new Error('Izin akses folder ditolak.');
+/* Upload semua foto (baru + yang lama dipertahankan) ke Supabase Storage,
+   dengan urutan penomoran 1.jpg, 2.jpg, dst sesuai urutan tampil di form.
+   Folder lama untuk slug ini dibersihkan lebih dulu, supaya tidak ada
+   file "warisan" dari produk lama yang pernah pakai slug yang sama
+   (ini yang dulu menyebabkan foto jadi berlipat / produk lama "muncul lagi"). */
+async function uploadPhotosToStorage(slug) {
+    const { data: existingFiles, error: listError } = await supabaseClient
+        .storage.from(STORAGE_BUCKET).list(slug);
+    if (!listError && existingFiles && existingFiles.length > 0) {
+        const pathsToRemove = existingFiles.map(f => `${slug}/${f.name}`);
+        await supabaseClient.storage.from(STORAGE_BUCKET).remove(pathsToRemove);
     }
 
-    const assetDir = await projectFolderHandle.getDirectoryHandle('asset', { create: true });
-    const imagesDir = await assetDir.getDirectoryHandle('images', { create: true });
-    const productsDir = await imagesDir.getDirectoryHandle('products', { create: true });
-    const slugDir = await productsDir.getDirectoryHandle(slug, { create: true });
-
+    const finalUrls = [];
     for (let i = 0; i < pendingPhotoBlobs.length; i++) {
-        const fileHandle = await slugDir.getFileHandle((i + 1) + '.jpg', { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(pendingPhotoBlobs[i].blob);
-        await writable.close();
+        const item = pendingPhotoBlobs[i];
+        const path = `${slug}/${i + 1}.jpg`;
+
+        let blobToUpload = item.blob;
+        if (item.isExisting) {
+            const res = await fetch(item.existingUrl);
+            blobToUpload = await res.blob();
+        }
+
+        const { error: uploadError } = await supabaseClient
+            .storage.from(STORAGE_BUCKET)
+            .upload(path, blobToUpload, { contentType: 'image/jpeg', upsert: true });
+        if (uploadError) throw uploadError;
+
+        const { data: publicUrlData } = supabaseClient
+            .storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        finalUrls.push(publicUrlData.publicUrl);
     }
+
+    return finalUrls;
+}
+
+/* Hapus seluruh folder foto sebuah produk dari Storage (dipanggil saat
+   produk dihapus dari admin panel), supaya tidak ada file yatim yang
+   nanti "diwarisi" produk baru dengan slug yang sama. */
+async function deletePhotosFromStorage(slug) {
+    if (!slug) return;
+    const { data: files, error: listError } = await supabaseClient
+        .storage.from(STORAGE_BUCKET).list(slug);
+    if (listError || !files || files.length === 0) return;
+    const paths = files.map(f => `${slug}/${f.name}`);
+    await supabaseClient.storage.from(STORAGE_BUCKET).remove(paths);
 }
 
 /* ==================== RENDER TABEL PRODUK ==================== */
@@ -414,12 +324,20 @@ async function bulkDeleteProducts() {
     if (!confirm(`Hapus ${count} produk terpilih? Tindakan ini tidak bisa dibatalkan.`)) return;
 
     const ids = Array.from(selectedProductIds);
+    const productsToDelete = PRODUCTS.filter(p => ids.includes(p.id));
+
     const { error } = await supabaseClient.from('products').delete().in('id', ids);
 
     if (error) {
         console.error('Gagal menghapus produk:', error);
         alert('Gagal menghapus produk: ' + error.message);
         return;
+    }
+
+    // Bersihkan juga foto masing-masing produk dari Storage.
+    for (const p of productsToDelete) {
+        try { await deletePhotosFromStorage(p.slug); }
+        catch (e) { console.warn('Gagal menghapus foto dari Storage untuk', p.slug, e); }
     }
 
     selectedProductIds.clear();
@@ -509,7 +427,6 @@ async function openModal(mode, id = null) {
     const modal = document.getElementById('productModal');
     const modalTitle = document.getElementById('modalTitle');
     const form = document.getElementById('productForm');
-    const status = document.getElementById('photoStatusNote');
 
     if (CATEGORIES.length === 0) {
         alert('Belum ada kategori. Tambahkan kategori dulu di menu "Kategori" sebelum menambah produk.');
@@ -533,13 +450,8 @@ async function openModal(mode, id = null) {
             document.getElementById('productDescription').value = product.description || '';
             populateCategoryOptions(product.category_id);
 
-            if (projectFolderHandle) {
-                if (status) status.textContent = 'Memuat foto yang sudah tersimpan...';
-                await loadExistingPhotosIntoPending(product);
-                renderPhotoPreviews();
-            } else if (status) {
-                status.textContent = 'Folder project belum terhubung, jadi foto lama produk ini tidak bisa ditampilkan di sini. Hubungkan folder project dulu (tombol di kanan atas) sebelum menambah/mengganti foto, supaya foto lama tidak tertimpa.';
-            }
+            loadExistingPhotosIntoPending(product);
+            renderPhotoPreviews();
         }
     } else {
         modalTitle.innerText = "Tambah Produk Baru";
@@ -582,11 +494,6 @@ async function saveProduct(event) {
     event.preventDefault();
     clearFormError();
 
-    if (pendingPhotoBlobs.length > 0 && !projectFolderHandle) {
-        showFormError('Ada foto yang belum tersimpan: hubungkan folder project dulu (tombol di kanan atas), atau hapus foto dan unggah manual nanti.');
-        return;
-    }
-
     const id = document.getElementById('productId').value;
     const name = document.getElementById('productName').value.trim();
     const category_id = document.getElementById('productCategory').value;
@@ -612,7 +519,7 @@ async function saveProduct(event) {
     try {
         if (id) {
             // Edit produk. Slug TIDAK diubah otomatis walau nama diedit —
-            // foto produk disimpan manual di folder asset/images/products/<slug>/,
+            // foto produk terhubung ke folder di Storage lewat slug ini,
             // jadi kalau slug ikut berubah, koneksi ke foto yang sudah
             // diunggah akan putus.
             const existing = PRODUCTS.find(p => p.id === parseInt(id, 10));
@@ -641,10 +548,13 @@ async function saveProduct(event) {
 
     if (pendingPhotoBlobs.length > 0 && savedSlug) {
         try {
-            await writePhotosToProjectFolder(savedSlug);
+            const imageUrls = await uploadPhotosToStorage(savedSlug);
+            const { error: imgError } = await supabaseClient.from('products')
+                .update({ images: imageUrls }).eq('slug', savedSlug);
+            if (imgError) throw imgError;
         } catch (e) {
             console.error('Gagal menyimpan foto:', e);
-            showFormError('Produk tersimpan di database, tapi foto GAGAL ditulis ke folder: ' + e.message);
+            showFormError('Produk tersimpan di database, tapi foto GAGAL diupload: ' + e.message);
             if (submitBtn) submitBtn.disabled = false;
             return;
         }
@@ -661,11 +571,18 @@ async function saveProduct(event) {
 async function deleteProduct(id) {
     if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
 
+    const product = PRODUCTS.find(p => p.id === id);
+
     const { error } = await supabaseClient.from('products').delete().eq('id', id);
     if (error) {
         console.error('Gagal menghapus produk:', error);
         alert('Gagal menghapus produk: ' + error.message);
         return;
+    }
+
+    if (product && product.slug) {
+        try { await deletePhotosFromStorage(product.slug); }
+        catch (e) { console.warn('Gagal menghapus foto dari Storage:', e); }
     }
 
     selectedProductIds.delete(id);
@@ -797,5 +714,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateCategoryFilterOptions();
     renderProducts();
     renderCategoryTable();
-    restoreProjectFolder();
 });
