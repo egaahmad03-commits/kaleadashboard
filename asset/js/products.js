@@ -85,18 +85,31 @@ function getCategoryIcon(category) {
 /* =========================================================
    Gambar Produk
    ---------------------------------------------------------
-   Setiap produk memiliki folder sendiri di:
-     asset/images/products/<slug>/1.jpg .. 6.jpg
-   Path dibangun otomatis dari kolom `slug` di database (satu
-   sumber, tidak perlu ditulis manual per produk). Foto TETAP
-   file statis (tidak dipindah ke Supabase Storage) — cukup
-   masukkan file 1.jpg..6.jpg ke folder slug terkait.
+   Sumber utama: kolom `images` (jsonb) di tabel `products` —
+   diisi otomatis oleh Panel Admin saat foto diupload ke Supabase
+   Storage (bucket 'product-images'). Ini yang dipakai untuk semua
+   produk yang fotonya sudah dikelola lewat admin panel versi baru,
+   dan bisa diupload dari perangkat mana pun termasuk HP.
+
+   Fallback: untuk produk LAMA yang belum dimigrasikan (kolom
+   `images` masih kosong []), path foto disusun otomatis dari
+   folder statis lama di asset/images/products/<slug>/1.jpg..6.jpg,
+   supaya produk itu tetap tampil normal sampai fotonya dimigrasikan.
    ========================================================= */
 const PRODUCT_IMAGE_BASE = (typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../") + "asset/images/products/";
 const PRODUCT_IMAGE_COUNT = 6;
 const PRODUCT_IMAGE_EXT = "jpg";
 
 function rebuildProductImages(p) {
+  // Kalau kolom `images` di database sudah berisi URL (hasil upload ke
+  // Supabase Storage), pakai itu apa adanya.
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    p.image = p.images[0];
+    return p;
+  }
+
+  // Fallback untuk produk LAMA yang fotonya masih di folder statis lokal
+  // (asset/images/products/<slug>/) dan belum dimigrasikan ke Storage.
   var images = [];
   for (var i = 1; i <= PRODUCT_IMAGE_COUNT; i++) {
     images.push(PRODUCT_IMAGE_BASE + p.slug + "/" + i + "." + PRODUCT_IMAGE_EXT);
