@@ -33,16 +33,12 @@
             <div class="topbar">
                 <h1>Dashboard</h1>
                 <div class="topbar-right">
-                    <button type="button" id="folderConnectBtn" class="btn-folder" onclick="connectProjectFolder()">
-                        <i class="fa-solid fa-folder-open"></i> <span id="folderConnectLabel">Hubungkan Folder Project</span>
-                    </button>
                     <div class="user-profile">
                         <i class="fa-solid fa-circle-user" style="font-size:32px;color:var(--primary-color);"></i>
                         <span id="loggedInUser">Admin</span>
                     </div>
                 </div>
             </div>
-            <p id="folderStatusNote" class="folder-status-note"></p>
 
             <!-- Stats -->
             <div class="stats-grid">
@@ -209,8 +205,7 @@
 
                 <p style="font-size:12px;color:var(--text-muted);margin-top:-6px;margin-bottom:18px;">
                     <i class="fa-solid fa-circle-info"></i>
-                    Foto otomatis dikonversi ke JPG dan disimpan ke <code>asset/images/products/&lt;slug&gt;/</code>, dan data produk otomatis ditulis ke <code>asset/js/products.js</code>, saat produk disimpan (butuh folder project terhubung — tombol di kanan atas). Setelah itu tinggal <code>git add . && git commit && git push</code>.
-                    Tanpa folder terhubung, unggah manual file <code>1.jpg</code>, dst ke folder tersebut dan edit <code>products.js</code> manual.
+                    Foto otomatis dikonversi ke JPG dan diupload langsung ke Supabase Storage saat produk disimpan. Bisa dipakai dari browser mana pun, termasuk HP — tidak perlu menghubungkan folder atau <code>git push</code>.
                 </p>
 
                 <p style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:16px;">
