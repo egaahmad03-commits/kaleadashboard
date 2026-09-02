@@ -257,6 +257,127 @@ async function deletePhotosFromStorage(slug) {
     await supabaseClient.storage.from(STORAGE_BUCKET).remove(paths);
 }
 
+/* =========================================================
+   Bantuan Menulis Deskripsi
+   ---------------------------------------------------------
+   1) updateDescCounter    -> counter karakter (maks 500)
+   2) insertBulletPoint    -> sisipkan poin "• " di posisi kursor
+   3) insertDescTemplate   -> draf otomatis dari Nama/Kategori/
+      Material/Warna/Dimensi yang sudah diisi di form
+   4) generateDescriptionWithAI -> panggil Supabase Edge Function
+      "generate-description" yang meneruskan permintaan ke
+      Anthropic API (API key disimpan aman di server, bukan di
+      browser). Function ini perlu di-deploy terpisah — lihat
+      supabase/functions/generate-description/index.ts.
+   ========================================================= */
+function updateDescCounter() {
+    const textarea = document.getElementById('productDescription');
+    const counterEl = document.getElementById('descCounterText');
+    if (!textarea || !counterEl) return;
+    const len = textarea.value.length;
+    counterEl.textContent = len;
+    const wrapper = counterEl.parentElement;
+    if (wrapper) wrapper.classList.toggle('desc-counter-warning', len > 450);
+}
+
+function insertBulletPoint() {
+    const textarea = document.getElementById('productDescription');
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = textarea.value.substring(0, start);
+    const after = textarea.value.substring(end);
+    const needsNewline = before.length > 0 && !before.endsWith('\n');
+    const insertion = (needsNewline ? '\n' : '') + '• ';
+
+    textarea.value = (before + insertion + after).slice(0, 500);
+    const cursorPos = Math.min((before + insertion).length, textarea.value.length);
+    textarea.focus();
+    textarea.setSelectionRange(cursorPos, cursorPos);
+    updateDescCounter();
+}
+
+function buildTemplateDescription() {
+    const name = document.getElementById('productName').value.trim();
+    const material = document.getElementById('productMaterial').value.trim();
+    const color = document.getElementById('productColor').value.trim();
+    const dimensions = document.getElementById('productDimensions').value.trim();
+    const categorySelect = document.getElementById('productCategory');
+    const categoryOption = categorySelect && categorySelect.options[categorySelect.selectedIndex];
+    const categoryName = categoryOption ? categoryOption.text : '';
+
+    if (!material || !color || !dimensions) {
+        alert('Isi dulu Material, Warna, dan Dimensi supaya template deskripsi bisa dibuat.');
+        return null;
+    }
+
+    const subject = name || categoryName || 'Produk ini';
+    const parts = [
+        `${subject} hadir dengan material ${material} berkualitas dan warna ${color} yang menawan.`,
+        `Dengan dimensi ${dimensions}, cocok untuk melengkapi${categoryName ? ' koleksi ' + categoryName.toLowerCase() + ' Anda' : ' ruangan Anda'}.`,
+        'Desain kokoh dan tahan lama, siap mempercantik interior rumah Anda.'
+    ];
+    return parts.join(' ');
+}
+
+function insertDescTemplate() {
+    const textarea = document.getElementById('productDescription');
+    if (!textarea) return;
+    const template = buildTemplateDescription();
+    if (!template) return;
+    if (textarea.value.trim() && !confirm('Deskripsi sudah terisi. Timpa dengan template otomatis?')) return;
+
+    textarea.value = template.slice(0, 500);
+    updateDescCounter();
+}
+
+async function generateDescriptionWithAI() {
+    const btn = document.getElementById('aiGenerateBtn');
+    const textarea = document.getElementById('productDescription');
+    if (!btn || !textarea) return;
+
+    const name = document.getElementById('productName').value.trim();
+    const material = document.getElementById('productMaterial').value.trim();
+    const color = document.getElementById('productColor').value.trim();
+    const dimensions = document.getElementById('productDimensions').value.trim();
+    const categorySelect = document.getElementById('productCategory');
+    const categoryOption = categorySelect && categorySelect.options[categorySelect.selectedIndex];
+    const categoryName = categoryOption ? categoryOption.text : '';
+
+    if (!name || !material || !color || !dimensions) {
+        alert('Isi dulu Nama, Material, Warna, dan Dimensi supaya AI bisa membuat deskripsi yang akurat.');
+        return;
+    }
+
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membuat...';
+
+    try {
+        const { data, error } = await supabaseClient.functions.invoke('generate-description', {
+            body: { name, material, color, dimensions, category: categoryName }
+        });
+
+        if (error) throw error;
+        if (!data || !data.description) throw new Error('Respons AI kosong.');
+
+        if (textarea.value.trim() && !confirm('Deskripsi sudah terisi. Timpa dengan hasil AI?')) return;
+
+        textarea.value = data.description.slice(0, 500);
+        updateDescCounter();
+    } catch (e) {
+        console.error('Gagal generate deskripsi AI:', e);
+        alert(
+            'Gagal membuat deskripsi dengan AI: ' + e.message +
+            '\n\nPastikan Edge Function "generate-description" sudah di-deploy di Supabase ' +
+            'dan secret ANTHROPIC_API_KEY sudah diset. Sementara itu, coba pakai "Template Otomatis".'
+        );
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    }
+}
+
 /* ==================== RENDER TABEL PRODUK ==================== */
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45"><rect width="45" height="45" fill="#e2e8f0"/></svg>'
@@ -459,6 +580,8 @@ async function openModal(mode, id = null) {
         document.getElementById('productId').value = '';
         populateCategoryOptions(null);
     }
+
+    updateDescCounter();
 }
 
 function closeModal() {
