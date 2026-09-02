@@ -21,7 +21,7 @@ const corsHeaders = {
 
 // Model Gemini yang dipakai. Alternatif lain: "gemini-2.0-flash-lite" (lebih murah/cepat)
 // atau "gemini-1.5-pro" (lebih pintar, lebih mahal).
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
