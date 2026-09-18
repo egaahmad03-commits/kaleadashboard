@@ -164,6 +164,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th style="width:64px;">Tampilan</th>
                                 <th>Nama Kategori</th>
                                 <th>Slug (URL)</th>
                                 <th>Jumlah Produk</th>
@@ -177,21 +178,54 @@
         </main>
     </div>
 
-    <!-- Modal Tambah Kategori -->
+    <!-- Modal Tambah / Edit Kategori -->
     <div class="modal" id="categoryModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Tambah Kategori Baru</h2>
+                <h2 id="categoryModalTitle">Tambah Kategori Baru</h2>
                 <button class="modal-close" onclick="closeCategoryModal()">&times;</button>
             </div>
             <form id="categoryForm" onsubmit="saveCategory(event)">
+                <input type="hidden" id="categoryId">
+
                 <div class="form-group">
                     <label for="categoryName">Nama Kategori</label>
                     <input type="text" id="categoryName" placeholder="Contoh: Rak Sepatu" autocomplete="off" required>
-                    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Slug URL dibuat otomatis dari nama (misalnya "Rak Sepatu" &rarr; "rak-sepatu"). Kategori baru memakai ikon generik.</p>
+                    <p id="categorySlugNote" style="font-size:12px;color:var(--text-muted);margin-top:6px;">Slug URL dibuat otomatis dari nama (tidak berubah lagi setelah kategori dibuat).</p>
                 </div>
-                <p id="categoryFormError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-10px;margin-bottom:16px;"></p>
-                <div class="modal-footer">
+
+                <div class="form-group">
+                    <label>Tampilan Kartu di Katalog</label>
+                    <div class="display-mode-toggle">
+                        <label class="display-mode-option">
+                            <input type="radio" name="categoryDisplayMode" value="icon" checked onchange="updateCategoryModePreview()">
+                            <span>Ikon</span>
+                        </label>
+                        <label class="display-mode-option">
+                            <input type="radio" name="categoryDisplayMode" value="image" onchange="updateCategoryModePreview()">
+                            <span>Foto Produk</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="categoryIconGroup">
+                    <label>Pilih Ikon</label>
+                    <div id="categoryIconPicker" class="icon-picker"></div>
+                </div>
+
+                <div class="form-group" id="categoryImageGroup" style="display:none;">
+                    <label>Foto Kategori <span style="font-weight:400;color:var(--text-muted);">(disarankan rasio 1:1)</span></label>
+                    <label for="categoryPhotoInput" class="photo-dropzone" id="categoryDropzone">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Klik atau seret foto ke sini (JPG/PNG/WebP)</span>
+                    </label>
+                    <input type="file" id="categoryPhotoInput" accept="image/*" style="display:none;" onchange="handleCategoryPhotoSelected(this.files)">
+                    <div id="categoryPhotoPreview" class="photo-preview-list"></div>
+                </div>
+
+                <p id="categoryFormError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-4px;margin-bottom:16px;"></p>
+
+                <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeCategoryModal()">Batal</button>
                     <button type="submit" class="btn-primary" id="categorySaveBtn"><i class="fa-solid fa-check"></i> Simpan Kategori</button>
                 </div>

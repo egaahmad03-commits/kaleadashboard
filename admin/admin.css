@@ -779,3 +779,111 @@ body {
         padding: 22px;
     }
 }
+/* ==================== KATEGORI: THUMBNAIL DI TABEL ==================== */
+.category-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border: 1px solid var(--border-color);
+}
+
+.category-thumb-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-thumb-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* ==================== KATEGORI: TOGGLE MODE TAMPILAN ==================== */
+.display-mode-toggle {
+    display: flex;
+    gap: 10px;
+}
+
+.display-mode-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.display-mode-option:has(input:checked) {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.display-mode-option input {
+    accent-color: var(--primary-color);
+}
+
+/* ==================== KATEGORI: PICKER IKON ==================== */
+.icon-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.icon-picker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 4px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.icon-picker-item svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--text-main);
+}
+
+.icon-picker-item.is-selected {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+}
+
+.icon-picker-item.is-selected svg {
+    stroke: var(--primary-color);
+}
+
+/* ==================== KATEGORI: PREVIEW FOTO TUNGGAL ==================== */
+#categoryPhotoPreview:not(:empty) {
+    margin-top: 12px;
+}
+
+#categoryPhotoPreview .photo-preview-item {
+    width: 96px;
+    height: 96px;
+}

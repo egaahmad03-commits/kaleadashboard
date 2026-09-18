@@ -719,24 +719,157 @@ function editProduct(id) {
 }
 
 /* ==================== KATEGORI ==================== */
+const CATEGORY_STORAGE_BUCKET = 'category-images';
+
+/* Ikon disimpan sebagai markup SVG mentah di kolom `icon_svg` (sama
+   persis dengan yang dibaca products.js/catalog-render.js), bukan
+   sekadar nama/key. Jadi apa pun yang dipilih di sini akan tampil
+   identik di kartu katalog publik. */
+const CATEGORY_ICON_LIBRARY = [
+    { label: 'Kursi Makan', svg: '<path d="M6 4v9"></path><path d="M18 4v16"></path><path d="M6 13h12"></path><path d="M6 13v7"></path>' },
+    { label: 'Kursi Bar',   svg: '<circle cx="12" cy="6" r="2"></circle><path d="M12 8v6"></path><path d="M8 20l4-6 4 6"></path>' },
+    { label: 'Kursi Santai',svg: '<path d="M4 12h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z"></path><path d="M4 12V7a2 2 0 0 1 2-2h2v7"></path><path d="M6 17v3"></path><path d="M18 17v3"></path>' },
+    { label: 'Sofa',        svg: '<path d="M4 10V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"></path><rect x="2" y="10" width="20" height="7" rx="2"></rect><path d="M4 17v3"></path><path d="M20 17v3"></path>' },
+    { label: 'Meja Kopi',   svg: '<rect x="3" y="8" width="18" height="3" rx="1"></rect><path d="M6 11v9"></path><path d="M18 11v9"></path>' },
+    { label: 'Meja Samping',svg: '<rect x="7" y="4" width="10" height="4" rx="1"></rect><path d="M9 8v12"></path><path d="M15 8v12"></path>' },
+    { label: 'Meja Makan',  svg: '<rect x="2" y="9" width="20" height="2.5" rx="1"></rect><path d="M5 11.5V19"></path><path d="M19 11.5V19"></path>' },
+    { label: 'Meja Kerja',  svg: '<rect x="2" y="8" width="20" height="3" rx="1"></rect><path d="M4 11v9"></path><path d="M20 11v9"></path><path d="M9 11v5h6v-5"></path>' },
+    { label: 'Meja Konsol', svg: '<rect x="3" y="9" width="18" height="2.5" rx="1"></rect><path d="M5 11.5V19"></path><path d="M19 11.5V19"></path><path d="M5 15h14"></path>' },
+    { label: 'Kabinet',     svg: '<rect x="5" y="3" width="14" height="18" rx="1"></rect><path d="M12 3v18"></path><circle cx="9" cy="12" r="0.6"></circle><circle cx="15" cy="12" r="0.6"></circle>' },
+    { label: 'Lemari',      svg: '<rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="M12 3v18"></path><path d="M9 11v2"></path><path d="M15 11v2"></path>' },
+    { label: 'Tempat Tidur',svg: '<path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"></path><path d="M3 18v2"></path><path d="M21 18v2"></path><path d="M3 12V9a2 2 0 0 1 2-2h4v5"></path>' },
+    { label: 'Outdoor',     svg: '<path d="M12 3v10"></path><path d="M6 21l6-8 6 8"></path><path d="M4 21h16"></path>' },
+    { label: 'Rak',         svg: '<rect x="4" y="3" width="16" height="18" rx="1"></rect><path d="M4 9h16"></path><path d="M4 15h16"></path>' },
+    { label: 'Umum',        svg: '<rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M4 10h16"></path>' }
+];
+
+// icon_svg yang sedang dipilih di form (string markup, bukan index)
+let selectedCategoryIconSvg = CATEGORY_ICON_LIBRARY[CATEGORY_ICON_LIBRARY.length - 1].svg;
+
+// { blob, previewUrl, isExisting, existingUrl } | null
+let pendingCategoryImage = null;
+
+function renderCategoryIconPicker() {
+    const box = document.getElementById('categoryIconPicker');
+    if (!box) return;
+    box.innerHTML = CATEGORY_ICON_LIBRARY.map((opt, i) => `
+        <div class="icon-picker-item ${opt.svg === selectedCategoryIconSvg ? 'is-selected' : ''}"
+             onclick="selectCategoryIcon(${i})" title="${opt.label}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${opt.svg}</svg>
+            <span style="font-size:9px;color:var(--text-muted);">${opt.label}</span>
+        </div>
+    `).join('');
+}
+
+function selectCategoryIcon(index) {
+    const opt = CATEGORY_ICON_LIBRARY[index];
+    if (!opt) return;
+    selectedCategoryIconSvg = opt.svg;
+    renderCategoryIconPicker();
+}
+
+function updateCategoryModePreview() {
+    const checked = document.querySelector('input[name="categoryDisplayMode"]:checked');
+    const mode = checked ? checked.value : 'icon';
+    document.getElementById('categoryIconGroup').style.display  = mode === 'icon'  ? 'block' : 'none';
+    document.getElementById('categoryImageGroup').style.display = mode === 'image' ? 'block' : 'none';
+}
+
+/* ---------- Foto kategori (satu foto, dipakai sebagai cover kartu) ---------- */
+function renderCategoryPhotoPreview() {
+    const box = document.getElementById('categoryPhotoPreview');
+    if (!box) return;
+    box.innerHTML = pendingCategoryImage
+        ? `<div class="photo-preview-item">
+             <img src="${pendingCategoryImage.previewUrl}" alt="Preview kategori">
+             <button type="button" class="photo-preview-remove" onclick="removeCategoryPhoto()" title="Hapus">&times;</button>
+           </div>`
+        : '';
+}
+
+function removeCategoryPhoto() {
+    if (pendingCategoryImage && !pendingCategoryImage.isExisting) {
+        URL.revokeObjectURL(pendingCategoryImage.previewUrl);
+    }
+    pendingCategoryImage = null;
+    renderCategoryPhotoPreview();
+    const input = document.getElementById('categoryPhotoInput');
+    if (input) input.value = '';
+}
+
+async function handleCategoryPhotoSelected(fileList) {
+    const file = Array.from(fileList || []).find(f => f.type.startsWith('image/'));
+    if (!file) return;
+    try {
+        const blob = await convertImageFileToJpeg(file);
+        if (pendingCategoryImage && !pendingCategoryImage.isExisting) {
+            URL.revokeObjectURL(pendingCategoryImage.previewUrl);
+        }
+        pendingCategoryImage = { blob, previewUrl: URL.createObjectURL(blob), isExisting: false };
+        renderCategoryPhotoPreview();
+    } catch (e) {
+        console.error(e);
+        alert(e.message);
+    }
+    const input = document.getElementById('categoryPhotoInput');
+    if (input) input.value = '';
+}
+
+async function uploadCategoryImage(slug) {
+    if (!pendingCategoryImage || pendingCategoryImage.isExisting) {
+        return pendingCategoryImage ? pendingCategoryImage.existingUrl : null;
+    }
+
+    const path = `${slug}/cover.jpg`;
+    const { error } = await supabaseClient.storage
+        .from(CATEGORY_STORAGE_BUCKET)
+        .upload(path, pendingCategoryImage.blob, { contentType: 'image/jpeg', upsert: true });
+    if (error) throw error;
+
+    const { data } = supabaseClient.storage.from(CATEGORY_STORAGE_BUCKET).getPublicUrl(path);
+    return data.publicUrl + '?v=' + Date.now();
+}
+
+async function deleteCategoryImageFolder(slug) {
+    if (!slug) return;
+    const { data: files, error } = await supabaseClient.storage.from(CATEGORY_STORAGE_BUCKET).list(slug);
+    if (error || !files || files.length === 0) return;
+    await supabaseClient.storage.from(CATEGORY_STORAGE_BUCKET)
+        .remove(files.map(f => `${slug}/${f.name}`));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dz = document.getElementById('categoryDropzone');
+    if (!dz) return;
+    ['dragenter', 'dragover'].forEach(evt => dz.addEventListener(evt, e => { e.preventDefault(); dz.classList.add('is-dragover'); }));
+    ['dragleave', 'drop'].forEach(evt => dz.addEventListener(evt, e => { e.preventDefault(); dz.classList.remove('is-dragover'); }));
+    dz.addEventListener('drop', e => handleCategoryPhotoSelected(e.dataTransfer.files));
+});
+
+/* ---------- Tabel kategori ---------- */
 function renderCategoryTable() {
     const tableBody = document.getElementById('categoryTableBody');
     if (!tableBody) return;
 
     if (CATEGORIES.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;">Belum ada kategori.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px;">Belum ada kategori.</td></tr>';
         return;
     }
 
     tableBody.innerHTML = CATEGORIES.map(c => {
         const count = PRODUCTS.filter(p => String(p.category_id) === String(c.id)).length;
+        const thumb = (c.display_mode === 'image' && c.image_url)
+            ? `<img src="${c.image_url}" class="category-thumb" alt="${escapeHtml(c.name)}">`
+            : `<div class="category-thumb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${c.icon_svg || CATEGORY_ICON_LIBRARY[CATEGORY_ICON_LIBRARY.length - 1].svg}</svg></div>`;
         return `
             <tr>
+                <td>${thumb}</td>
                 <td><strong>${escapeHtml(c.name)}</strong></td>
                 <td>${escapeHtml(c.slug)}</td>
                 <td>${count}</td>
                 <td>
                     <div class="action-btns">
+                        <button class="btn-edit" onclick="editCategory('${c.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
                         <button class="btn-delete" onclick="deleteCategory('${c.id}')"><i class="fa-solid fa-trash"></i> Hapus</button>
                     </div>
                 </td>
@@ -745,51 +878,115 @@ function renderCategoryTable() {
     }).join('');
 }
 
-function openCategoryModal() {
-    document.getElementById('categoryForm').reset();
+/* ---------- Modal tambah/edit ---------- */
+function openCategoryModal(mode = 'add', id = null) {
+    const form = document.getElementById('categoryForm');
     const errEl = document.getElementById('categoryFormError');
     if (errEl) errEl.style.display = 'none';
+
+    form.reset();
+    removeCategoryPhoto();
+    selectedCategoryIconSvg = CATEGORY_ICON_LIBRARY[CATEGORY_ICON_LIBRARY.length - 1].svg;
+
+    const slugNote = document.getElementById('categorySlugNote');
+    const nameInput = document.getElementById('categoryName');
+
+    if (mode === 'edit' && id !== null) {
+        const cat = CATEGORIES.find(c => String(c.id) === String(id));
+        if (!cat) return;
+        document.getElementById('categoryModalTitle').textContent = 'Edit Kategori';
+        document.getElementById('categoryId').value = cat.id;
+        nameInput.value = cat.name;
+        document.querySelector(`input[name="categoryDisplayMode"][value="${cat.display_mode || 'icon'}"]`).checked = true;
+        selectedCategoryIconSvg = cat.icon_svg || CATEGORY_ICON_LIBRARY[CATEGORY_ICON_LIBRARY.length - 1].svg;
+        if (cat.image_url) {
+            pendingCategoryImage = { blob: null, previewUrl: cat.image_url, isExisting: true, existingUrl: cat.image_url };
+        }
+        if (slugNote) slugNote.textContent = 'Slug saat ini: "' + cat.slug + '" (tidak berubah walau nama diedit, supaya link katalog tidak putus).';
+    } else {
+        document.getElementById('categoryModalTitle').textContent = 'Tambah Kategori Baru';
+        document.getElementById('categoryId').value = '';
+        document.querySelector('input[name="categoryDisplayMode"][value="icon"]').checked = true;
+        if (slugNote) slugNote.textContent = 'Slug URL dibuat otomatis dari nama (tidak berubah lagi setelah kategori dibuat).';
+    }
+
+    renderCategoryIconPicker();
+    renderCategoryPhotoPreview();
+    updateCategoryModePreview();
     document.getElementById('categoryModal').style.display = 'flex';
+}
+
+function editCategory(id) {
+    openCategoryModal('edit', id);
 }
 
 function closeCategoryModal() {
     document.getElementById('categoryModal').style.display = 'none';
+    removeCategoryPhoto();
 }
 
+/* ---------- Simpan ---------- */
 async function saveCategory(event) {
     event.preventDefault();
     const errEl = document.getElementById('categoryFormError');
+    const fail = (msg) => { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
     if (errEl) errEl.style.display = 'none';
 
+    const id = document.getElementById('categoryId').value;
     const name = document.getElementById('categoryName').value.trim();
-    if (!name) {
-        if (errEl) { errEl.textContent = 'Nama kategori tidak boleh kosong.'; errEl.style.display = 'block'; }
-        return;
-    }
-    if (name.length > 50) {
-        if (errEl) { errEl.textContent = 'Nama kategori maksimal 50 karakter.'; errEl.style.display = 'block'; }
-        return;
+    const checked = document.querySelector('input[name="categoryDisplayMode"]:checked');
+    const displayMode = checked ? checked.value : 'icon';
+
+    if (!name) return fail('Nama kategori tidak boleh kosong.');
+    if (name.length > 50) return fail('Nama kategori maksimal 50 karakter.');
+    if (displayMode === 'image' && !pendingCategoryImage) {
+        return fail('Tampilan "Foto Produk" dipilih, tapi belum ada foto yang diunggah.');
     }
 
-    const slug = slugify(name);
+    const existing = id ? CATEGORIES.find(c => String(c.id) === String(id)) : null;
+    // Slug hanya dibuat sekali saat kategori baru; saat edit, slug lama dipertahankan
+    // supaya link katalog & folder foto Storage tidak putus.
+    const slug = existing ? existing.slug : slugify(name);
+
     const saveBtn = document.getElementById('categorySaveBtn');
     if (saveBtn) saveBtn.disabled = true;
 
-    const { error } = await supabaseClient.from('categories').insert([{
-        name, slug, sort_order: CATEGORIES.length + 1
-    }]);
+    try {
+        let imageUrl = existing ? (existing.image_url || null) : null;
 
-    if (saveBtn) saveBtn.disabled = false;
+        if (displayMode === 'image') {
+            imageUrl = await uploadCategoryImage(slug);
+        } else if (existing && existing.image_url) {
+            // Beralih dari mode foto ke ikon: bersihkan foto lama dari Storage
+            await deleteCategoryImageFolder(slug);
+            imageUrl = null;
+        }
 
-    if (error) {
-        console.error('Gagal menambah kategori:', error);
-        const message = (error.code === '23505')
+        const payload = {
+            name,
+            slug,
+            icon_svg: selectedCategoryIconSvg,
+            image_url: imageUrl,
+            display_mode: displayMode
+        };
+
+        if (id) {
+            const { error } = await supabaseClient.from('categories').update(payload).eq('id', id);
+            if (error) throw error;
+        } else {
+            payload.sort_order = CATEGORIES.length + 1;
+            const { error } = await supabaseClient.from('categories').insert([payload]);
+            if (error) throw error;
+        }
+    } catch (e) {
+        console.error('Gagal menyimpan kategori:', e);
+        if (saveBtn) saveBtn.disabled = false;
+        return fail(e.code === '23505'
             ? 'Kategori dengan nama/slug yang sama sudah ada.'
-            : 'Gagal menambah kategori: ' + error.message;
-        if (errEl) { errEl.textContent = message; errEl.style.display = 'block'; }
-        return;
+            : 'Gagal menyimpan kategori: ' + e.message);
     }
 
+    if (saveBtn) saveBtn.disabled = false;
     invalidateCatalogCache();
     await loadCatalogData();
     renderCategoryTable();
@@ -805,11 +1002,18 @@ async function deleteCategory(id) {
     }
     if (!confirm('Hapus kategori ini? Tindakan ini tidak bisa dibatalkan.')) return;
 
+    const cat = CATEGORIES.find(c => String(c.id) === String(id));
+
     const { error } = await supabaseClient.from('categories').delete().eq('id', id);
     if (error) {
         console.error('Gagal menghapus kategori:', error);
         alert('Gagal menghapus kategori: ' + error.message);
         return;
+    }
+
+    if (cat && cat.slug) {
+        try { await deleteCategoryImageFolder(cat.slug); }
+        catch (e) { console.warn('Gagal menghapus foto kategori dari Storage:', e); }
     }
 
     invalidateCatalogCache();
