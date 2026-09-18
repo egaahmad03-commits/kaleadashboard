@@ -398,6 +398,7 @@ a {
 
 .katalog-page .page-content {
   max-width: 1000px;
+  width: 100%;
 }
 
 .product-grid {
@@ -422,7 +423,7 @@ a {
   box-shadow: var(--shadow-md);
 }
 
-/* ===== Product Icon (foto kategori bulat) — DIPERBAIKI ===== */
+/* ===== Product Icon (foto kategori bulat) ===== */
 .product-icon {
   width: 64px;
   height: 64px;
@@ -1760,7 +1761,6 @@ a {
     grid-template-columns: 1fr;
   }
 
-  /* Ikon kategori lebih kecil di tablet/HP besar */
   .product-icon {
     width: 56px;
     height: 56px;
@@ -1794,7 +1794,6 @@ a {
 }
 
 @media (max-width: 480px) {
-  /* Ikon kategori lebih kecil lagi di HP kecil */
   .product-icon {
     width: 48px;
     height: 48px;
