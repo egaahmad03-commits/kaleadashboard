@@ -422,16 +422,28 @@ a {
   box-shadow: var(--shadow-md);
 }
 
+/* ===== Product Icon (foto kategori bulat) — DIPERBAIKI ===== */
 .product-icon {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
+  padding: 0;
   margin: 0 auto 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  overflow: hidden;
   background: var(--brand);
   color: #ffffff;
+}
+
+.product-icon img,
+.product-icon .product-icon-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .product-card h3 {
@@ -494,7 +506,6 @@ a {
   display: none;
 }
 
-/* Tampilkan ikon cadangan hanya jika gambar tidak tersedia/gagal dimuat */
 .product-photo-placeholder .product-photo-fallback-icon {
   display: block;
 }
@@ -505,16 +516,10 @@ a {
 }
 
 .gallery-main-wrap .product-photo-main {
-  /* FIX: sebelumnya 3 / 4 (potret) membuat kotak terlalu tinggi untuk foto
-     produk yang umumnya landscape (mis. sofa), sehingga muncul ruang kosong
-     besar di atas & bawah foto pada tampilan mobile. 4 / 3 (landscape)
-     jauh mengurangi ruang kosong tersebut. */
   aspect-ratio: 4 / 3;
   background: var(--surface-alt);
 }
 
-/* Foto utama galeri produk: tampilkan utuh (tidak dipotong).
-   Ini beda dari thumbnail/katalog/cart yang tetap pakai object-fit: cover di atas. */
 .gallery-main-wrap .product-photo-main img {
   object-fit: contain;
   cursor: zoom-in;
@@ -861,7 +866,6 @@ a {
   line-height: 1.6;
 }
 
-/* --- Cerita Kami --- */
 .about-story {
   max-width: 800px;
   margin: 0 auto 60px;
@@ -881,7 +885,6 @@ a {
   margin-bottom: 16px;
 }
 
-/* --- Statistik --- */
 .about-stats {
   display: flex;
   flex-wrap: wrap;
@@ -915,7 +918,6 @@ a {
   font-weight: 600;
 }
 
-/* --- Visi & Misi --- */
 .about-vm {
   display: flex;
   flex-wrap: wrap;
@@ -1750,7 +1752,6 @@ a {
     font-size: 2.3rem;
   }
 
-  /* Tablet: 2-3 produk per baris */
   .product-list-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1758,10 +1759,15 @@ a {
   #product-detail {
     grid-template-columns: 1fr;
   }
+
+  /* Ikon kategori lebih kecil di tablet/HP besar */
+  .product-icon {
+    width: 56px;
+    height: 56px;
+  }
 }
 
 @media (max-width: 560px) {
-  /* Mobile: 1-2 produk per baris */
   .product-list-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 14px;
@@ -1782,10 +1788,17 @@ a {
     width: 110px;
   }
 
-  /* FIX: pada layar sangat sempit, foto galeri utama dibuat lebih persegi
-     supaya ruang kosong (letterbox) di atas & bawah semakin minimal. */
   .gallery-main-wrap .product-photo-main {
     aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ikon kategori lebih kecil lagi di HP kecil */
+  .product-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
   }
 }
 
@@ -1867,25 +1880,4 @@ a {
     justify-content: space-between;
     margin-top: 4px;
   }
-}
-
-.product-icon-photo {
-  width: 64px;
-  height: 64px;
-  padding: 0;
-  border-radius: 50%;
-  overflow: hidden;
-}
-.product-icon-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.product-icon .product-icon-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
