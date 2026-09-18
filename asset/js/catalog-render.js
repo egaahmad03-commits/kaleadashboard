@@ -34,7 +34,11 @@ function renderProductPhoto(src, alt, iconSvg, extraClass) {
   );
 }
 
-/* ===== Tombol kategori di katalog.html (dulu hardcode, sekarang dari data) ===== */
+/* ===== Tombol kategori di katalog.html (dulu hardcode, sekarang dari data) =====
+   Sekarang mengecek c.display_mode: kalau "image" dan c.image_url ada,
+   tampilkan foto kategori. Kalau tidak, tampilkan icon_svg seperti biasa
+   (perilaku lama). Ini menyamakan logika dengan renderCategoryTable() di
+   admin panel, yang sudah lebih dulu mengecek display_mode. */
 function renderCategoryButtons() {
   var container = document.getElementById("category-grid");
   if (!container) return Promise.resolve();
@@ -46,12 +50,20 @@ function renderCategoryButtons() {
     }
 
     container.innerHTML = CATEGORIES.map(function (c) {
+      var usePhoto = c.display_mode === "image" && c.image_url;
+
+      var visual = usePhoto
+        ? '<img src="' + c.image_url + '" alt="' + escapeHtml(c.name) + '" loading="lazy">'
+        : (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            (c.icon_svg || GENERIC_CATEGORY_ICON) +
+            '</svg>'
+          );
+
       return (
         '<a href="produk/kategori.html?slug=' + encodeURIComponent(c.slug) + '" class="product-card">' +
-        '<div class="product-icon">' +
-        '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-        (c.icon_svg || GENERIC_CATEGORY_ICON) +
-        '</svg>' +
+        '<div class="product-icon' + (usePhoto ? ' product-icon-photo' : '') + '">' +
+        visual +
         '</div>' +
         '<h3>' + escapeHtml(c.name) + '</h3>' +
         '</a>'
