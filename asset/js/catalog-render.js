@@ -6,6 +6,15 @@
    Supabase, bukan array yang sudah ada saat halaman dimuat.
    ========================================================= */
 
+/* Harga produk tidak ditampilkan. Sebagai gantinya, pengunjung diarahkan
+   langsung ke WhatsApp untuk menanyakan harga. */
+var PRICE_WA_NUMBER = "6289504977797";
+
+function getProductWaUrl(product) {
+  var msg = "Halo Kalea Furniture, saya ingin menanyakan harga produk " + product.name + ".";
+  return "https://wa.me/" + PRICE_WA_NUMBER + "?text=" + encodeURIComponent(msg);
+}
+
 function renderIconPlaceholder(iconSvg) {
   return (
     '<svg class="product-photo-fallback-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" ' +
@@ -116,7 +125,7 @@ function renderProductList(slug) {
         renderProductPhoto(mainImage, p.name, category.icon_svg) +
         '<div class="product-list-info">' +
         '<h3>' + escapeHtml(p.name) + '</h3>' +
-        '<p class="product-list-price">' + formatRupiah(p.price) + '</p>' +
+        '<button type="button" class="product-price-wa" data-wa-price="' + p.id + '">Tanya Harga via WhatsApp</button>' +
         '<span class="product-detail-link">Lihat Detail &rarr;</span>' +
         '</div>' +
         '</a>'
@@ -130,6 +139,15 @@ function renderProductList(slug) {
         addToCart(Number(btn.getAttribute("data-add-cart")), 1);
         btn.classList.add("is-added");
         setTimeout(function () { btn.classList.remove("is-added"); }, 1200);
+      });
+    });
+
+    container.querySelectorAll("[data-wa-price]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var product = getProductById(btn.getAttribute("data-wa-price"));
+        if (product) window.open(getProductWaUrl(product), "_blank", "noopener");
       });
     });
   }).catch(function (err) {
@@ -278,7 +296,7 @@ function renderProductDetail() {
       '<div class="product-detail-info">' +
       '<span class="product-detail-category">' + escapeHtml(product.category) + '</span>' +
       '<h1>' + escapeHtml(product.name) + '</h1>' +
-      '<p class="product-detail-price">' + formatRupiah(product.price) + '</p>' +
+      '<a class="product-price-wa product-price-wa-detail" href="' + getProductWaUrl(product) + '" target="_blank" rel="noopener">Tanya Harga via WhatsApp</a>' +
       '<p class="product-detail-desc">' + escapeHtml(product.description) + '</p>' +
       '<table class="product-spec-table">' +
       '<tr><th>Kategori</th><td>' + escapeHtml(product.category) + '</td></tr>' +
