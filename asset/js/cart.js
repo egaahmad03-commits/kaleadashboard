@@ -6,6 +6,7 @@
    sebagai SATU pesan WhatsApp ke toko — bukan checkout/
    pembayaran online. Data keranjang disimpan di localStorage
    per-browser (mirip data produk admin).
+   Harga tidak ditampilkan; pembeli menanyakan harga lewat WhatsApp.
    ========================================================= */
 
 const CART_STORAGE_KEY = "kalea_cart";
@@ -133,14 +134,10 @@ function renderCartPage() {
     return;
   }
 
-  var total = 0;
-
   container.innerHTML = staleNotice + cart.map(function (item) {
     var product = getProductById(item.id);
     if (!product) return "";
 
-    var subtotal = product.price * item.qty;
-    total += subtotal;
     var mainImage = product.image || (product.images && product.images[0]) || "";
     var productCategory = getCategoryBySlug(product.category_slug);
 
@@ -149,7 +146,6 @@ function renderCartPage() {
       '<div class="cart-item-photo">' + renderProductPhoto(mainImage, product.name, productCategory ? productCategory.icon_svg : null) + '</div>' +
       '<div class="cart-item-info">' +
       '<h3>' + escapeHtml(product.name) + '</h3>' +
-      '<p class="cart-item-price">' + formatRupiah(product.price) + '</p>' +
       '<div class="cart-qty-control">' +
       '<button type="button" aria-label="Kurangi" onclick="setCartQty(' + product.id + ', ' + (item.qty - 1) + ')">&minus;</button>' +
       '<input type="number" min="1" value="' + item.qty + '" onchange="setCartQty(' + product.id + ', this.value)">' +
@@ -157,7 +153,6 @@ function renderCartPage() {
       '</div>' +
       '</div>' +
       '<div class="cart-item-side">' +
-      '<span class="cart-item-subtotal">' + formatRupiah(subtotal) + '</span>' +
       '<button type="button" class="cart-item-remove" onclick="removeFromCart(' + product.id + ')" aria-label="Hapus dari keranjang">&#10005;</button>' +
       '</div>' +
       '</div>'
@@ -169,26 +164,20 @@ function renderCartPage() {
     summaryEl.style.display = "flex";
   }
 
-  var totalEl = document.getElementById("cartTotal");
-  if (totalEl) totalEl.textContent = formatRupiah(total);
-
   var waBtn = document.getElementById("cartWaButton");
   if (waBtn) {
-    waBtn.href = "https://wa.me/" + CART_WA_NUMBER + "?text=" + encodeURIComponent(buildCartWaMessage(cart, total));
+    waBtn.href = "https://wa.me/" + CART_WA_NUMBER + "?text=" + encodeURIComponent(buildCartWaMessage(cart));
   }
 }
 
-function buildCartWaMessage(cart, total) {
-  var lines = ["Halo Kalea Furniture, saya ingin memesan produk berikut:", ""];
+function buildCartWaMessage(cart) {
+  var lines = ["Halo Kalea Furniture, saya ingin menanyakan harga dan memesan produk berikut:", ""];
 
   cart.forEach(function (item) {
     var product = getProductById(item.id);
     if (!product) return;
-    lines.push("- " + product.name + " x" + item.qty + " = " + formatRupiah(product.price * item.qty));
+    lines.push("- " + product.name + " x" + item.qty);
   });
-
-  lines.push("");
-  lines.push("Total: " + formatRupiah(total));
 
   return lines.join("\n");
 }

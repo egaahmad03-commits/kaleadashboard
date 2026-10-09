@@ -1880,3 +1880,29 @@ a {
     margin-top: 4px;
   }
 }
+/* Tempel di BAGIAN PALING BAWAH asset/css/style.css */
+
+.product-price-wa {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: #1a8f4c;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.product-price-wa:hover {
+  text-decoration: underline;
+}
+
+.product-price-wa-detail {
+  margin: 4px 0 12px;
+}
+
+/* Harga tidak ditampilkan di keranjang: sembunyikan baris "Total" */
+.cart-summary-total {
+  display: none;
+}
