@@ -1906,3 +1906,464 @@ a {
 .cart-summary-total {
   display: none;
 }
+
+/* =========================================================
+   TEMA MINIMALIS (putih, hitam, abu muda) — Kalea Furniture
+   CUKUP SATU LANGKAH: salin SELURUH file ini, lalu tempel di
+   BAGIAN PALING BAWAH asset/css/style.css. Tidak perlu @import,
+   karena memakai font Inter yang sudah dimuat di semua halaman.
+   ========================================================= */
+
+/* ===== Token warna & font ===== */
+:root {
+  --brand: #111111;
+  --brand-dark: #000000;
+  --brand-tint: rgba(0, 0, 0, 0.05);
+  --accent: #111111;
+  --ink: #111111;
+  --ink-muted: #6b6b6b;
+  --surface-alt: #f4f4f4;
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --radius-lg: 0;
+  --radius-md: 0;
+  --radius-pill: 0;
+  --font-heading: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ===== Judul: kapital, tipis, jarak huruf lebar ===== */
+h1, h2, h3, .site-logo {
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.page-content h1,
+.about-hero h1,
+.about-story h2,
+.about-testimonials h2,
+.about-gallery h2,
+.contact-form-section h2,
+.contact-map-section h2 {
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.page-content h1 {
+  font-size: 1.8rem;
+}
+
+/* ===== Header & menu ===== */
+.site-header {
+  background: #ffffff;
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-logo {
+  text-transform: uppercase;
+  font-size: 1.05rem;
+  letter-spacing: 0.2em;
+}
+
+.site-logo-icon {
+  border-radius: 0;
+}
+
+.site-nav a {
+  border-radius: 0;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #111111;
+  background: none;
+  border-bottom: 1px solid transparent;
+}
+
+.site-nav a:hover {
+  background: none;
+  color: #111111;
+  border-bottom-color: #111111;
+}
+
+.site-nav a.nav-active {
+  color: #111111;
+  background: none;
+  border-bottom-color: #111111;
+}
+
+.cart-badge {
+  background: #111111;
+  border-radius: 10rem;
+}
+
+.site-nav a.nav-active .cart-badge {
+  background: #111111;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+/* ===== Tombol: hitam polos, sudut tajam ===== */
+.animated-button {
+  border-radius: 0;
+  border: 1px solid #111111;
+  background-color: #111111;
+  box-shadow: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 16px 40px;
+}
+
+.animated-button:hover {
+  border-radius: 0;
+  box-shadow: none;
+  color: #111111;
+}
+
+.animated-button:active {
+  box-shadow: none;
+}
+
+.cart-wa-button {
+  border-color: #25d366 !important;
+}
+
+.hero-link-secondary {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+}
+
+/* ===== Hero beranda ===== */
+.hero-eyebrow {
+  border-radius: 0;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+
+.hero-content h1 {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 3rem;
+}
+
+/* ===== Kenapa pilih kami ===== */
+.why-us {
+  background: var(--surface-alt);
+}
+
+.why-us-icon {
+  border-radius: 0;
+  box-shadow: none;
+  background: #ffffff;
+  color: #111111;
+}
+
+.why-us-item h3 {
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+}
+
+/* ===== Foto produk: kotak abu muda, tanpa sudut bulat ===== */
+.product-photo {
+  border-radius: 0;
+  background: var(--surface-alt);
+  color: #9a9a9a;
+}
+
+.gallery-main-wrap .product-photo-main {
+  background: var(--surface-alt);
+}
+
+/* ===== Kategori di katalog.html: kotak besar ===== */
+.product-card {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  text-align: left;
+}
+
+.product-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.product-icon {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+  margin: 0 0 12px;
+  background: var(--surface-alt);
+  color: #111111;
+}
+
+.product-card h3 {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.product-card h3::after {
+  content: " \2192";
+}
+
+/* ===== Daftar produk per kategori: tanpa bingkai ===== */
+.product-list-grid {
+  gap: 36px 24px;
+}
+
+.product-list-card {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  text-align: center;
+}
+
+.product-list-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.product-list-card .product-photo {
+  margin-bottom: 14px;
+}
+
+.product-list-info h3 {
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #111111;
+  margin-bottom: 6px;
+}
+
+.product-list-card .product-price-wa {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.product-list-card .product-price-wa:hover {
+  color: #111111;
+}
+
+.product-detail-link {
+  display: none;
+}
+
+.card-add-cart {
+  border-radius: 0;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: none;
+}
+
+.card-add-cart:hover {
+  background: #111111;
+  color: #ffffff;
+}
+
+/* ===== Halaman detail produk ===== */
+.product-detail-category {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: var(--ink-muted);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+}
+
+.product-detail-info h1 {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+.product-detail-desc {
+  font-size: 0.92rem;
+  font-weight: 400;
+}
+
+.product-price-wa-detail {
+  color: #111111;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #111111;
+  margin: 4px 0 18px;
+}
+
+.product-price-wa-detail:hover {
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.product-spec-table th {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+}
+
+.gallery-thumb {
+  border-radius: 0;
+}
+
+.gallery-thumb .product-photo {
+  border-radius: 0;
+}
+
+.gallery-thumb-active {
+  border-color: #111111;
+}
+
+.gallery-nav {
+  border-radius: 0;
+  box-shadow: none;
+  background: #ffffff;
+  color: #111111;
+}
+
+.gallery-counter {
+  border-radius: 0;
+}
+
+/* ===== Keranjang ===== */
+.cart-item {
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+.cart-item-photo .product-photo {
+  border-radius: 0;
+}
+
+.cart-item-info h3 {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+}
+
+.cart-qty-control {
+  border-radius: 0;
+}
+
+.cart-qty-control button {
+  background: var(--surface-alt);
+  color: #111111;
+}
+
+.cart-item-remove {
+  border-radius: 0;
+}
+
+.cart-summary {
+  border-radius: 0;
+  background: var(--surface-alt);
+}
+
+/* ===== Kartu lain (kontak, tentang kami, testimoni) ===== */
+.contact-card,
+.stat-card,
+.vm-card,
+.testimonial-card,
+.contact-form,
+.contact-map-wrap,
+.project-gallery-item {
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+.contact-icon,
+.vm-icon,
+.coming-soon-icon,
+.error-page-icon,
+.testimonial-avatar {
+  border-radius: 0;
+  background: #111111;
+}
+
+.contact-form-submit {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+}
+
+.form-field input,
+.form-field textarea {
+  border-radius: 0;
+}
+
+.vm-list li::before {
+  border-radius: 0;
+  background: #111111;
+}
+
+.stat-number {
+  color: #111111;
+  font-weight: 500;
+}
+
+/* ===== Breadcrumb ===== */
+.breadcrumb {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.breadcrumb a {
+  color: var(--ink-muted);
+}
+
+/* ===== Footer ===== */
+.footer {
+  background: #ffffff;
+  box-shadow: none;
+  border-top: 1px solid var(--border);
+}
+
+.footer-content h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.footer-content p {
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+
+.copyright {
+  color: var(--ink-muted) !important;
+  font-size: 0.78rem;
+}
+
+.wrapper .icon {
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
