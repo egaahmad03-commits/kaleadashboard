@@ -2367,3 +2367,17 @@ h1, h2, h3, .site-logo {
   box-shadow: none;
   border: 1px solid var(--border);
 }
+/* Tempel di BAGIAN PALING BAWAH asset/css/style.css
+   (menimpa aturan lama yang menyembunyikan "Lihat Detail") */
+
+.product-detail-link {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.product-list-card:hover .product-detail-link {
+  color: #111111;
+}

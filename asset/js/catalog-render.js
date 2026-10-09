@@ -125,7 +125,6 @@ function renderProductList(slug) {
         renderProductPhoto(mainImage, p.name, category.icon_svg) +
         '<div class="product-list-info">' +
         '<h3>' + escapeHtml(p.name) + '</h3>' +
-        '<button type="button" class="product-price-wa" data-wa-price="' + p.id + '">Tanya Harga via WhatsApp</button>' +
         '<span class="product-detail-link">Lihat Detail &rarr;</span>' +
         '</div>' +
         '</a>'
@@ -139,15 +138,6 @@ function renderProductList(slug) {
         addToCart(Number(btn.getAttribute("data-add-cart")), 1);
         btn.classList.add("is-added");
         setTimeout(function () { btn.classList.remove("is-added"); }, 1200);
-      });
-    });
-
-    container.querySelectorAll("[data-wa-price]").forEach(function (btn) {
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var product = getProductById(btn.getAttribute("data-wa-price"));
-        if (product) window.open(getProductWaUrl(product), "_blank", "noopener");
       });
     });
   }).catch(function (err) {
