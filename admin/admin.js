@@ -194,35 +194,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* Upload semua foto (baru + lama yang dipertahankan) dengan penomoran
-   1.jpg, 2.jpg, dst. Folder lama untuk slug ini dibersihkan dulu. */
+/* Upload semua foto (baru + lama yang dipertahankan) dengan nama file
+   UNIK (pakai waktu), sehingga URL berubah setiap kali foto diganti dan
+   browser/Instagram tidak memakai foto lama dari cache. */
 async function uploadPhotosToStorage(slug) {
-    const { data: existingFiles, error: listError } = await supabaseClient
-        .storage.from(STORAGE_BUCKET).list(slug);
-    if (!listError && existingFiles && existingFiles.length > 0) {
-        const pathsToRemove = existingFiles.map(f => `${slug}/${f.name}`);
-        await supabaseClient.storage.from(STORAGE_BUCKET).remove(pathsToRemove);
+    // 1. Ambil semua data foto DULU, sebelum ada file yang dihapus
+    const blobs = [];
+    for (const item of pendingPhotoBlobs) {
+        if (item.isExisting) {
+            const res = await fetch(item.existingUrl, { cache: 'no-store' });
+            if (!res.ok) throw new Error('Gagal mengambil foto lama dari Storage.');
+            blobs.push(await res.blob());
+        } else {
+            blobs.push(item.blob);
+        }
     }
 
+    // 2. Upload dengan nama baru yang unik
+    const stamp = Date.now();
+    const newNames = [];
     const finalUrls = [];
-    for (let i = 0; i < pendingPhotoBlobs.length; i++) {
-        const item = pendingPhotoBlobs[i];
-        const path = `${slug}/${i + 1}.jpg`;
-
-        let blobToUpload = item.blob;
-        if (item.isExisting) {
-            const res = await fetch(item.existingUrl);
-            blobToUpload = await res.blob();
-        }
+    for (let i = 0; i < blobs.length; i++) {
+        const fileName = `${stamp}-${i + 1}.jpg`;
+        const path = `${slug}/${fileName}`;
 
         const { error: uploadError } = await supabaseClient
             .storage.from(STORAGE_BUCKET)
-            .upload(path, blobToUpload, { contentType: 'image/jpeg', upsert: true });
+            .upload(path, blobs[i], { contentType: 'image/jpeg', upsert: true });
         if (uploadError) throw uploadError;
 
         const { data: publicUrlData } = supabaseClient
             .storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        newNames.push(fileName);
         finalUrls.push(publicUrlData.publicUrl);
+    }
+
+    // 3. Setelah semua upload berhasil, baru hapus file lama
+    const { data: existingFiles, error: listError } = await supabaseClient
+        .storage.from(STORAGE_BUCKET).list(slug);
+    if (!listError && existingFiles && existingFiles.length > 0) {
+        const pathsToRemove = existingFiles
+            .filter(f => !newNames.includes(f.name))
+            .map(f => `${slug}/${f.name}`);
+        if (pathsToRemove.length > 0) {
+            await supabaseClient.storage.from(STORAGE_BUCKET).remove(pathsToRemove);
+        }
     }
 
     return finalUrls;

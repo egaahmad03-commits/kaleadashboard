@@ -100,10 +100,22 @@ const PRODUCT_IMAGE_BASE = (typeof window !== "undefined" && typeof window.KALEA
 const PRODUCT_IMAGE_COUNT = 6;
 const PRODUCT_IMAGE_EXT = "jpg";
 
+/* Naikkan nilai ini setiap kali foto lama (nama file sama) diganti,
+   supaya browser — termasuk browser bawaan Instagram — memuat foto
+   terbaru. Foto yang diupload lewat Panel Admin versi baru sudah
+   bernama unik, jadi tidak perlu menaikkan nilai ini lagi. */
+const IMAGE_VERSION = "20261010";
+
+function withVersion(url) {
+  if (!url) return url;
+  return url + (url.indexOf("?") === -1 ? "?" : "&") + "v=" + IMAGE_VERSION;
+}
+
 function rebuildProductImages(p) {
   // Kalau kolom `images` di database sudah berisi URL (hasil upload ke
-  // Supabase Storage), pakai itu apa adanya.
+  // Supabase Storage), pakai itu (ditambah nomor versi untuk cache).
   if (Array.isArray(p.images) && p.images.length > 0) {
+    p.images = p.images.map(withVersion);
     p.image = p.images[0];
     return p;
   }
@@ -112,7 +124,7 @@ function rebuildProductImages(p) {
   // (asset/images/products/<slug>/) dan belum dimigrasikan ke Storage.
   var images = [];
   for (var i = 1; i <= PRODUCT_IMAGE_COUNT; i++) {
-    images.push(PRODUCT_IMAGE_BASE + p.slug + "/" + i + "." + PRODUCT_IMAGE_EXT);
+    images.push(withVersion(PRODUCT_IMAGE_BASE + p.slug + "/" + i + "." + PRODUCT_IMAGE_EXT));
   }
   p.images = images;
   p.image = images[0];
