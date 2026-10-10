@@ -238,13 +238,7 @@ async function deletePhotosFromStorage(slug) {
     await supabaseClient.storage.from(STORAGE_BUCKET).remove(paths);
 }
 
-/* =========================================================
-   Bantuan Menulis Deskripsi
-   1) updateDescCounter  -> counter karakter (maks 500)
-   2) insertBulletPoint  -> sisipkan poin "• " di posisi kursor
-   3) insertDescTemplate -> draf otomatis dari Nama/Kategori/
-      Material/Warna/Dimensi yang sudah diisi di form
-   ========================================================= */
+/* Counter karakter deskripsi (maks 500) */
 function updateDescCounter() {
     const textarea = document.getElementById('productDescription');
     const counterEl = document.getElementById('descCounterText');
@@ -253,57 +247,6 @@ function updateDescCounter() {
     counterEl.textContent = len;
     const wrapper = counterEl.parentElement;
     if (wrapper) wrapper.classList.toggle('desc-counter-warning', len > 450);
-}
-
-function insertBulletPoint() {
-    const textarea = document.getElementById('productDescription');
-    if (!textarea) return;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const before = textarea.value.substring(0, start);
-    const after = textarea.value.substring(end);
-    const needsNewline = before.length > 0 && !before.endsWith('\n');
-    const insertion = (needsNewline ? '\n' : '') + '• ';
-
-    textarea.value = (before + insertion + after).slice(0, 500);
-    const cursorPos = Math.min((before + insertion).length, textarea.value.length);
-    textarea.focus();
-    textarea.setSelectionRange(cursorPos, cursorPos);
-    updateDescCounter();
-}
-
-function buildTemplateDescription() {
-    const name = document.getElementById('productName').value.trim();
-    const material = document.getElementById('productMaterial').value.trim();
-    const color = document.getElementById('productColor').value.trim();
-    const dimensions = document.getElementById('productDimensions').value.trim();
-    const categorySelect = document.getElementById('productCategory');
-    const categoryOption = categorySelect && categorySelect.options[categorySelect.selectedIndex];
-    const categoryName = categoryOption ? categoryOption.text : '';
-
-    if (!material || !color || !dimensions) {
-        alert('Isi dulu Material, Warna, dan Dimensi supaya template deskripsi bisa dibuat.');
-        return null;
-    }
-
-    const subject = name || categoryName || 'Produk ini';
-    const parts = [
-        `${subject} hadir dengan material ${material} berkualitas dan warna ${color} yang menawan.`,
-        `Dengan dimensi ${dimensions}, cocok untuk melengkapi${categoryName ? ' koleksi ' + categoryName.toLowerCase() + ' Anda' : ' ruangan Anda'}.`,
-        'Desain kokoh dan tahan lama, siap mempercantik interior rumah Anda.'
-    ];
-    return parts.join(' ');
-}
-
-function insertDescTemplate() {
-    const textarea = document.getElementById('productDescription');
-    if (!textarea) return;
-    const template = buildTemplateDescription();
-    if (!template) return;
-    if (textarea.value.trim() && !confirm('Deskripsi sudah terisi. Timpa dengan template otomatis?')) return;
-
-    textarea.value = template.slice(0, 500);
-    updateDescCounter();
 }
 
 /* ==================== RENDER TABEL PRODUK ==================== */
