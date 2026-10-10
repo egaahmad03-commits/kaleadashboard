@@ -12,39 +12,40 @@
 const CART_STORAGE_KEY = "kalea_cart";
 const CART_WA_NUMBER = "6289504977797";
 
-var lastPrunedCount = 0; // jumlah item yang baru dibuang getCart() krn produknya sudah dihapus
+var lastPrunedCount = 0; // jumlah item yang baru dibuang pruneCart() krn produknya sudah dihapus
 
+/* getCart() HANYA membaca localStorage. Jangan menghapus item di sini:
+   saat dipanggil sebelum data produk dari Supabase selesai dimuat,
+   PRODUCTS masih kosong sehingga semua item akan dianggap "sudah dihapus"
+   dan keranjang terhapus. Pembersihan dilakukan di pruneCart(). */
 function getCart() {
-  var cart;
   try {
     var raw = localStorage.getItem(CART_STORAGE_KEY);
-    cart = raw ? JSON.parse(raw) : [];
+    var cart = raw ? JSON.parse(raw) : [];
+    return Array.isArray(cart) ? cart : [];
   } catch (e) {
-    cart = [];
+    return [];
   }
+}
 
-  /* Buang item yang produknya sudah dihapus dari katalog (lewat Panel
-     Admin, atau data produk yang berubah setelah deploy baru). Tanpa ini,
-     badge keranjang tetap menghitung item tsb (notif muncul) padahal saat
-     halaman keranjang dibuka, item itu tidak bisa dirender karena
-     produknya sudah tidak ada — hasilnya keranjang tampak kosong/rusak
-     meski badge menunjukkan ada isi. getProductById hanya tersedia di
-     halaman yang memuat products.js. */
+/* Buang item yang produknya sudah dihapus dari katalog (lewat Panel
+   Admin, atau data produk berubah setelah deploy baru).
+   HANYA berjalan setelah data produk benar-benar termuat. */
+function pruneCart() {
   lastPrunedCount = 0;
-  if (typeof getProductById === "function") {
-    var validCart = cart.filter(function (item) { return !!getProductById(item.id); });
-    lastPrunedCount = cart.length - validCart.length;
-    if (lastPrunedCount > 0) {
-      cart = validCart;
-      try {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-      } catch (e) {
-        console.error("Gagal menyimpan keranjang:", e);
-      }
+  if (typeof PRODUCTS === "undefined" || PRODUCTS.length === 0) return;
+
+  var cart = getCart();
+  var validCart = cart.filter(function (item) { return !!getProductById(item.id); });
+  lastPrunedCount = cart.length - validCart.length;
+
+  if (lastPrunedCount > 0) {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(validCart));
+    } catch (e) {
+      console.error("Gagal menyimpan keranjang:", e);
     }
   }
-
-  return cart;
 }
 
 function saveCart(cart) {
@@ -116,6 +117,9 @@ function renderCartPage() {
       'Ada ' + lastPrunedCount + ' produk di keranjang yang sudah tidak tersedia dan telah dihapus otomatis.') +
     '</div>' : '';
 
+  // Notifikasi cukup tampil sekali (tidak muncul lagi saat qty diubah).
+  lastPrunedCount = 0;
+
   if (cart.length === 0) {
     container.innerHTML =
       staleNotice +
@@ -129,8 +133,8 @@ function renderCartPage() {
       '<svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
       '</a></div></div>';
 
-    var summaryEl = document.getElementById("cartSummary");
-    if (summaryEl) summaryEl.style.display = "none";
+    var emptySummaryEl = document.getElementById("cartSummary");
+    if (emptySummaryEl) emptySummaryEl.style.display = "none";
     return;
   }
 
@@ -183,17 +187,16 @@ function buildCartWaMessage(cart) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Badge count tidak butuh data produk (cuma jumlah item), jadi bisa
-  // langsung tampil duluan tanpa menunggu fetch Supabase selesai.
+  // Badge hanya butuh jumlah item (tanpa data produk), jadi bisa
+  // langsung tampil tanpa menunggu fetch Supabase selesai.
   updateCartBadge();
 
-  // renderCartPage() (dan getCart() di dalamnya, untuk pruning item yang
-  // produknya sudah dihapus) butuh PRODUCTS sudah terisi lebih dulu —
-  // tunggu loadCatalogData() selesai. Di halaman selain cart.html,
-  // renderCartPage() langsung return (tidak ada #cartItems) jadi ini
-  // aman dipanggil di semua halaman.
+  // Pruning dan render butuh PRODUCTS sudah terisi, jadi tunggu
+  // loadCatalogData() selesai. Di halaman selain cart.html,
+  // renderCartPage() langsung return (tidak ada #cartItems).
   if (typeof loadCatalogData === "function") {
     loadCatalogData().then(function () {
+      pruneCart();
       renderCartPage();
       updateCartBadge();
     }).catch(function (err) {

@@ -2381,3 +2381,62 @@ h1, h2, h3, .site-logo {
 .product-list-card:hover .product-detail-link {
   color: #111111;
 }
+/* =========================================================
+   PERBAIKAN HALAMAN DETAIL PRODUK — Kalea Furniture
+   Tempel SELURUH isi file ini di BAGIAN PALING BAWAH
+   asset/css/style.css (setelah semua kode yang sudah ada),
+   supaya menimpa aturan lama.
+   ========================================================= */
+
+/* 1. Tombol aksi: kolom rapi, rata kiri, lebar seragam */
+.button-container.product-detail-actions {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.product-detail-actions .animated-button {
+  width: 100%;
+  max-width: none;
+  justify-content: center;
+}
+
+/* 2. Foto utama persegi: tidak ada blok abu-abu di kiri-kanan */
+.gallery-main-wrap .product-photo-main {
+  aspect-ratio: 1 / 1;
+  background: #ffffff;
+  border: 1px solid var(--border);
+}
+
+/* 3. Enam thumbnail dalam satu baris */
+.gallery-thumbs {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+/* 4. Foto menempel saat info produk di-scroll (desktop) */
+@media (min-width: 769px) {
+  .product-detail-gallery {
+    position: sticky;
+    top: 90px;
+    align-self: start;
+  }
+}
+
+/* 5. Di HP: thumbnail bisa digeser ke samping, tombol tidak melebar aneh */
+@media (max-width: 560px) {
+  .gallery-thumbs {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 72px;
+    overflow-x: auto;
+  }
+
+  .product-detail-actions .animated-button {
+    max-width: none;
+  }
+}
