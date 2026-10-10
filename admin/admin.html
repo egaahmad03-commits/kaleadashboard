@@ -5,70 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Kalea Furniture</title>
     <link rel="icon" type="image/svg+xml" href="../asset/favicon.svg">
-    <link rel="stylesheet" href="admin.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* ==== Tambahan: toolbar & counter untuk field Deskripsi ==== */
-        .desc-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .desc-tool-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12.5px;
-            font-weight: 500;
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid var(--border-color, #e2e8f0);
-            background: #f8fafc;
-            color: var(--primary-color, #4f46e5);
-            cursor: pointer;
-            transition: background 0.15s ease, border-color 0.15s ease;
-        }
-        .desc-tool-btn:hover {
-            background: #eef2ff;
-            border-color: var(--primary-color, #4f46e5);
-        }
-        .desc-tool-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        #productDescription {
-            width: 100%;
-            resize: vertical;
-            min-height: 90px;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color, #e2e8f0);
-            box-sizing: border-box;
-        }
-        .desc-counter {
-            display: flex;
-            justify-content: flex-end;
-            font-size: 12px;
-            color: var(--text-muted, #94a3b8);
-            margin-top: 4px;
-        }
-        .desc-counter-warning {
-            color: var(--danger-color, #ef4444);
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     <div class="dashboard-layout">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <i class="fa-solid fa-couch"></i>
+                <img src="../asset/favicon.svg" alt="Logo Kalea Furniture">
                 <span>Kalea Furniture</span>
             </div>
             <nav class="sidebar-menu">
@@ -88,7 +36,7 @@
                 <h1>Dashboard</h1>
                 <div class="topbar-right">
                     <div class="user-profile">
-                        <i class="fa-solid fa-circle-user" style="font-size:32px;color:var(--primary-color);"></i>
+                        <i class="fa-solid fa-circle-user"></i>
                         <span id="loggedInUser">Admin</span>
                     </div>
                 </div>
@@ -97,24 +45,17 @@
             <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon bg-blue"><i class="fa-solid fa-box"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
                     <div class="stat-info">
                         <h3>Total Produk</h3>
                         <p id="statTotalProducts">0</p>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon bg-purple"><i class="fa-solid fa-tags"></i></div>
+                    <div class="stat-icon"><i class="fa-solid fa-tags"></i></div>
                     <div class="stat-info">
                         <h3>Total Kategori</h3>
                         <p id="statTotalCategories">0</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon bg-green"><i class="fa-solid fa-sack-dollar"></i></div>
-                    <div class="stat-info">
-                        <h3>Rata-rata Harga</h3>
-                        <p id="statAvgPrice">Rp 0</p>
                     </div>
                 </div>
             </div>
@@ -145,7 +86,6 @@
                                 <th>Foto</th>
                                 <th>Nama Produk</th>
                                 <th>Kategori</th>
-                                <th>Harga</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -214,7 +154,7 @@
                 </div>
 
                 <div class="form-group" id="categoryImageGroup" style="display:none;">
-                    <label>Foto Kategori <span style="font-weight:400;color:var(--text-muted);">(disarankan rasio 1:1)</span></label>
+                    <label>Foto Kategori <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(disarankan rasio 1:1)</span></label>
                     <label for="categoryPhotoInput" class="photo-dropzone" id="categoryDropzone">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Klik atau seret foto ke sini (JPG/PNG/WebP)</span>
@@ -248,15 +188,9 @@
                     <input type="text" id="productName" placeholder="Contoh: Kursi Makan Jati Klasik" autocomplete="off" required>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productCategory">Kategori</label>
-                        <select id="productCategory" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productPrice">Harga (Rp)</label>
-                        <input type="number" id="productPrice" placeholder="1500000" min="0" required>
-                    </div>
+                <div class="form-group">
+                    <label for="productCategory">Kategori</label>
+                    <select id="productCategory" required></select>
                 </div>
 
                 <div class="form-row">
@@ -281,9 +215,6 @@
                         <button type="button" class="desc-tool-btn" onclick="insertDescTemplate()" title="Buat draf otomatis dari Material/Warna/Dimensi">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Template Otomatis
                         </button>
-                        <button type="button" class="desc-tool-btn" id="aiGenerateBtn" onclick="generateDescriptionWithAI()" title="Generate deskripsi pakai AI">
-                            <i class="fa-solid fa-robot"></i> Generate dengan AI
-                        </button>
                         <button type="button" class="desc-tool-btn" onclick="insertBulletPoint()" title="Tambahkan poin baru">
                             <i class="fa-solid fa-list-ul"></i> Tambah Poin
                         </button>
@@ -293,7 +224,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Foto Produk <span style="font-weight:400;color:var(--text-muted);">(maks. 6, urutan = urutan tampil)</span></label>
+                    <label>Foto Produk <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(maks. 6, urutan = urutan tampil)</span></label>
                     <label for="productPhotoInput" class="photo-dropzone" id="photoDropzone">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Klik atau seret foto ke sini (JPG/PNG/WebP)</span>
@@ -310,7 +241,7 @@
 
                 <p style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:16px;">
                     <i class="fa-solid fa-circle-info"></i>
-                    Masih melihat saran nama/ukuran lama saat mengetik? Itu riwayat autofill browser (bukan data produk). Arahkan mouse ke saran yang mau dibuang lalu tekan <strong>Shift+Delete</strong> (Chrome/Edge/Firefox) untuk menghapusnya satu per satu. Field ini sudah diatur agar tidak menyimpan saran baru lagi.
+                    Masih melihat saran nama/ukuran lama saat mengetik? Itu riwayat autofill browser (bukan data produk). Arahkan mouse ke saran yang mau dibuang lalu tekan <strong>Shift+Delete</strong> (Chrome/Edge/Firefox) untuk menghapusnya satu per satu.
                 </p>
 
                 <p id="formError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-10px;margin-bottom:16px;"></p>
