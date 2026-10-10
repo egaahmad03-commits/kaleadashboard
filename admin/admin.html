@@ -211,14 +211,6 @@
 
                 <div class="form-group">
                     <label for="productDescription">Deskripsi</label>
-                    <div class="desc-toolbar">
-                        <button type="button" class="desc-tool-btn" onclick="insertDescTemplate()" title="Buat draf otomatis dari Material/Warna/Dimensi">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Template Otomatis
-                        </button>
-                        <button type="button" class="desc-tool-btn" onclick="insertBulletPoint()" title="Tambahkan poin baru">
-                            <i class="fa-solid fa-list-ul"></i> Tambah Poin
-                        </button>
-                    </div>
                     <textarea id="productDescription" placeholder="Deskripsi produk (bisa pakai beberapa kalimat atau poin-poin)..." rows="4" maxlength="500" required oninput="updateDescCounter()"></textarea>
                     <p class="desc-counter"><span id="descCounterText">0</span>/500 karakter</p>
                 </div>
