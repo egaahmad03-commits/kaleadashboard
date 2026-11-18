@@ -43,6 +43,11 @@ function renderProductPhoto(src, alt, iconSvg, extraClass) {
   );
 }
 
+function getCategoryImage(category) {
+  if (category.slug === "lemari") return "asset/images/category-lemari.png";
+  return category.display_mode === "image" && category.image_url ? category.image_url : "";
+}
+
 /* ===== Tombol kategori di katalog.html (dulu hardcode, sekarang dari data) =====
    Sekarang mengecek c.display_mode: kalau "image" dan c.image_url ada,
    tampilkan foto kategori. Kalau tidak, tampilkan icon_svg seperti biasa
@@ -59,10 +64,11 @@ function renderCategoryButtons() {
     }
 
     container.innerHTML = CATEGORIES.map(function (c) {
-      var usePhoto = c.display_mode === "image" && c.image_url;
+      var categoryPhoto = getCategoryImage(c);
+      var usePhoto = Boolean(categoryPhoto);
 
       var visual = usePhoto
-        ? '<img src="' + c.image_url + '" alt="' + escapeHtml(c.name) + '" loading="lazy">'
+        ? '<img src="' + categoryPhoto + '" alt="' + escapeHtml(c.name) + '" loading="lazy">'
         : (
             '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
             (c.icon_svg || GENERIC_CATEGORY_ICON) +
@@ -81,6 +87,70 @@ function renderCategoryButtons() {
   }).catch(function (err) {
     console.error("Gagal memuat kategori:", err);
     container.innerHTML = '<p class="empty-state">Gagal memuat kategori. Coba muat ulang halaman.</p>';
+  });
+}
+
+/* Alur katalog berbasis ruangan: pilih ruang dulu, lalu tampilkan kategori terkait. */
+function initRoomCatalog() {
+  var roomGrid = document.getElementById("room-grid");
+  var categoryGrid = document.getElementById("category-grid");
+  var title = document.getElementById("catalog-title");
+  var description = document.getElementById("catalog-description");
+  var back = document.getElementById("room-back");
+  var hero = document.querySelector(".catalog-hero");
+  if (!roomGrid || !categoryGrid) return;
+
+  var rooms = {
+    living: { name: "Ruang Tamu", description: "Pilih furniture untuk ruang tamu Anda.", slugs: ["sofa", "kursi-santai", "meja-kopi", "meja-samping", "meja-konsol", "kabinet", "kursi-bar"], choices: [{ name: "Rak Buku", terms: ["buku"], image: "bookshelf" }, { name: "Rak TV", terms: ["tv", "televisi"], image: "tv-unit" }] },
+    dining: { name: "Ruang Makan", description: "Temukan furniture untuk momen berkumpul bersama.", slugs: ["meja-makan", "kursi-makan", "kursi-bar", "kabinet", "meja-konsol", "meja-samping"], choices: [] },
+    bedroom: { name: "Kamar Tidur", description: "Lengkapi kamar dengan furniture yang nyaman dan fungsional.", slugs: ["rangka-tempat-tidur", "lemari", "meja-samping", "kursi-santai", "meja-konsol"], choices: [{ name: "Meja Rias", terms: ["rias"], image: "vanity" }] },
+    work: { name: "Ruang Kerja", description: "Pilih furniture untuk ruang kerja yang nyaman.", slugs: ["meja-kerja", "kursi-santai", "kabinet", "meja-samping", "meja-konsol"], choices: [{ name: "Rak Buku", terms: ["buku"], image: "office-shelf" }, { name: "Kursi Kerja", terms: ["kursi kerja", "kursi kantor"], image: "desk-chair" }] },
+    outdoor: { name: "Area Outdoor", description: "Jelajahi furniture yang dirancang untuk teras dan area luar ruangan.", slugs: ["furnitur-luar-ruangan"], choices: [{ name: "Set Meja & Kursi Taman", terms: ["set", "paket"], image: "outdoor-set-new" }, { name: "Kursi Outdoor", terms: ["kursi", "bangku"], image: "garden-chair" }, { name: "Meja Outdoor", terms: ["meja"], image: "outdoor-table" }, { name: "Bangku Taman", terms: ["bangku", "taman"], image: "garden-bench" }] }
+  };
+
+  function showRoom(roomKey) {
+    var room = rooms[roomKey];
+    if (!room) return;
+    loadCatalogData().then(function () {
+      var categories = CATEGORIES.filter(function (category) { return room.slugs.indexOf(category.slug) !== -1; });
+      title.textContent = room.name;
+      description.textContent = room.description;
+      if (hero) hero.setAttribute("data-room", roomKey);
+      var categoryCards = categories.map(function (category) {
+        var categoryPhoto = getCategoryImage(category);
+        var usePhoto = Boolean(categoryPhoto);
+        var categoryLabel = category.slug === "furnitur-luar-ruangan" ? "Furniture Outdoor & Taman" : category.name;
+        var visual = usePhoto
+          ? '<img src="' + categoryPhoto + '" alt="' + escapeHtml(categoryLabel) + '" loading="lazy">'
+          : '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (category.icon_svg || GENERIC_CATEGORY_ICON) + '</svg>';
+        return '<a href="produk/kategori.html?slug=' + encodeURIComponent(category.slug) + '" class="product-card"><div class="product-icon' + (usePhoto ? ' product-icon-photo' : '') + '">' + visual + '</div><h3>' + escapeHtml(categoryLabel) + '</h3></a>';
+      }).join("");
+      var roomChoices = (room.choices || []).map(function (choice) {
+        var href = "produk/kategori.html?slug=" + encodeURIComponent(room.slugs[0]) + "&ruang=" + encodeURIComponent(room.slugs.join(",")) + "&jenis=" + encodeURIComponent(choice.terms.join(",")) + "&pilihan=" + encodeURIComponent(choice.name);
+        return '<a href="' + href + '" class="product-card room-choice-card"><div class="product-icon room-choice-icon" data-scene="' + escapeHtml(choice.image || "bookshelf") + '" role="img" aria-label="' + escapeHtml(choice.name) + '"></div><h3>' + escapeHtml(choice.name) + '</h3></a>';
+      }).join("");
+      categoryGrid.innerHTML = categoryCards + roomChoices || '<p class="empty-state">Belum ada kategori untuk ruangan ini.</p>';
+      roomGrid.hidden = true;
+      categoryGrid.hidden = false;
+      back.hidden = false;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }).catch(function () {
+      categoryGrid.innerHTML = '<p class="empty-state">Gagal memuat kategori. Coba muat ulang halaman.</p>';
+      categoryGrid.hidden = false;
+    });
+  }
+
+  roomGrid.querySelectorAll("[data-room]").forEach(function (button) {
+    button.addEventListener("click", function () { showRoom(button.getAttribute("data-room")); });
+  });
+  back.addEventListener("click", function () {
+    categoryGrid.hidden = true;
+    roomGrid.hidden = false;
+    back.hidden = true;
+    title.textContent = "Pilih Ruangan";
+    description.textContent = "Mulai dari ruangan yang ingin Anda lengkapi, lalu temukan furniture yang sesuai.";
+    if (hero) hero.removeAttribute("data-room");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 }
 
@@ -104,14 +174,28 @@ function renderProductList(slug) {
     }
 
     document.title = category.name + " - Kalea Furniture";
-    if (titleEl) titleEl.textContent = category.name;
+    if (titleEl) titleEl.textContent = category.slug === "furnitur-luar-ruangan" ? "Furniture Outdoor & Taman" : category.name;
     if (descEl) descEl.textContent = "Pilih produk " + category.name.toLowerCase() + " yang sesuai dengan kebutuhan Anda.";
     if (breadcrumbEl) breadcrumbEl.textContent = category.name;
 
-    var products = getProductsByCategorySlug(slug);
+    var query = new URLSearchParams(window.location.search);
+    var roomSlugs = query.get("ruang");
+    var products = roomSlugs
+      ? roomSlugs.split(",").reduce(function (all, roomSlug) { return all.concat(getProductsByCategorySlug(roomSlug)); }, [])
+      : getProductsByCategorySlug(slug);
+    var roomType = query.get("jenis");
+    if (roomType) {
+      var terms = roomType.split(",").map(function (term) { return term.toLowerCase(); });
+      products = products.filter(function (product) {
+        var name = String(product.name || "").toLowerCase();
+        return terms.some(function (term) { return name.indexOf(term) !== -1; });
+      });
+      if (titleEl) titleEl.textContent = query.get("pilihan") || category.name;
+      if (descEl) descEl.textContent = "Pilihan furniture dari koleksi Kalea Furniture.";
+    }
 
     if (products.length === 0) {
-      container.innerHTML = '<p class="empty-state">Belum ada produk pada kategori ini.</p>';
+      container.innerHTML = '<p class="empty-state">Belum ada produk untuk pilihan ini saat ini.</p>';
       return;
     }
 

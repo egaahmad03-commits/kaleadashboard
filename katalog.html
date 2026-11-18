@@ -47,10 +47,25 @@
         <span class="breadcrumb-current">Katalog</span>
       </nav>
 
-      <h1>Katalog Produk</h1>
-      <p>Jelajahi berbagai kategori furniture interior dan exterior yang kami tawarkan.</p>
+      <section class="catalog-hero">
+        <div class="catalog-hero-content">
+          <span class="catalog-hero-eyebrow">Kalea Furniture · Koleksi Interior</span>
+          <h1 id="catalog-title">Pilih Ruangan</h1>
+          <p id="catalog-description">Mulai dari ruangan yang ingin Anda lengkapi, lalu temukan furniture yang sesuai.</p>
+        </div>
+      </section>
 
-      <div class="product-grid" id="category-grid">
+      <div class="room-grid" id="room-grid">
+        <button class="room-card room-living" type="button" data-room="living"><span>Ruang Tamu</span></button>
+        <button class="room-card room-dining" type="button" data-room="dining"><span>Ruang Makan</span></button>
+        <button class="room-card room-bedroom" type="button" data-room="bedroom"><span>Kamar Tidur</span></button>
+        <button class="room-card room-work" type="button" data-room="work"><span>Ruang Kerja</span></button>
+        <button class="room-card room-outdoor" type="button" data-room="outdoor"><span>Area Outdoor</span></button>
+      </div>
+
+      <button id="room-back" class="room-back" type="button" hidden>&larr; Pilih ruangan lain</button>
+
+      <div class="product-grid" id="category-grid" hidden>
         <p class="empty-state">Memuat kategori...</p>
       </div>
 
@@ -115,6 +130,6 @@
   <script src="asset/js/catalog-render.js"></script>
   <script src="asset/js/cart.js"></script>
   <script src="asset/js/script.js"></script>
-  <script>renderCategoryButtons();</script>
+  <script>initRoomCatalog();</script>
 </body>
 </html>
