@@ -224,7 +224,8 @@ a {
   overflow: hidden;
   background-color: var(--ink);
   background-image:
-    linear-gradient(180deg, rgba(10, 12, 18, 0.35) 0%, rgba(10, 12, 18, 0.55) 55%, rgba(10, 12, 18, 0.78) 100%),
+    linear-gradient(90deg, rgba(10, 12, 18, 0.58) 0%, rgba(10, 12, 18, 0.38) 48%, rgba(10, 12, 18, 0.12) 100%),
+    linear-gradient(180deg, rgba(10, 12, 18, 0.12) 0%, rgba(10, 12, 18, 0.22) 100%),
     url('https://images.unsplash.com/photo-1721222204755-669d8056cdb4?q=80&w=2400&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
@@ -662,14 +663,6 @@ a {
   margin-bottom: 4px;
 }
 
-.product-list-price {
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 8px !important;
-}
-
 .product-detail-link {
   font-size: 0.88rem;
   font-weight: 600;
@@ -769,14 +762,6 @@ a {
   text-align: left;
 }
 
-.product-detail-price {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 18px !important;
-}
-
 .product-detail-desc {
   font-size: 1rem;
   color: var(--ink-muted);
@@ -850,30 +835,47 @@ a {
 }
 
 .about-hero {
-  max-width: 700px;
-  margin: 0 auto 60px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-content: center;
+  min-height: clamp(300px, 42vw, 460px);
+  max-width: 1200px;
+  margin: 0 auto 72px;
+  padding: 56px 28px;
   text-align: center;
+  color: #fff;
+  background: linear-gradient(90deg, rgba(14, 17, 20, .72), rgba(14, 17, 20, .22)), url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop') center 55% / cover;
 }
 
 .about-hero h1 {
-  font-size: 2.4rem;
-  margin-bottom: 16px;
-  color: var(--ink);
+  max-width: 780px;
+  margin: 0 auto 16px;
+  font-family: var(--font-heading);
+  font-size: clamp(2.6rem, 6vw, 4.8rem);
+  font-weight: 500;
+  letter-spacing: .025em;
+  line-height: 1.05;
+  color: #fff;
 }
 
 .about-hero p {
+  max-width: 620px;
+  margin: 0 auto;
   font-size: 1.1rem;
-  color: var(--ink-muted);
+  color: rgba(255,255,255,.88);
   line-height: 1.6;
 }
 
 .about-story {
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto 60px;
+  padding: 0 24px;
 }
 
 .about-story h2 {
-  font-size: 1.7rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
   color: var(--ink);
   margin-bottom: 20px;
   text-align: center;
@@ -897,11 +899,11 @@ a {
 
 .stat-card {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 2px;
   padding: 34px 30px;
   min-width: 200px;
   text-align: center;
-  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0,0,0,.08);
 }
 
 .stat-number {
@@ -930,11 +932,11 @@ a {
 
 .vm-card {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 2px;
   padding: 34px 30px;
   flex: 1 1 320px;
   max-width: 380px;
-  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0,0,0,.08);
 }
 
 .vm-icon {
@@ -997,6 +999,104 @@ a {
   gap: 20px;
   justify-content: center;
   margin-bottom: 40px;
+}
+
+/* Halaman kontak: hierarki lebih jelas dan kartu kontak terasa rapi. */
+body:has(.contact-grid) .page {
+  align-items: flex-start;
+  padding: 72px 24px;
+  background: #f7f6f3;
+}
+
+body:has(.contact-grid) .page-content {
+  width: min(1120px, 100%);
+  max-width: none;
+}
+
+body:has(.contact-grid) .page-content > h1 {
+  position: relative;
+  display: grid;
+  place-content: center;
+  min-height: 310px;
+  margin: 0 auto 18px;
+  padding: 42px 24px;
+  color: #fff;
+  background: linear-gradient(90deg, rgba(12,14,16,.72), rgba(12,14,16,.18)), url('../images/gallery-interiors.png') left top / 200% 200% no-repeat;
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: .03em;
+  text-align: center;
+  padding: 42px 24px;
+}
+
+body:has(.contact-grid) .page-content > p {
+  max-width: 600px;
+  margin: -92px auto 60px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--ink-muted);
+  color: rgba(255,255,255,.9);
+}
+
+body:has(.contact-grid) .contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 0 auto 56px;
+}
+
+body:has(.contact-grid) .contact-card {
+  min-height: 190px;
+  padding: 26px 20px;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: none;
+  transition: transform .2s ease, border-color .2s ease;
+}
+
+body:has(.contact-grid) .contact-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0,0,0,.28);
+}
+
+body:has(.contact-grid) .contact-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  color: #171717;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,.15);
+}
+
+body:has(.contact-grid) .contact-icon svg { width: 22px; height: 22px; }
+
+body:has(.contact-grid) .contact-form {
+  border-radius: 2px;
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+body:has(.contact-grid) .form-field input,
+body:has(.contact-grid) .form-field textarea { border-radius: 2px; }
+
+body:has(.contact-grid) .contact-map-wrap { border-radius: 2px; overflow: hidden; }
+
+body:has(.contact-grid) .contact-form-section,
+body:has(.contact-grid) .contact-map-section {
+  margin-top: 40px;
+}
+
+@media (max-width: 600px) {
+  body:has(.contact-grid) .page { padding: 28px 16px; }
+  body:has(.contact-grid) .page-content > h1 { min-height: 250px; padding: 28px 24px; }
+  body:has(.contact-grid) .page-content > p { margin: -78px auto 48px; }
+  body:has(.contact-grid) .contact-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  body:has(.contact-grid) .contact-card { min-height: 170px; padding: 20px 12px; }
 }
 
 .contact-card {
@@ -1400,6 +1500,22 @@ a {
   transition: transform 0.3s ease;
 }
 
+/* Satu lembar gambar lokal berisi empat foto interior untuk galeri Tentang Kami. */
+.about-gallery .project-gallery-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.about-gallery .project-gallery-item:nth-child(1) img { transform: translate(0, 0); }
+.about-gallery .project-gallery-item:nth-child(2) img { transform: translate(-50%, 0); }
+.about-gallery .project-gallery-item:nth-child(3) img { transform: translate(0, -50%); }
+.about-gallery .project-gallery-item:nth-child(4) img { transform: translate(-50%, -50%); }
+
 .project-gallery-item:hover img {
   transform: scale(1.06);
 }
@@ -1607,12 +1723,6 @@ a {
   margin-bottom: 4px;
 }
 
-.cart-item-price {
-  font-size: 0.88rem;
-  color: rgb(120, 120, 120);
-  margin-bottom: 10px !important;
-}
-
 .cart-qty-control {
   display: inline-flex;
   align-items: center;
@@ -1701,19 +1811,6 @@ a {
   border-radius: 16px;
   padding: 24px;
   margin-top: 10px;
-}
-
-.cart-summary-total {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.1rem;
-  color: var(--ink);
-}
-
-.cart-summary-total strong {
-  color: var(--brand);
-  font-size: 1.3rem;
 }
 
 .cart-wa-button {
@@ -1902,11 +1999,6 @@ a {
   margin: 4px 0 12px;
 }
 
-/* Harga tidak ditampilkan di keranjang: sembunyikan baris "Total" */
-.cart-summary-total {
-  display: none;
-}
-
 /* =========================================================
    TEMA MINIMALIS (putih, hitam, abu muda) — Kalea Furniture
    CUKUP SATU LANGKAH: salin SELURUH file ini, lalu tempel di
@@ -2043,6 +2135,21 @@ h1, h2, h3, .site-logo {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(10, 12, 18, 0.22);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hero-link-secondary:hover {
+  background: #ffffff;
+  color: var(--ink);
+  opacity: 1;
 }
 
 /* ===== Hero beranda ===== */
@@ -2056,7 +2163,27 @@ h1, h2, h3, .site-logo {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 3rem;
+  font-size: clamp(2.25rem, 4.2vw, 3rem);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.8), transparent);
+  opacity: .75;
+}
+
+@media (max-width: 600px) {
+  .hero { min-height: 82svh; background-position: 58% center; }
+  .hero-content h1 { font-size: clamp(2rem, 9vw, 2.55rem); letter-spacing: .055em; }
+  .hero-content p { max-width: 38ch; }
+  .hero-content .button-container { flex-direction: column; gap: 10px; }
+  .hero-link-secondary { width: 100%; max-width: 280px; }
+  .hero::after { bottom: 12px; }
 }
 
 /* ===== Kenapa pilih kami ===== */

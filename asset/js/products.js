@@ -52,10 +52,6 @@ function invalidateCatalogCache() {
   _catalogDataPromise = null;
 }
 
-function formatRupiah(number) {
-  return "Rp " + Number(number).toLocaleString("id-ID");
-}
-
 /* Escape karakter HTML sensitif (&, <, >, ", ') sebelum data produk
    (nama, deskripsi, dll) dimasukkan ke innerHTML/atribut HTML. */
 function escapeHtml(value) {
