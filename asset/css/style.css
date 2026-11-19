@@ -3164,3 +3164,11 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
   background-size: contain;
   background-color: #f0efec;
 }
+
+/* Use the supplied Raymond photo on the Kursi Santai category tile. */
+.category-generated-image[data-scene="lounge-chair"] {
+  background-image: url('../images/products/kursi-santai-raymond/kalea-raymond-clean.png');
+  background-position: center;
+  background-size: contain;
+  background-color: #f0efec;
+}
