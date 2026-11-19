@@ -61,7 +61,7 @@ function renderCategoryVisual(category, label) {
     "meja-makan": "images/categories/dining-table-clean.png",
     "meja-kerja": "images/categories/work-desk-clean.png",
     "meja-konsol": "images/categories/console-table-clean.png",
-    kabinet: "images/categories/cabinet-clean.jpg",
+    kabinet: "images/categories/cabinet-clean.png",
     lemari: "images/categories/wardrobe-clean.png",
     "rangka-tempat-tidur": "images/categories/bed-clean.png",
     "furnitur-luar-ruangan": "images/categories/outdoor-set-clean.png",
