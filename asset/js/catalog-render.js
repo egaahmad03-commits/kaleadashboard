@@ -51,12 +51,26 @@ var CATEGORY_IMAGE_SCENES = {
 };
 
 function renderCategoryVisual(category, label) {
+  var localCategoryImages = {
+    "kursi-makan": "dining-chair-clean.png",
+    sofa: "sofa-clean.png",
+    kabinet: "cabinet-clean.jpg",
+    "rangka-tempat-tidur": "bed-clean.png"
+  };
+  var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
+  var localImage = localCategoryImages[category.slug];
+  var photo = localImage
+    ? assetPrefix + "asset/images/categories/" + localImage
+    : category.display_mode === "image" && category.image_url ? category.image_url : "";
+
+  if (photo) {
+    return '<div class="product-icon product-icon-photo"><img src="' + escapeHtml(photo) + '" alt="' + escapeHtml(label) + '" loading="lazy"></div>';
+  }
+
   var scene = CATEGORY_IMAGE_SCENES[category.slug];
   if (scene) {
     return '<div class="product-icon category-generated-image" data-scene="' + scene + '" role="img" aria-label="' + escapeHtml(label) + '"></div>';
   }
-  var photo = category.display_mode === "image" && category.image_url ? category.image_url : "";
-  if (photo) return '<div class="product-icon product-icon-photo"><img src="' + photo + '" alt="' + escapeHtml(label) + '" loading="lazy"></div>';
   return '<div class="product-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (category.icon_svg || GENERIC_CATEGORY_ICON) + '</svg></div>';
 }
 
