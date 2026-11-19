@@ -3156,3 +3156,11 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
 .animated-button .text { transform: translateX(0); }
 .animated-button:hover .text,
 .animated-button:focus-visible .text { transform: translateX(8px); }
+
+/* Use the supplied Lenox photo on the Kursi Bar category tile too. */
+.category-generated-image[data-scene="bar-stool"] {
+  background-image: url('../images/products/kursi-bar-lenox/kalea-bar-lenox-clean.png');
+  background-position: center;
+  background-size: contain;
+  background-color: #f0efec;
+}

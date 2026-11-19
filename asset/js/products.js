@@ -108,6 +108,16 @@ function withVersion(url) {
 }
 
 function rebuildProductImages(p) {
+  // Primary image override for the locally supplied, watermark-free Lenox photo.
+  if (p.slug === "kursi-bar-lenox") {
+    var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
+    var localPrimaryImage = assetPrefix + "asset/images/products/kursi-bar-lenox/kalea-bar-lenox-clean.png";
+    var remainingImages = Array.isArray(p.images) ? p.images.slice(1).map(withVersion) : [];
+    p.images = [withVersion(localPrimaryImage)].concat(remainingImages);
+    p.image = p.images[0];
+    return p;
+  }
+
   // Kalau kolom `images` di database sudah berisi URL (hasil upload ke
   // Supabase Storage), pakai itu (ditambah nomor versi untuk cache).
   if (Array.isArray(p.images) && p.images.length > 0) {
