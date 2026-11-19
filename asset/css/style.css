@@ -3213,3 +3213,15 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
 .gallery-thumb:hover img {
   transform: none;
 }
+
+.room-choice-card .room-choice-icon.room-choice-photo {
+  background-image: none;
+  background-color: #ffffff;
+}
+.room-choice-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #ffffff;
+}

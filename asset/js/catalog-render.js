@@ -56,8 +56,16 @@ function renderCategoryVisual(category, label) {
     "kursi-santai": "images/products/kursi-santai-raymond/kalea-raymond-clean.png",
     "kursi-makan": "images/categories/dining-chair-clean.png",
     sofa: "images/categories/sofa-clean.png",
+    "meja-kopi": "images/categories/coffee-table-clean.png",
+    "meja-samping": "images/categories/side-table-clean.png",
+    "meja-makan": "images/categories/dining-table-clean.png",
+    "meja-kerja": "images/categories/work-desk-clean.png",
+    "meja-konsol": "images/categories/console-table-clean.png",
     kabinet: "images/categories/cabinet-clean.jpg",
-    "rangka-tempat-tidur": "images/categories/bed-clean.png"
+    lemari: "images/categories/wardrobe-clean.png",
+    "rangka-tempat-tidur": "images/categories/bed-clean.png",
+    "furnitur-luar-ruangan": "images/categories/outdoor-set-clean.png",
+    "furniture-anak": "images/categories/kids-furniture-clean.png"
   };
   var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
   var localImage = localCategoryImages[category.slug];
@@ -125,6 +133,18 @@ function initRoomCatalog() {
     outdoor: { name: "Area Outdoor", description: "Jelajahi furniture yang dirancang untuk teras dan area luar ruangan.", slugs: ["furnitur-luar-ruangan"], hideCategoryCards: true, choices: [{ name: "Set Meja & Kursi Taman", terms: ["set", "paket"], image: "outdoor-set-new" }, { name: "Kursi Outdoor", terms: ["kursi", "bangku"], image: "garden-chair" }, { name: "Meja Outdoor", terms: ["meja"], image: "outdoor-table" }, { name: "Bangku Taman", terms: ["bangku", "taman"], image: "garden-bench" }] }
   };
 
+  var roomChoiceImages = {
+    bookshelf: "bookshelf-clean.png",
+    "office-shelf": "bookshelf-clean.png",
+    "tv-unit": "tv-console-clean.png",
+    vanity: "vanity-clean.png",
+    "desk-chair": "desk-chair-clean.png",
+    "outdoor-set-new": "outdoor-set-clean.png",
+    "garden-chair": "garden-chair-clean.png",
+    "outdoor-table": "outdoor-table-clean.png",
+    "garden-bench": "garden-bench-clean.png"
+  };
+
   function showRoom(roomKey) {
     var room = rooms[roomKey];
     if (!room) return;
@@ -139,6 +159,11 @@ function initRoomCatalog() {
       }).join("");
       var roomChoices = (room.choices || []).map(function (choice) {
         var href = "produk/kategori.html?slug=" + encodeURIComponent(room.slugs[0]) + "&ruang=" + encodeURIComponent(room.slugs.join(",")) + "&jenis=" + encodeURIComponent(choice.terms.join(",")) + "&pilihan=" + encodeURIComponent(choice.name);
+        var localChoiceImage = roomChoiceImages[choice.image];
+        if (localChoiceImage) {
+          var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
+          return '<a href="' + href + '" class="product-card room-choice-card"><div class="product-icon room-choice-icon room-choice-photo"><img src="' + assetPrefix + 'asset/images/categories/' + localChoiceImage + '" alt="' + escapeHtml(choice.name) + '" loading="lazy"></div><h3>' + escapeHtml(choice.name) + '</h3></a>';
+        }
         return '<a href="' + href + '" class="product-card room-choice-card"><div class="product-icon room-choice-icon" data-scene="' + escapeHtml(choice.image || "bookshelf") + '" role="img" aria-label="' + escapeHtml(choice.name) + '"></div><h3>' + escapeHtml(choice.name) + '</h3></a>';
       }).join("");
       categoryGrid.innerHTML = categoryCards + roomChoices || '<p class="empty-state">Belum ada kategori untuk ruangan ini.</p>';
