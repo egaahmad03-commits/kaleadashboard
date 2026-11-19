@@ -57,6 +57,37 @@ async function requireAuth() {
     return session;
 }
 
+async function loadWebsiteVisitStats() {
+    const totalEl = document.getElementById('statVisitsTotal');
+    const todayEl = document.getElementById('statVisitsToday');
+    const weekEl = document.getElementById('statVisitsWeek');
+    if (!totalEl || !todayEl || !weekEl) return;
+
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const weekStart = new Date(todayStart);
+    weekStart.setDate(weekStart.getDate() - 6);
+
+    const [total, today, week] = await Promise.all([
+        supabaseClient.from('website_visits').select('id', { count: 'exact', head: true }),
+        supabaseClient.from('website_visits').select('id', { count: 'exact', head: true }).gte('visited_at', todayStart.toISOString()),
+        supabaseClient.from('website_visits').select('id', { count: 'exact', head: true }).gte('visited_at', weekStart.toISOString())
+    ]);
+
+    const error = total.error || today.error || week.error;
+    if (error) {
+        console.warn('Gagal memuat statistik kunjungan:', error.message);
+        totalEl.textContent = todayEl.textContent = weekEl.textContent = '—';
+        return;
+    }
+
+    const format = value => new Intl.NumberFormat('id-ID').format(value || 0);
+    totalEl.textContent = format(total.count);
+    todayEl.textContent = format(today.count);
+    weekEl.textContent = format(week.count);
+}
+
 /* =========================================================
    Upload & Konversi Foto Produk (Supabase Storage)
    Foto dikonversi ke JPEG (kualitas 85%, sisi terpanjang 1200px),
@@ -897,6 +928,8 @@ async function deleteCategory(id) {
 document.addEventListener('DOMContentLoaded', async () => {
     const session = await requireAuth();
     if (!session) return;
+
+    loadWebsiteVisitStats();
 
     try {
         await loadCatalogData();
