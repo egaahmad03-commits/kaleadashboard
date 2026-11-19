@@ -52,16 +52,18 @@ var CATEGORY_IMAGE_SCENES = {
 
 function renderCategoryVisual(category, label) {
   var localCategoryImages = {
-    "kursi-makan": "dining-chair-clean.png",
-    sofa: "sofa-clean.png",
-    kabinet: "cabinet-clean.jpg",
-    "rangka-tempat-tidur": "bed-clean.png"
+    "kursi-bar": "images/products/kursi-bar-lenox/kalea-bar-lenox-clean.png",
+    "kursi-santai": "images/products/kursi-santai-raymond/kalea-raymond-clean.png",
+    "kursi-makan": "images/categories/dining-chair-clean.png",
+    sofa: "images/categories/sofa-clean.png",
+    kabinet: "images/categories/cabinet-clean.jpg",
+    "rangka-tempat-tidur": "images/categories/bed-clean.png"
   };
   var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
   var localImage = localCategoryImages[category.slug];
   var photo = localImage
-    ? assetPrefix + "asset/images/categories/" + localImage
-    : category.display_mode === "image" && category.image_url ? category.image_url : "";
+    ? assetPrefix + "asset/" + localImage
+    : "";
 
   if (photo) {
     return '<div class="product-icon product-icon-photo"><img src="' + escapeHtml(photo) + '" alt="' + escapeHtml(label) + '" loading="lazy"></div>';

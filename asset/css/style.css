@@ -2452,20 +2452,21 @@ h1, h2, h3, .site-logo {
   aspect-ratio: 1 / 1;
   border-radius: 0;
   margin: 0 0 12px;
-  background: #f0efec;
+  background: #ffffff;
   color: #111111;
 }
 
 .product-icon img,
 .product-icon .product-icon-photo {
   object-fit: contain;
-  background: #f0efec;
+  background: #ffffff;
 }
 
 .category-generated-image {
   background-image: url('../images/catalog-products-mix.png');
   background-size: 400% 400%;
   background-repeat: no-repeat;
+  background-color: #ffffff;
 }
 .category-generated-image[data-scene="bar-stool"] { background-position: 0% 0%; }
 .category-generated-image[data-scene="dining-chair"] { background-position: 33.333% 0%; }
