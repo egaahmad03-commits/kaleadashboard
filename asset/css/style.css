@@ -3172,3 +3172,17 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
   background-size: contain;
   background-color: #f0efec;
 }
+
+/* User supplied product photos for the main furniture categories. */
+.category-generated-image[data-scene="sofa"],
+.category-generated-image[data-scene="bed-frame"],
+.category-generated-image[data-scene="dining-chair"],
+.category-generated-image[data-scene="sideboard"] {
+  background-position: center;
+  background-size: contain;
+  background-color: #f0efec;
+}
+.category-generated-image[data-scene="sofa"] { background-image: url('../images/categories/sofa-clean.png'); }
+.category-generated-image[data-scene="bed-frame"] { background-image: url('../images/categories/bed-clean.png'); }
+.category-generated-image[data-scene="dining-chair"] { background-image: url('../images/categories/dining-chair-clean.png'); }
+.category-generated-image[data-scene="sideboard"] { background-image: url('../images/categories/cabinet-clean.jpg'); }
