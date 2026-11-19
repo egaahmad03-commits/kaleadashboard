@@ -3186,3 +3186,29 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
 .category-generated-image[data-scene="bed-frame"] { background-image: url('../images/categories/bed-clean.png'); }
 .category-generated-image[data-scene="dining-chair"] { background-image: url('../images/categories/dining-chair-clean.png'); }
 .category-generated-image[data-scene="sideboard"] { background-image: url('../images/categories/cabinet-clean.jpg'); }
+
+/* Keep every product photo in the same square frame without cropping it. */
+.product-list-card .product-photo,
+.gallery-main-wrap .product-photo-main,
+.gallery-thumb .product-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f0efec;
+}
+
+.product-photo img,
+.gallery-thumb img,
+.lightbox-overlay img,
+.cart-item-photo .product-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.product-list-card:hover .product-photo img,
+.product-list-card:focus-visible .product-photo img,
+.gallery-main-wrap .product-photo-main img:hover,
+.gallery-thumb:hover img {
+  transform: none;
+}
