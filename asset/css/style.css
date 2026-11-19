@@ -2931,7 +2931,7 @@ body:has(.contact-hero) .contact-hero-copy p {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgba(14, 17, 20, .72), rgba(14, 17, 20, .22)), url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop') center 55% / cover no-repeat;
+  background: linear-gradient(90deg, rgba(14, 17, 20, .58), rgba(14, 17, 20, .34)), url('../images/kalea-about-hero.png') center 55% / cover no-repeat;
   content: "";
   animation: kalea-image-drift 1.5s cubic-bezier(.2,.7,.2,1) both;
 }
@@ -2951,6 +2951,122 @@ body:has(.contact-hero) .contact-hero-copy h1,
 body:has(.contact-hero) .contact-hero-copy p { opacity: 0; animation: kalea-copy-enter .8s cubic-bezier(.2,.7,.2,1) both; }
 body:has(.contact-hero) .contact-hero-copy h1 { animation-delay: .42s; }
 body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
+
+/* Home navigation sits over the hero so its photo continues behind the header. */
+body:has(.hero) .site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom-color: rgba(255, 255, 255, .24);
+}
+
+body:has(.hero) .site-logo,
+body:has(.hero) .site-nav a,
+body:has(.hero) .nav-toggle span {
+  color: #fff;
+}
+
+body:has(.hero) .site-nav a.nav-active,
+body:has(.hero) .site-nav a:hover {
+  color: #fff;
+  background: transparent;
+  border-bottom-color: #fff;
+}
+
+body:has(.catalog-hero, .about-hero, .contact-hero) .site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom-color: rgba(255, 255, 255, .24);
+}
+
+body:has(.catalog-hero, .about-hero, .contact-hero) .site-logo,
+body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav a,
+body:has(.catalog-hero, .about-hero, .contact-hero) .nav-toggle span {
+  color: #fff;
+}
+
+body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav a.nav-active,
+body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav a:hover {
+  color: #fff;
+  background: transparent;
+  border-bottom-color: #fff;
+}
+
+/* Keep each secondary page hero underneath the now transparent header. */
+body:has(.catalog-hero) .page { padding-top: 0; }
+body:has(.catalog-hero) .page-content { position: relative; }
+body:has(.catalog-hero) .breadcrumb {
+  position: absolute;
+  top: 84px;
+  left: 28px;
+  z-index: 3;
+  margin: 0;
+  color: rgba(255, 255, 255, .82);
+}
+body:has(.catalog-hero) .breadcrumb a { color: #fff; }
+body:has(.catalog-hero) .catalog-hero { padding-top: 112px; }
+body:has(.about-hero) .about { padding-top: 0; }
+body:has(.contact-hero) .page { padding-top: 0; }
+
+@media (max-width: 768px) {
+  body:has(.hero) .site-nav {
+    background: #fff;
+  }
+
+  body:has(.hero) .site-nav a {
+    color: #111;
+  }
+
+  body:has(.hero) .site-nav a.nav-active,
+  body:has(.hero) .site-nav a:hover {
+    color: #111;
+    border-bottom-color: #111;
+  }
+
+  body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav {
+    background: #fff;
+  }
+
+  body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav a {
+    color: #111;
+  }
+
+  body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav a.nav-active,
+  body:has(.catalog-hero, .about-hero, .contact-hero) .site-nav a:hover {
+    color: #111;
+    border-bottom-color: #111;
+  }
+
+  body:has(.catalog-hero) .breadcrumb { top: 76px; left: 18px; }
+  body:has(.catalog-hero) .catalog-hero { padding-top: 100px; }
+}
+
+/* Wide catalog hero artwork uses a matching landscape composition and full bleed width. */
+body:has(.catalog-hero) .catalog-hero {
+  position: relative;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  max-width: none;
+  min-height: clamp(600px, 78svh, 780px);
+  padding-top: 140px;
+  background-position: center;
+}
+
+body:has(.catalog-hero) .breadcrumb {
+  left: clamp(24px, 8vw, 120px);
+}
+
+@media (max-width: 768px) {
+  body:has(.catalog-hero) .catalog-hero {
+    min-height: clamp(500px, 78svh, 650px);
+    padding-top: 112px;
+  }
+}
 
 .reveal-on-scroll {
   opacity: 0;
@@ -3203,7 +3319,7 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
 .cart-item-photo .product-photo img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -3224,4 +3340,56 @@ body:has(.contact-hero) .contact-hero-copy p { animation-delay: .62s; }
   object-fit: contain;
   object-position: center;
   background: #ffffff;
+}
+
+/* About and contact hero artwork fills a wide, tall canvas without stretching. */
+body:has(.about-hero) .about-hero,
+body:has(.contact-hero) .contact-hero {
+  position: relative;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  max-width: none;
+  height: auto;
+  min-height: clamp(560px, 76svh, 740px);
+  margin-top: 0;
+}
+
+body:has(.about-hero) .about-hero { padding-top: 140px; }
+body:has(.contact-hero) .contact-hero { overflow: visible; }
+body:has(.contact-hero) .contact-hero > img {
+  left: 50%;
+  right: auto;
+  width: 100vw;
+  max-width: none;
+  transform: translateX(-50%);
+  object-fit: cover;
+  object-position: center;
+  animation-name: kalea-contact-panorama-reveal;
+}
+body:has(.contact-hero) .contact-hero::after {
+  left: 50%;
+  right: auto;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, .3);
+}
+body:has(.about-hero) .about { padding-left: 0; padding-right: 0; }
+body:has(.contact-hero) .page { padding-left: 0; padding-right: 0; }
+body:has(.contact-hero) .page-content { width: 100%; }
+body:has(.catalog-hero),
+body:has(.about-hero),
+body:has(.contact-hero) { overflow-x: clip; }
+
+@keyframes kalea-contact-panorama-reveal {
+  from { clip-path: inset(0 100% 0 0); transform: translateX(-50%) scale(1.045); }
+  to { clip-path: inset(0); transform: translateX(-50%) scale(1); }
+}
+
+@media (max-width: 768px) {
+  body:has(.about-hero) .about-hero,
+  body:has(.contact-hero) .contact-hero {
+    min-height: clamp(460px, 76svh, 620px);
+  }
+
+  body:has(.about-hero) .about-hero { padding-top: 112px; }
 }
