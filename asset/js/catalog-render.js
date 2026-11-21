@@ -275,7 +275,7 @@ function initProductGallery(product, categoryIcon) {
   function updateGallery(animate) {
     if (track) {
       track.classList.toggle("is-dragging", !animate);
-      track.style.transform = "translate3d(calc(-" + (currentIndex * 100 / Math.max(total, 1)) + "% + " + dragOffset + "px), 0, 0)";
+      track.style.transform = "translate3d(calc(-" + (currentIndex * 100) + "% + " + dragOffset + "px), 0, 0)";
     }
 
     if (counter) {
@@ -358,7 +358,7 @@ function initProductGallery(product, categoryIcon) {
       track.classList.remove("is-dragging");
       if (moved) {
         suppressLightbox = true;
-        var threshold = Math.max(45, mainWrap.clientWidth * 0.16);
+        var threshold = Math.max(45, mainWrap.clientWidth * 0.5);
         if (delta < -threshold) goTo(currentIndex + 1);
         else if (delta > threshold) goTo(currentIndex - 1);
         else { dragOffset = 0; updateGallery(true); }
