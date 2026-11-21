@@ -265,19 +265,13 @@ function initProductGallery(product, categoryIcon) {
   if (!mainWrap) return;
 
   var currentIndex = 0;
-  var startX = null;
-  var startY = null;
-  var dragOffset = 0;
+  var mouseStartX = null;
+  var mouseStartScroll = 0;
   var moved = false;
   var track = null;
   var suppressLightbox = false;
 
-  function updateGallery(animate) {
-    if (track) {
-      track.classList.toggle("is-dragging", !animate);
-      track.style.transform = "translate3d(calc(-" + (currentIndex * 100) + "% + " + dragOffset + "px), 0, 0)";
-    }
-
+  function updateGallery() {
     if (counter) {
       counter.textContent = total > 0 ? (currentIndex + 1) + " / " + total : "";
       counter.style.display = total > 1 ? "block" : "none";
@@ -294,12 +288,14 @@ function initProductGallery(product, categoryIcon) {
   function goTo(index) {
     if (total === 0) return;
     currentIndex = Math.max(0, Math.min(total - 1, index));
-    dragOffset = 0;
-    updateGallery(true);
+    mainWrap.scrollTo({ left: currentIndex * mainWrap.clientWidth, behavior: "smooth" });
+    updateGallery();
   }
 
   track = document.createElement("div");
   track.className = "gallery-track";
+  track.style.width = (Math.max(total, 1) * 100) + "%";
+  track.style.setProperty("--gallery-total", Math.max(total, 1));
   track.innerHTML = (total ? images : [""]).map(function (src, index) {
     return '<div class="gallery-slide" data-gallery-index="' + index + '">' + renderProductPhoto(src, product.name, categoryIcon, "product-photo-main") + '</div>';
   }).join("");
@@ -328,48 +324,42 @@ function initProductGallery(product, categoryIcon) {
 
   if (total > 1) {
     mainWrap.addEventListener("pointerdown", function (event) {
-      if (event.pointerType === "mouse" && event.button !== 0) return;
-      startX = event.clientX;
-      startY = event.clientY;
-      dragOffset = 0;
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      mouseStartX = event.clientX;
+      mouseStartScroll = mainWrap.scrollLeft;
       moved = false;
-      track.classList.add("is-dragging");
       mainWrap.setPointerCapture(event.pointerId);
+      mainWrap.classList.add("is-mouse-dragging");
     });
     mainWrap.addEventListener("pointermove", function (event) {
-      if (startX === null) return;
-      var dx = event.clientX - startX;
-      var dy = event.clientY - startY;
-      if (!moved && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
-        startX = null;
-        track.classList.remove("is-dragging");
-        updateGallery(true);
-        return;
-      }
-      dragOffset = dx;
+      if (mouseStartX === null || event.pointerType !== "mouse") return;
+      var dx = event.clientX - mouseStartX;
       if (Math.abs(dx) > 6) moved = true;
-      updateGallery(false);
+      if (moved) {
+        mainWrap.scrollLeft = mouseStartScroll - dx;
+        event.preventDefault();
+      }
     });
 
     function finishDrag(event) {
-      if (startX === null) return;
-      var delta = event.clientX - startX;
-      startX = null;
-      track.classList.remove("is-dragging");
+      if (mouseStartX === null || event.pointerType !== "mouse") return;
+      mouseStartX = null;
+      mainWrap.classList.remove("is-mouse-dragging");
       if (moved) {
         suppressLightbox = true;
-        var threshold = Math.max(45, mainWrap.clientWidth * 0.5);
-        if (delta < -threshold) goTo(currentIndex + 1);
-        else if (delta > threshold) goTo(currentIndex - 1);
-        else { dragOffset = 0; updateGallery(true); }
+        goTo(Math.round(mainWrap.scrollLeft / Math.max(mainWrap.clientWidth, 1)));
         setTimeout(function () { suppressLightbox = false; }, 400);
-      } else {
-        dragOffset = 0;
-        updateGallery(true);
       }
     }
     mainWrap.addEventListener("pointerup", finishDrag);
     mainWrap.addEventListener("pointercancel", finishDrag);
+    mainWrap.addEventListener("scroll", function () {
+      currentIndex = Math.max(0, Math.min(total - 1, Math.round(mainWrap.scrollLeft / Math.max(mainWrap.clientWidth, 1))));
+      updateGallery();
+    }, { passive: true });
+    window.addEventListener("resize", function () {
+      mainWrap.scrollLeft = currentIndex * mainWrap.clientWidth;
+    });
   }
 
   mainWrap.addEventListener("click", function (e) {
@@ -379,7 +369,7 @@ function initProductGallery(product, categoryIcon) {
     if (slide && img) openLightbox(images[Number(slide.getAttribute("data-gallery-index"))], product.name);
   });
 
-  updateGallery(true);
+  updateGallery();
 }
 
 function openLightbox(src, alt) {
