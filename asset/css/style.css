@@ -732,7 +732,27 @@ body:has(.room-grid) .room-back {
 /* ===== Gallery Halaman Detail ===== */
 .gallery-main-wrap {
   position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
 }
+
+.gallery-main-wrap:active { cursor: grabbing; }
+.gallery-main-wrap .product-photo-main img {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.gallery-main-wrap:active .product-photo-main img { cursor: grabbing; }
+#gallery-main { width: 100%; overflow: hidden; touch-action: pan-y; }
+.gallery-track {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+  transition: transform .36s cubic-bezier(.22,.7,.25,1);
+}
+.gallery-track.is-dragging { transition: none; }
+.gallery-slide { flex: 0 0 100%; width: 100%; min-width: 0; }
 
 .gallery-main-wrap .product-photo-main {
   aspect-ratio: 4 / 3;
@@ -741,8 +761,11 @@ body:has(.room-grid) .room-back {
 
 .gallery-main-wrap .product-photo-main img {
   object-fit: contain;
-  cursor: zoom-in;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
 }
+.gallery-main-wrap:active .product-photo-main img { cursor: grabbing; }
 
 .gallery-nav {
   position: absolute;
