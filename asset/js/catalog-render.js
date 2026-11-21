@@ -43,43 +43,10 @@ function renderProductPhoto(src, alt, iconSvg, extraClass) {
   );
 }
 
-var CATEGORY_IMAGE_SCENES = {
-  "kursi-bar": "bar-stool", "kursi-makan": "dining-chair", "kursi-santai": "lounge-chair", sofa: "sofa",
-  "meja-kopi": "coffee-table", "meja-samping": "side-table", "meja-konsol": "console-table", "meja-makan": "dining-table",
-  "meja-kerja": "work-desk", kabinet: "sideboard", lemari: "wardrobe", "rak-buku": "bookshelf",
-  "rak-tv": "tv-console", "rangka-tempat-tidur": "bed-frame", "meja-rias": "vanity", "furnitur-luar-ruangan": "outdoor-set"
-};
-
 function renderCategoryVisual(category, label) {
-  var localCategoryImages = {
-    "kursi-bar": "images/products/kursi-bar-lenox/kalea-bar-lenox-clean.png",
-    "kursi-santai": "images/products/kursi-santai-raymond/kalea-raymond-clean.png",
-    "kursi-makan": "images/categories/dining-chair-clean.png",
-    sofa: "images/categories/sofa-clean.png",
-    "meja-kopi": "images/categories/coffee-table-clean.png",
-    "meja-samping": "images/categories/side-table-clean.png",
-    "meja-makan": "images/categories/dining-table-clean.png",
-    "meja-kerja": "images/categories/work-desk-clean.png",
-    "meja-konsol": "images/categories/console-table-clean.png",
-    kabinet: "images/categories/cabinet-clean.png",
-    lemari: "images/categories/wardrobe-clean.png",
-    "rangka-tempat-tidur": "images/categories/bed-clean.png",
-    "furnitur-luar-ruangan": "images/categories/outdoor-set-clean.png",
-    "furniture-anak": "images/categories/kids-furniture-clean.png"
-  };
-  var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
-  var localImage = localCategoryImages[category.slug];
-  var photo = localImage
-    ? assetPrefix + "asset/" + localImage
-    : "";
-
-  if (photo) {
-    return '<div class="product-icon product-icon-photo"><img src="' + escapeHtml(photo) + '" alt="' + escapeHtml(label) + '" loading="lazy"></div>';
-  }
-
-  var scene = CATEGORY_IMAGE_SCENES[category.slug];
-  if (scene) {
-    return '<div class="product-icon category-generated-image" data-scene="' + scene + '" role="img" aria-label="' + escapeHtml(label) + '"></div>';
+  var databasePhoto = category.display_mode === "image" && category.image_url ? category.image_url : "";
+  if (databasePhoto) {
+    return '<div class="product-icon product-icon-photo"><img src="' + escapeHtml(databasePhoto) + '" alt="' + escapeHtml(label) + '" loading="lazy"></div>';
   }
   return '<div class="product-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (category.icon_svg || GENERIC_CATEGORY_ICON) + '</svg></div>';
 }
