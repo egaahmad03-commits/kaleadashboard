@@ -90,6 +90,8 @@ function initRoomCatalog() {
   var backBottom = document.getElementById("room-back-bottom");
   var backBottomWrap = document.getElementById("room-back-bottom-wrap");
   var hero = document.querySelector(".catalog-hero");
+  var activeRoomKey = null;
+  var lastFocusRefresh = 0;
   if (!roomGrid || !categoryGrid) return;
 
   var rooms = {
@@ -112,9 +114,10 @@ function initRoomCatalog() {
     "garden-bench": "garden-bench-clean.png"
   };
 
-  function showRoom(roomKey) {
+  function showRoom(roomKey, keepScroll) {
     var room = rooms[roomKey];
     if (!room) return;
+    activeRoomKey = roomKey;
     loadCatalogData().then(function () {
       var categories = room.hideCategoryCards ? [] : CATEGORIES.filter(function (category) { return room.slugs.indexOf(category.slug) !== -1; });
       title.textContent = room.name;
@@ -138,7 +141,7 @@ function initRoomCatalog() {
       categoryGrid.hidden = false;
       if (back) back.hidden = false;
       if (backBottomWrap) backBottomWrap.hidden = false;
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: "smooth" });
     }).catch(function () {
       categoryGrid.innerHTML = '<p class="empty-state">Gagal memuat kategori. Coba muat ulang halaman.</p>';
       categoryGrid.hidden = false;
@@ -149,6 +152,7 @@ function initRoomCatalog() {
     button.addEventListener("click", function () { showRoom(button.getAttribute("data-room")); });
   });
   function returnToRooms() {
+    activeRoomKey = null;
     categoryGrid.hidden = true;
     roomGrid.hidden = false;
     if (back) back.hidden = true;
@@ -160,6 +164,17 @@ function initRoomCatalog() {
   }
   if (back) back.addEventListener("click", returnToRooms);
   if (backBottom) backBottom.addEventListener("click", returnToRooms);
+
+  function refreshCategoriesOnReturn() {
+    if (!activeRoomKey || document.visibilityState === "hidden") return;
+    var now = Date.now();
+    if (now - lastFocusRefresh < 1500) return;
+    lastFocusRefresh = now;
+    invalidateCatalogCache();
+    showRoom(activeRoomKey, true);
+  }
+  window.addEventListener("focus", refreshCategoriesOnReturn);
+  document.addEventListener("visibilitychange", refreshCategoriesOnReturn);
 }
 
 /* ===== Halaman daftar produk per kategori (produk/kategori.html) ===== */
