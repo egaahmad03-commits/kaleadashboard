@@ -744,15 +744,30 @@ body:has(.room-grid) .room-back {
   -webkit-user-drag: none;
 }
 .gallery-main-wrap:active .product-photo-main img { cursor: grabbing; }
-#gallery-main { width: 100%; overflow: hidden; touch-action: pan-y; }
+#gallery-main {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: auto;
+}
+#gallery-main::-webkit-scrollbar { display: none; }
 .gallery-track {
   display: flex;
-  width: 100%;
-  will-change: transform;
-  transition: transform .46s cubic-bezier(.2,.75,.25,1);
+  height: 100%;
 }
-.gallery-track.is-dragging { transition: none; }
-.gallery-slide { flex: 0 0 100%; width: 100%; min-width: 0; }
+.gallery-slide {
+  flex: 0 0 calc(100% / var(--gallery-total));
+  width: calc(100% / var(--gallery-total));
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.gallery-slide .product-photo-main { width: 100%; }
+.gallery-main-wrap.is-mouse-dragging .product-photo-main img { cursor: grabbing; }
 
 .gallery-main-wrap .product-photo-main {
   aspect-ratio: 4 / 3;
