@@ -36,7 +36,7 @@ function renderProductPhoto(src, alt, iconSvg, extraClass) {
 
   return (
     '<div class="product-photo ' + (extraClass || "") + '">' +
-    '<img src="' + src + '" alt="' + escapeHtml(alt) + '" loading="lazy" ' +
+    '<img src="' + src + '" alt="' + escapeHtml(alt) + '" loading="lazy" draggable="false" ' +
     'onerror="this.closest(\'.product-photo\').classList.add(\'product-photo-placeholder\'); this.remove();">' +
     fallback +
     '</div>'
@@ -261,16 +261,22 @@ function initProductGallery(product, categoryIcon) {
   var mainWrap = document.getElementById("gallery-main");
   var thumbWrap = document.getElementById("gallery-thumbs");
   var counter = document.getElementById("gallery-counter");
-  var prevBtn = document.getElementById("gallery-prev");
-  var nextBtn = document.getElementById("gallery-next");
 
   if (!mainWrap) return;
 
   var currentIndex = 0;
+  var startX = null;
+  var startY = null;
+  var dragOffset = 0;
+  var moved = false;
+  var track = null;
+  var suppressLightbox = false;
 
-  function renderMain() {
-    var src = total > 0 ? images[currentIndex] : "";
-    mainWrap.innerHTML = renderProductPhoto(src, product.name, categoryIcon, "product-photo-main");
+  function updateGallery(animate) {
+    if (track) {
+      track.classList.toggle("is-dragging", !animate);
+      track.style.transform = "translate3d(calc(-" + (currentIndex * 100 / Math.max(total, 1)) + "% + " + dragOffset + "px), 0, 0)";
+    }
 
     if (counter) {
       counter.textContent = total > 0 ? (currentIndex + 1) + " / " + total : "";
@@ -287,9 +293,18 @@ function initProductGallery(product, categoryIcon) {
 
   function goTo(index) {
     if (total === 0) return;
-    currentIndex = (index + total) % total;
-    renderMain();
+    currentIndex = Math.max(0, Math.min(total - 1, index));
+    dragOffset = 0;
+    updateGallery(true);
   }
+
+  track = document.createElement("div");
+  track.className = "gallery-track";
+  track.innerHTML = (total ? images : [""]).map(function (src, index) {
+    return '<div class="gallery-slide" data-gallery-index="' + index + '">' + renderProductPhoto(src, product.name, categoryIcon, "product-photo-main") + '</div>';
+  }).join("");
+  mainWrap.innerHTML = "";
+  mainWrap.appendChild(track);
 
   if (thumbWrap) {
     if (total <= 1) {
@@ -311,22 +326,60 @@ function initProductGallery(product, categoryIcon) {
     }
   }
 
-  if (prevBtn && nextBtn) {
-    var showNav = total > 1;
-    prevBtn.style.display = showNav ? "flex" : "none";
-    nextBtn.style.display = showNav ? "flex" : "none";
-    prevBtn.addEventListener("click", function () { goTo(currentIndex - 1); });
-    nextBtn.addEventListener("click", function () { goTo(currentIndex + 1); });
+  if (total > 1) {
+    mainWrap.addEventListener("pointerdown", function (event) {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      startX = event.clientX;
+      startY = event.clientY;
+      dragOffset = 0;
+      moved = false;
+      track.classList.add("is-dragging");
+      mainWrap.setPointerCapture(event.pointerId);
+    });
+    mainWrap.addEventListener("pointermove", function (event) {
+      if (startX === null) return;
+      var dx = event.clientX - startX;
+      var dy = event.clientY - startY;
+      if (!moved && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+        startX = null;
+        track.classList.remove("is-dragging");
+        updateGallery(true);
+        return;
+      }
+      dragOffset = dx;
+      if (Math.abs(dx) > 6) moved = true;
+      updateGallery(false);
+    });
+
+    function finishDrag(event) {
+      if (startX === null) return;
+      var delta = event.clientX - startX;
+      startX = null;
+      track.classList.remove("is-dragging");
+      if (moved) {
+        suppressLightbox = true;
+        var threshold = Math.max(45, mainWrap.clientWidth * 0.16);
+        if (delta < -threshold) goTo(currentIndex + 1);
+        else if (delta > threshold) goTo(currentIndex - 1);
+        else { dragOffset = 0; updateGallery(true); }
+        setTimeout(function () { suppressLightbox = false; }, 400);
+      } else {
+        dragOffset = 0;
+        updateGallery(true);
+      }
+    }
+    mainWrap.addEventListener("pointerup", finishDrag);
+    mainWrap.addEventListener("pointercancel", finishDrag);
   }
 
   mainWrap.addEventListener("click", function (e) {
-    var img = mainWrap.querySelector("img");
-    if (img && e.target === img) {
-      openLightbox(images[currentIndex], product.name);
-    }
+    if (suppressLightbox) return;
+    var slide = e.target.closest(".gallery-slide");
+    var img = e.target.closest("img");
+    if (slide && img) openLightbox(images[Number(slide.getAttribute("data-gallery-index"))], product.name);
   });
 
-  renderMain();
+  updateGallery(true);
 }
 
 function openLightbox(src, alt) {
@@ -384,8 +437,6 @@ function renderProductDetail() {
       '<div class="product-detail-gallery">' +
       '  <div class="gallery-main-wrap">' +
       '    <div id="gallery-main"></div>' +
-      '    <button type="button" id="gallery-prev" class="gallery-nav gallery-nav-prev" aria-label="Foto sebelumnya">&#8249;</button>' +
-      '    <button type="button" id="gallery-next" class="gallery-nav gallery-nav-next" aria-label="Foto berikutnya">&#8250;</button>' +
       '    <span id="gallery-counter" class="gallery-counter"></span>' +
       '  </div>' +
       '  <div id="gallery-thumbs" class="gallery-thumbs"></div>' +
