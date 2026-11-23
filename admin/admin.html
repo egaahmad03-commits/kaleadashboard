@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css?v=20261123-rooms">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -23,6 +23,7 @@
                 <a href="admin.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
                 <a href="admin.html#productSection"><i class="fa-solid fa-box"></i> Produk</a>
                 <a href="admin.html#categorySection"><i class="fa-solid fa-tags"></i> Kategori</a>
+                <a href="admin.html#roomSection"><i class="fa-solid fa-couch"></i> Ruangan</a>
                 <a href="../katalog.html" target="_blank"><i class="fa-solid fa-store"></i> Lihat Toko</a>
             </nav>
             <div class="sidebar-footer">
@@ -137,7 +138,45 @@
                     </table>
                 </div>
             </div>
+
+            <div class="content-section" id="roomSection">
+                <div class="section-header">
+                    <h2>Ruangan &amp; Produk</h2>
+                    <button class="btn-primary" onclick="openRoomModal()"><i class="fa-solid fa-plus"></i> Tambah Ruangan</button>
+                </div>
+                <p class="room-admin-note">Atur ruangan yang tampil di katalog. Pilih produk untuk tiap ruangan dan seret produk untuk mengubah urutannya.</p>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th style="width:80px;">Foto</th><th>Nama Ruangan</th><th>Produk Tampil</th><th>Urutan</th><th>Aksi</th></tr></thead>
+                        <tbody id="roomTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </main>
+    </div>
+
+    <div class="modal" id="roomModal">
+        <div class="modal-content room-modal-content">
+            <div class="modal-header">
+                <h2 id="roomModalTitle">Tambah Ruangan</h2>
+                <button class="modal-close" type="button" onclick="closeRoomModal()">&times;</button>
+            </div>
+            <form id="roomForm" onsubmit="saveRoom(event)">
+                <input type="hidden" id="roomId">
+                <div class="form-group"><label for="roomName">Nama Ruangan</label><input id="roomName" required maxlength="60" placeholder="Contoh: Ruang Keluarga"></div>
+                <div class="form-group"><label for="roomDescription">Deskripsi singkat</label><textarea id="roomDescription" rows="2" maxlength="180" placeholder="Furniture pilihan untuk ruangan ini"></textarea></div>
+                <div class="form-group"><label>Foto Ruangan</label>
+                    <label for="roomPhotoInput" class="photo-dropzone" id="roomPhotoDropzone"><i class="fa-solid fa-cloud-arrow-up"></i><span>Klik atau seret foto ruangan ke sini</span></label>
+                    <input type="file" id="roomPhotoInput" accept="image/*" hidden onchange="handleRoomPhotoSelected(this.files)">
+                    <div id="roomPhotoPreview" class="photo-preview-list"></div>
+                </div>
+                <div class="form-group"><label for="roomProductSearch">Produk untuk ruangan ini</label><input id="roomProductSearch" type="search" placeholder="Cari produk..." oninput="renderRoomProductPicker()"></div>
+                <div id="roomProductPicker" class="room-product-picker"></div>
+                <div class="form-group"><label>Urutan produk di website <span class="room-admin-muted">(seret untuk mengatur urutan)</span></label><ol id="roomSelectedProducts" class="room-selected-products"></ol></div>
+                <p id="roomFormError" class="room-form-error" hidden></p>
+                <div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeRoomModal()">Batal</button><button type="submit" class="btn-primary" id="roomSaveBtn">Simpan Ruangan</button></div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal Tambah / Edit Kategori -->
@@ -271,6 +310,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../asset/js/supabase-client.js"></script>
     <script src="../asset/js/products.js"></script>
-    <script src="admin.js"></script>
+    <script src="admin.js?v=20261123-rooms"></script>
+    <script src="rooms.js?v=20261123-rooms"></script>
 </body>
 </html>

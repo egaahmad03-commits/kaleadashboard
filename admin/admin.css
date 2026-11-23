@@ -848,3 +848,19 @@ h1, h2, h3 {
   color: var(--text-muted);
   font-size: 0.75rem;
 }
+
+.room-admin-note, .room-admin-muted { color: var(--text-muted); font-size: 13px; }
+.room-admin-note { margin: -8px 0 18px; }
+.room-thumb { width: 58px; height: 44px; object-fit: cover; background: #f1efeb; border: 1px solid var(--border-color); }
+.room-modal-content { max-width: 760px; }
+.room-product-picker { max-height: 230px; overflow: auto; border: 1px solid var(--border-color); padding: 8px; }
+.room-product-option { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+.room-product-option:last-child { border-bottom: 0; }
+.room-product-option img { width: 42px; height: 42px; object-fit: cover; background: #f1efeb; }
+.room-selected-products { display: grid; gap: 7px; padding: 0; margin: 8px 0 0; list-style: none; }
+.room-selected-product { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border-color); background: #fff; cursor: grab; }
+.room-selected-product.is-dragging { opacity: .45; }
+.room-selected-product img { width: 46px; height: 46px; object-fit: cover; background: #f1efeb; }
+.room-selected-product .room-product-name { flex: 1; font-size: 13px; }
+.room-selected-product .room-drag-handle { color: var(--text-muted); }
+.room-form-error { color: var(--danger-color); font-size: 13px; }

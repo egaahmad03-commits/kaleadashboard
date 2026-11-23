@@ -55,13 +55,7 @@
         </div>
       </section>
 
-      <div class="room-grid" id="room-grid">
-        <button class="room-card room-living" type="button" data-room="living"><span>Ruang Tamu</span></button>
-        <button class="room-card room-dining" type="button" data-room="dining"><span>Ruang Makan</span></button>
-        <button class="room-card room-bedroom" type="button" data-room="bedroom"><span>Kamar Tidur</span></button>
-        <button class="room-card room-work" type="button" data-room="work"><span>Ruang Kerja</span></button>
-        <button class="room-card room-outdoor" type="button" data-room="outdoor"><span>Area Outdoor</span></button>
-      </div>
+      <div class="room-grid" id="room-grid" aria-live="polite"></div>
 
       <div class="product-grid" id="category-grid" hidden>
         <p class="empty-state">Memuat kategori...</p>
@@ -134,7 +128,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="asset/js/supabase-client.js"></script>
   <script src="asset/js/products.js"></script>
-  <script src="asset/js/catalog-render.js?v=20261121-2"></script>
+  <script src="asset/js/catalog-render.js?v=20261123-rooms"></script>
   <script src="asset/js/cart.js"></script>
   <script src="asset/js/script.js"></script>
   <script>initRoomCatalog();</script>

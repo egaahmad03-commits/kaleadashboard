@@ -941,4 +941,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateCategoryFilterOptions();
     renderProducts();
     renderCategoryTable();
+    if (typeof loadAdminRooms === 'function') await loadAdminRooms();
 });
