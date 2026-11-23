@@ -17,7 +17,7 @@ async function loadAdminRooms() {
     if (!body) return;
     const { data, error } = await supabaseClient.from('rooms').select('*').order('sort_order', { ascending: true });
     if (error) {
-        body.innerHTML = `<tr><td colspan="5" class="room-form-error">${escapeHtml(error.message)}. Jalankan supabase_rooms_migration.sql di Supabase terlebih dahulu.</td></tr>`;
+        body.innerHTML = '<tr><td colspan="5" class="room-form-error">Data ruangan belum dibuat di Supabase. Jalankan supabase_rooms_migration.sql; migrasi ini akan mengisi lima ruangan yang sudah ada beserta produk awalnya.</td></tr>';
         return;
     }
     ADMIN_ROOMS = data || [];

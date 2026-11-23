@@ -63,7 +63,11 @@ with room_categories(room_slug, category_slugs) as (
   from room_categories rc
   join public.rooms r on r.slug = rc.room_slug
   join public.products p on true
-  join public.categories c on c.id = p.category_id and c.slug = any(rc.category_slugs)
+  join public.categories c on c.id = p.category_id
+  where c.slug = any(rc.category_slugs)
+     or (rc.room_slug = 'ruang-tamu' and p.name ilike any (array['%rak buku%', '%rak tv%', '%rak televisi%']))
+     or (rc.room_slug = 'kamar-tidur' and p.name ilike '%meja rias%')
+     or (rc.room_slug = 'ruang-kerja' and p.name ilike any (array['%rak buku%', '%kursi kerja%', '%kursi kantor%']))
 )
 insert into public.room_products (room_id, product_id, sort_order)
 select p.room_id, p.product_id, p.sort_order
