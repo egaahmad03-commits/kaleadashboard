@@ -92,7 +92,7 @@ function initRoomCatalog() {
   var hero = document.querySelector(".catalog-hero");
   var activeRoomKey = null;
   var rooms = [];
-  var roomProducts = {};
+  var roomCategoryIds = {};
   var roomDataFromDatabase = false;
   var lastFocusRefresh = 0;
   if (!roomGrid || !categoryGrid) return;
@@ -106,15 +106,15 @@ function initRoomCatalog() {
   function loadRooms() {
     return Promise.all([
       supabaseClient.from("rooms").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
-      supabaseClient.from("room_products").select("room_id, product_id, sort_order").order("sort_order", { ascending: true })
+      supabaseClient.from("room_categories").select("room_id, category_id, sort_order").order("sort_order", { ascending: true })
     ]).then(function (results) {
       if (results[0].error || results[1].error) throw results[0].error || results[1].error;
       rooms = results[0].data || [];
       roomDataFromDatabase = true;
-      roomProducts = {};
+      roomCategoryIds = {};
       (results[1].data || []).forEach(function (row) {
-        if (!roomProducts[row.room_id]) roomProducts[row.room_id] = [];
-        roomProducts[row.room_id].push(Number(row.product_id));
+        if (!roomCategoryIds[row.room_id]) roomCategoryIds[row.room_id] = [];
+        roomCategoryIds[row.room_id].push(String(row.category_id));
       });
       renderRoomButtons();
       return rooms;
@@ -137,25 +137,21 @@ function initRoomCatalog() {
     if (!room) return;
     activeRoomKey = roomKey;
     loadCatalogData().then(function () {
-      var ids = roomProducts[room.id] || [];
-      var products = roomDataFromDatabase
-        ? ids.map(function (id) { return PRODUCTS.find(function (product) { return Number(product.id) === id; }); }).filter(Boolean)
-        : PRODUCTS.filter(function (product) {
-            if ((room.categories || []).indexOf(product.category_slug) !== -1) return true;
-            var name = String(product.name || '').toLowerCase();
-            return (room.keywords || []).some(function (term) { return name.indexOf(term) !== -1; });
-          });
+      var ids = roomCategoryIds[room.id] || [];
+      var categories = roomDataFromDatabase
+        ? ids.map(function (id) { return CATEGORIES.find(function (category) { return String(category.id) === id; }); }).filter(Boolean)
+        : CATEGORIES.filter(function (category) { return (room.categories || []).indexOf(category.slug) !== -1; });
       title.textContent = room.name;
       description.textContent = room.description || "Pilihan furniture untuk " + room.name.toLowerCase() + ".";
       if (hero) {
         hero.removeAttribute("data-room");
         hero.style.backgroundImage = 'linear-gradient(90deg,rgba(20,18,15,.62),rgba(20,18,15,.12) 78%),url("' + String(room.image_url || fallbackRoomImage(room.slug)).replace(/["\\]/g, "\\$&") + '")';
       }
-      var cards = products.map(function (product) {
-        var image = product.image || (product.images && product.images[0]) || "";
-        return '<a href="produk/produk-detail.html?id=' + encodeURIComponent(product.id) + '" class="product-list-card">' + renderProductPhoto(image, product.name, getCategoryIcon(getCategoryBySlug(product.category_slug))) + '<div class="product-list-info"><h3>' + escapeHtml(product.name) + '</h3><span class="product-detail-link">Lihat Detail &rarr;</span></div></a>';
+      var cards = categories.map(function (category) {
+        var categoryLabel = category.slug === "furnitur-luar-ruangan" ? "Furniture Outdoor & Taman" : category.name;
+        return '<a href="produk/kategori.html?slug=' + encodeURIComponent(category.slug) + '" class="product-card">' + renderCategoryVisual(category, categoryLabel) + '<h3>' + escapeHtml(categoryLabel) + '</h3></a>';
       }).join("");
-      categoryGrid.innerHTML = cards || '<p class="empty-state">Belum ada produk yang ditambahkan ke ruangan ini.</p>';
+      categoryGrid.innerHTML = cards || '<p class="empty-state">Belum ada kategori yang ditambahkan ke ruangan ini.</p>';
       roomGrid.hidden = true;
       categoryGrid.hidden = false;
       if (back) back.hidden = false;

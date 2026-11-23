@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="admin.css?v=20261123-rooms">
+    <link rel="stylesheet" href="admin.css?v=20261123-room-categories">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -141,13 +141,13 @@
 
             <div class="content-section" id="roomSection">
                 <div class="section-header">
-                    <h2>Ruangan &amp; Produk</h2>
+                    <h2>Ruangan &amp; Kategori</h2>
                     <button class="btn-primary" onclick="openRoomModal()"><i class="fa-solid fa-plus"></i> Tambah Ruangan</button>
                 </div>
-                <p class="room-admin-note">Atur ruangan yang tampil di katalog. Pilih produk untuk tiap ruangan dan seret produk untuk mengubah urutannya.</p>
+                <p class="room-admin-note">Atur ruangan yang tampil di katalog. Pilih kategori produk untuk tiap ruangan dan seret kategori untuk mengubah urutannya.</p>
                 <div style="overflow-x:auto;">
                     <table class="data-table">
-                        <thead><tr><th style="width:80px;">Foto</th><th>Nama Ruangan</th><th>Produk Tampil</th><th>Urutan</th><th>Aksi</th></tr></thead>
+                        <thead><tr><th style="width:80px;">Foto</th><th>Nama Ruangan</th><th>Kategori Tampil</th><th>Urutan</th><th>Aksi</th></tr></thead>
                         <tbody id="roomTableBody"></tbody>
                     </table>
                 </div>
@@ -170,9 +170,9 @@
                     <input type="file" id="roomPhotoInput" accept="image/*" hidden onchange="handleRoomPhotoSelected(this.files)">
                     <div id="roomPhotoPreview" class="photo-preview-list"></div>
                 </div>
-                <div class="form-group"><label for="roomProductSearch">Produk untuk ruangan ini</label><input id="roomProductSearch" type="search" placeholder="Cari produk..." oninput="renderRoomProductPicker()"></div>
-                <div id="roomProductPicker" class="room-product-picker"></div>
-                <div class="form-group"><label>Urutan produk di website <span class="room-admin-muted">(seret untuk mengatur urutan)</span></label><ol id="roomSelectedProducts" class="room-selected-products"></ol></div>
+                <div class="form-group"><label for="roomCategorySearch">Kategori untuk ruangan ini</label><input id="roomCategorySearch" type="search" placeholder="Cari kategori..." oninput="renderRoomCategoryPicker()"></div>
+                <div id="roomCategoryPicker" class="room-product-picker"></div>
+                <div class="form-group"><label>Urutan kategori di website <span class="room-admin-muted">(seret untuk mengatur urutan)</span></label><ol id="roomSelectedCategories" class="room-selected-products"></ol></div>
                 <p id="roomFormError" class="room-form-error" hidden></p>
                 <div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeRoomModal()">Batal</button><button type="submit" class="btn-primary" id="roomSaveBtn">Simpan Ruangan</button></div>
             </form>
@@ -310,7 +310,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../asset/js/supabase-client.js"></script>
     <script src="../asset/js/products.js"></script>
-    <script src="admin.js?v=20261123-rooms"></script>
-    <script src="rooms.js?v=20261123-rooms-2"></script>
+    <script src="admin.js?v=20261123-room-categories"></script>
+    <script src="rooms.js?v=20261123-room-categories"></script>
 </body>
 </html>

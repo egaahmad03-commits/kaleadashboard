@@ -857,10 +857,13 @@ h1, h2, h3 {
 .room-product-option { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
 .room-product-option:last-child { border-bottom: 0; }
 .room-product-option img { width: 42px; height: 42px; object-fit: cover; background: #f1efeb; }
+.room-category-icon { display: inline-flex; width: 42px; height: 42px; flex: 0 0 42px; align-items: center; justify-content: center; color: var(--text-muted); background: #f5f4f1; }
+.room-category-icon svg { width: 24px; height: 24px; }
 .room-selected-products { display: grid; gap: 7px; padding: 0; margin: 8px 0 0; list-style: none; }
 .room-selected-product { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border-color); background: #fff; cursor: grab; }
 .room-selected-product.is-dragging { opacity: .45; }
 .room-selected-product img { width: 46px; height: 46px; object-fit: cover; background: #f1efeb; }
+.room-selected-product .room-category-icon { width: 46px; height: 46px; flex-basis: 46px; }
 .room-selected-product .room-product-name { flex: 1; font-size: 13px; }
 .room-selected-product .room-drag-handle { color: var(--text-muted); }
 .room-form-error { color: var(--danger-color); font-size: 13px; }

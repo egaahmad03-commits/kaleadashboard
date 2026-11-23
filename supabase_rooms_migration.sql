@@ -20,8 +20,18 @@ create table if not exists public.room_products (
   primary key (room_id, product_id)
 );
 
+-- Ruangan pada katalog menampilkan kategori terlebih dahulu, bukan setiap produk.
+create table if not exists public.room_categories (
+  room_id uuid not null references public.rooms(id) on delete cascade,
+  category_id uuid not null references public.categories(id) on delete cascade,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  primary key (room_id, category_id)
+);
+
 alter table public.rooms enable row level security;
 alter table public.room_products enable row level security;
+alter table public.room_categories enable row level security;
 
 drop policy if exists "Publik boleh membaca ruangan" on public.rooms;
 create policy "Publik boleh membaca ruangan" on public.rooms
@@ -39,6 +49,15 @@ create policy "Admin boleh mengelola produk per ruangan" on public.room_products
 
 grant select on public.rooms, public.room_products to anon, authenticated;
 grant insert, update, delete on public.rooms, public.room_products to authenticated;
+grant select on public.room_categories to anon, authenticated;
+grant insert, update, delete on public.room_categories to authenticated;
+
+drop policy if exists "Publik boleh membaca kategori per ruangan" on public.room_categories;
+create policy "Publik boleh membaca kategori per ruangan" on public.room_categories
+  for select to anon, authenticated using (true);
+drop policy if exists "Admin boleh mengelola kategori per ruangan" on public.room_categories;
+create policy "Admin boleh mengelola kategori per ruangan" on public.room_categories
+  for all to authenticated using (true) with check (true);
 
 insert into public.rooms (name, slug, description, sort_order) values
   ('Ruang Tamu', 'ruang-tamu', 'Pilihan furniture untuk ruang tamu yang nyaman dan berkelas.', 1),
@@ -73,3 +92,24 @@ insert into public.room_products (room_id, product_id, sort_order)
 select p.room_id, p.product_id, p.sort_order
 from products_to_add p
 on conflict (room_id, product_id) do nothing;
+
+-- Asosiasikan tiap ruangan dengan kategori yang sebelumnya tampil pada katalog.
+-- Menjalankan ulang migrasi aman; kategori yang sudah tersimpan tidak diduplikasi.
+with room_category_order(room_slug, category_slugs) as (
+  values
+    ('ruang-tamu', array['sofa','kursi-santai','meja-kopi','meja-samping','meja-konsol','kabinet','kursi-bar']),
+    ('ruang-makan', array['meja-makan','kursi-makan','kursi-bar','kabinet','meja-konsol','meja-samping']),
+    ('kamar-tidur', array['rangka-tempat-tidur','lemari','meja-samping','kursi-santai','meja-konsol']),
+    ('ruang-kerja', array['meja-kerja','lemari','kabinet','kursi-santai','meja-samping','meja-konsol']),
+    ('area-outdoor', array['furnitur-luar-ruangan'])
+), categories_to_add as (
+  select r.id as room_id, c.id as category_id,
+         array_position(rc.category_slugs, c.slug)::integer as sort_order
+  from room_category_order rc
+  join public.rooms r on r.slug = rc.room_slug
+  join public.categories c on c.slug = any(rc.category_slugs)
+)
+insert into public.room_categories (room_id, category_id, sort_order)
+select room_id, category_id, sort_order
+from categories_to_add
+on conflict (room_id, category_id) do nothing;
