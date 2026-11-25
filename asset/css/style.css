@@ -3695,6 +3695,35 @@ body:has(main.hero, .catalog-hero, .about-hero, .contact-hero) .site-header {
   background: linear-gradient(to bottom,rgba(247,245,241,.96),rgba(247,245,241,.74) 76%,transparent);
   border-bottom-color: rgba(60,52,43,.1);
 }
+@media (max-width: 768px) {
+  html, body { max-width: 100%; overflow-x: clip; }
+  main.hero {
+    min-height: max(720px,100svh);
+    background-image: url('../images/kalea-living-room.jpeg');
+    background-size: cover;
+    background-position: center 58%;
+  }
+  main.hero .kalea-hero-video { display: none; }
+  main.hero .hero-veil { background: linear-gradient(to bottom,rgba(242,240,236,.8),rgba(242,240,236,.56) 35%,rgba(242,240,236,.48) 72%,rgba(242,240,236,.78)); }
+  main.hero .hero-content { top: 15%; width: calc(100% - 40px); }
+  main.hero .hero-content h1 { max-width: 14ch; font-size: clamp(2.5rem,9.5vw,3.7rem); }
+  main.hero .hero-content p { max-width: 36ch; font-size: .98rem; }
+  .why-us { min-height: 0; padding: 28px 20px; }
+  .why-us-inner { grid-template-columns: 1fr; gap: 0; max-width: 540px; }
+  .why-us-item {
+    display: grid;
+    grid-template-columns: 48px minmax(0,1fr);
+    column-gap: 15px;
+    align-items: center;
+    text-align: left;
+    padding: 17px 0;
+    border-bottom: 1px solid rgba(111,91,71,.14);
+  }
+  .why-us-item:last-child { border-bottom: 0; }
+  .why-us-icon { grid-column: 1; grid-row: 1 / span 2; width: 44px; height: 44px; margin: 0; }
+  .why-us-item h3 { grid-column: 2; margin: 0 0 4px; font-size: 1.15rem; }
+  .why-us-item p { grid-column: 2; max-width: none; margin: 0; font-size: .82rem; line-height: 1.45; }
+}
 body:has(main.hero, .catalog-hero, .about-hero, .contact-hero) .site-header .site-logo,
 body:has(main.hero, .catalog-hero, .about-hero, .contact-hero) .site-header .site-logo span,
 body:has(main.hero, .catalog-hero, .about-hero, .contact-hero) .site-header .site-nav a:not(.nav-cart-link),
@@ -3870,4 +3899,16 @@ body:has(main.hero, .catalog-hero, .about-hero, .contact-hero) .site-header {
   border-bottom-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
+}
+@media (max-width: 768px) {
+  main.hero .hero-content { top: 15%; width: calc(100% - 40px); }
+  main.hero .hero-content h1 { max-width: 14ch; font-size: clamp(2.5rem,9.5vw,3.7rem); }
+  main.hero .hero-content p { max-width: 36ch; font-size: .98rem; }
+  .why-us { min-height: 0; padding: 28px 20px; }
+  .why-us-inner { grid-template-columns: 1fr; gap: 0; max-width: 540px; }
+  .why-us-item { display: grid; grid-template-columns: 48px minmax(0,1fr); column-gap: 15px; align-items: center; text-align: left; padding: 17px 0; border-bottom: 1px solid rgba(111,91,71,.14); }
+  .why-us-item:last-child { border-bottom: 0; }
+  .why-us-icon { grid-column: 1; grid-row: 1 / span 2; width: 44px; height: 44px; margin: 0; }
+  .why-us-item h3 { grid-column: 2; margin: 0 0 4px; font-size: 1.15rem; }
+  .why-us-item p { grid-column: 2; max-width: none; margin: 0; font-size: .82rem; line-height: 1.45; }
 }
