@@ -3901,6 +3901,10 @@ body:has(main.hero, .catalog-hero, .about-hero, .contact-hero) .site-header {
   backdrop-filter: none !important;
 }
 @media (max-width: 768px) {
+  body:has(.contact-grid) .page-content { width: 100%; }
+  body:has(.contact-grid) .contact-grid { width: calc(100% - 32px); }
+  body:has(.contact-grid) .contact-card { width: 100%; }
+  body:has(.contact-hero) .contact-hero-video { display: none; }
   main.hero .hero-content { top: 15%; width: calc(100% - 40px); }
   main.hero .hero-content h1 { max-width: 14ch; font-size: clamp(2.5rem,9.5vw,3.7rem); }
   main.hero .hero-content p { max-width: 36ch; font-size: .98rem; }
