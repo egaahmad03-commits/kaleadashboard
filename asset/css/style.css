@@ -778,6 +778,12 @@ body:has(.hero, .page-hero) .site-header.is-scrolled,
 .project-card-photo { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; }
 .project-card:has(.project-card-photo) { border-color: transparent; color: #fff; }
 .project-card:has(.project-card-photo)::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,0) 35%, rgba(0,0,0,0) 55%, rgba(0,0,0,.6)); }
+/* Logo klien: bingkai bulat di tengah kartu. */
+.project-card-logo { width: min(52%, 160px); aspect-ratio: 1 / 1; margin: auto; border: 1px solid var(--k-line); border-radius: 50%; object-fit: cover; }
+/* Logo persegi panjang (mis. BINUS): tampil utuh di lingkaran putih. */
+.project-card-logo--contain { padding: 12%; background: #fff; object-fit: contain; }
+.project-card:has(.project-card-logo):not(:has(.project-card-photo)) { aspect-ratio: 3 / 4; }
+.project-card:has(.project-card-logo) .project-card-name { margin-top: 0; }
 .project-card-index { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .project-card-name { margin-top: auto; font-size: clamp(1.2rem, 1.9vw, 2.2rem); font-weight: 800; font-stretch: 110%; letter-spacing: -.035em; line-height: .92; text-transform: uppercase; }
 .project-card-loc { min-height: 1em; font-size: .78rem; opacity: .8; }
