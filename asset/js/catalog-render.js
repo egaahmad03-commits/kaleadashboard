@@ -51,6 +51,49 @@ function renderCategoryVisual(category, label) {
   return '<div class="product-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (category.icon_svg || GENERIC_CATEGORY_ICON) + '</svg></div>';
 }
 
+/* Kartu produk (daftar kategori & produk terkait). Foto ke-2 muncul saat kursor diarahkan. */
+function productCardHtml(p, iconSvg) {
+  var images = p.images || [];
+  var mainImage = p.image || images[0] || "";
+  var photo = renderProductPhoto(mainImage, p.name, iconSvg);
+  if (mainImage && images[1] && images[1] !== mainImage) {
+    photo = photo.slice(0, -"</div>".length) +
+      '<img class="product-photo-alt" src="' + images[1] + '" alt="" loading="lazy" draggable="false" onerror="this.remove()">' +
+      "</div>";
+  }
+  return (
+    '<a href="produk-detail.html?id=' + p.id + '" class="product-list-card">' +
+    '<button type="button" class="card-add-cart" data-add-cart="' + p.id + '" aria-label="Tambah ke keranjang">' +
+    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>' +
+    '</button>' +
+    photo +
+    '<div class="product-list-info">' +
+    '<h3>' + escapeHtml(p.name) + '</h3>' +
+    (p.material ? '<span class="product-list-material">' + escapeHtml(p.material) + '</span>' : '') +
+    '</div>' +
+    '</a>'
+  );
+}
+
+function bindAddCartButtons(container) {
+  container.querySelectorAll("[data-add-cart]").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      addToCart(Number(btn.getAttribute("data-add-cart")), 1);
+      btn.classList.add("is-added");
+      setTimeout(function () { btn.classList.remove("is-added"); }, 1200);
+    });
+  });
+}
+
+/* Pita teks berjalan, mis. "PRODUK TERKAIT ◎". Isinya digandakan agar putarannya mulus. */
+function marqueeHtml(text, variant) {
+  var item = '<span>' + escapeHtml(text) + '</span><i class="marquee-dot"></i>';
+  var run = new Array(7).join(item);
+  return '<div class="marquee marquee--' + variant + '" aria-hidden="true"><div class="marquee-track">' + run + run + '</div></div>';
+}
+
 /* ===== Tombol kategori di katalog.html (dulu hardcode, sekarang dari data) =====
    Sekarang mengecek c.display_mode: kalau "image" dan c.image_url ada,
    tampilkan foto kategori. Kalau tidak, tampilkan icon_svg seperti biasa
@@ -106,7 +149,9 @@ function initRoomCatalog() {
   function loadRooms() {
     return Promise.all([
       supabaseClient.from("rooms").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
-      supabaseClient.from("room_categories").select("room_id, category_id, sort_order").order("sort_order", { ascending: true })
+      supabaseClient.from("room_categories").select("room_id, category_id, sort_order").order("sort_order", { ascending: true }),
+      // Nama kategori dipakai untuk ringkasan di kartu ruangan; kalau gagal, kartu tetap tampil.
+      loadCatalogData().catch(function () { return null; })
     ]).then(function (results) {
       if (results[0].error || results[1].error) throw results[0].error || results[1].error;
       rooms = results[0].data || [];
@@ -121,11 +166,30 @@ function initRoomCatalog() {
     });
   }
 
+  // Ringkasan isi ruangan, mis. "Sofa, Meja Kopi, Kabinet · 7 kategori".
+  function roomSummary(room) {
+    var categories = roomDataFromDatabase
+      ? (roomCategoryIds[room.id] || []).map(function (id) { return CATEGORIES.find(function (c) { return String(c.id) === id; }); })
+      : CATEGORIES.filter(function (c) { return (room.categories || []).indexOf(c.slug) !== -1; });
+    var count = roomDataFromDatabase ? (roomCategoryIds[room.id] || []).length : (room.categories || []).length;
+    var names = categories.filter(Boolean).slice(0, 3).map(function (c) { return c.name; });
+    var parts = [];
+    if (names.length) parts.push(names.join(", "));
+    if (count) parts.push(count + " kategori");
+    return parts.join(" · ");
+  }
+
   function renderRoomButtons() {
-    roomGrid.innerHTML = rooms.map(function (room) {
+    roomGrid.innerHTML = rooms.map(function (room, index) {
       var image = room.image_url || fallbackRoomImage(room.slug);
       var safeImage = String(image).replace(/["\\]/g, "\\$&");
-      return '<button class="room-card" type="button" data-room="' + escapeHtml(room.id) + '" style="background-image:linear-gradient(0deg,rgba(0,0,0,.68),rgba(0,0,0,.03) 70%),url(&quot;' + safeImage + '&quot;);background-size:cover;background-position:center"><span>' + escapeHtml(room.name) + '</span></button>';
+      var number = (index + 1 < 10 ? "0" : "") + (index + 1);
+      var summary = roomSummary(room);
+      return '<button class="room-card" type="button" data-room="' + escapeHtml(room.id) + '" style="background-image:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 50%,rgba(0,0,0,.65)),url(&quot;' + safeImage + '&quot;);background-size:cover;background-position:center">' +
+        '<span class="room-card-index">' + number + ' / Ruangan</span>' +
+        '<span class="room-card-meta"><b>' + escapeHtml(room.name) + '</b>' +
+        (summary ? '<small>' + escapeHtml(summary) + '</small>' : '') + '</span>' +
+        '</button>';
     }).join("");
     roomGrid.querySelectorAll("[data-room]").forEach(function (button) {
       button.addEventListener("click", function () { showRoom(button.getAttribute("data-room")); });
@@ -257,30 +321,9 @@ function renderProductList(slug) {
     }
 
     container.innerHTML = products.map(function (p) {
-      var mainImage = p.image || (p.images && p.images[0]) || "";
-      return (
-        '<a href="produk-detail.html?id=' + p.id + '" class="product-list-card">' +
-        '<button type="button" class="card-add-cart" data-add-cart="' + p.id + '" aria-label="Tambah ke keranjang">' +
-        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>' +
-        '</button>' +
-        renderProductPhoto(mainImage, p.name, category.icon_svg) +
-        '<div class="product-list-info">' +
-        '<h3>' + escapeHtml(p.name) + '</h3>' +
-        '<span class="product-detail-link">Lihat Detail &rarr;</span>' +
-        '</div>' +
-        '</a>'
-      );
+      return productCardHtml(p, category.icon_svg);
     }).join("");
-
-    container.querySelectorAll("[data-add-cart]").forEach(function (btn) {
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        addToCart(Number(btn.getAttribute("data-add-cart")), 1);
-        btn.classList.add("is-added");
-        setTimeout(function () { btn.classList.remove("is-added"); }, 1200);
-      });
-    });
+    bindAddCartButtons(container);
   }).catch(function (err) {
     console.error("Gagal memuat produk:", err);
     container.innerHTML = '<p class="empty-state">Gagal memuat produk. Coba muat ulang halaman.</p>';
@@ -457,45 +500,43 @@ function renderProductDetail() {
 
     var waMessage = encodeURIComponent("Halo Kalea Furniture, saya tertarik dengan produk " + product.name + ".");
 
+    var categoryName = escapeHtml(product.category);
+    var categoryUrl = 'kategori.html?slug=' + encodeURIComponent(categorySlug);
+    function accordion(title, body, open) {
+      return '<details class="product-accordion-item"' + (open ? ' open' : '') + '><summary>' + title + '</summary><div class="product-accordion-body">' + body + '</div></details>';
+    }
+
     wrapper.innerHTML =
+      '<div class="product-detail-info">' +
+      '<span class="product-detail-category">' + categoryName + '</span>' +
+      '<h1>' + escapeHtml(product.name) + '</h1>' +
+      '<p class="product-detail-desc">' + escapeHtml(product.description) + '</p>' +
+      '<a class="product-price-wa product-price-wa-detail" href="' + getProductWaUrl(product) + '" target="_blank" rel="noopener">Tanya Harga via WhatsApp</a>' +
+      '<div class="product-detail-actions">' +
+      '<a href="https://wa.me/6289504977797?text=' + waMessage + '" target="_blank" rel="noopener" class="btn-solid">Pesan via WhatsApp</a>' +
+      '<button type="button" id="detailAddCart" class="btn-outline"><span class="text">Tambah ke Keranjang</span></button>' +
+      '</div>' +
+      '<div class="product-accordion">' +
+      accordion('Detail &amp; Ukuran',
+        '<table class="product-spec-table">' +
+        '<tr><th>Kategori</th><td>' + categoryName + '</td></tr>' +
+        '<tr><th>Material</th><td>' + escapeHtml(product.material) + '</td></tr>' +
+        '<tr><th>Warna</th><td>' + escapeHtml(product.color) + '</td></tr>' +
+        '<tr><th>Dimensi</th><td>' + escapeHtml(product.dimensions) + '</td></tr>' +
+        '</table>', true) +
+      accordion('Custom Ukuran &amp; Finishing',
+        '<p>Ukuran, warna, dan finishing dapat disesuaikan dengan kebutuhan ruang Anda melalui pesanan khusus. Konsultasikan detailnya lewat WhatsApp.</p>') +
+      accordion('Pengiriman',
+        '<p>Dikemas aman langsung dari workshop Jepara dan dikirim ke seluruh Indonesia. Estimasi ongkos kirim dan waktu pengiriman diinformasikan saat pemesanan.</p>') +
+      '</div>' +
+      '<a class="link-underline product-back" href="' + categoryUrl + '">&larr; Kembali ke ' + categoryName + '</a>' +
+      '</div>' +
       '<div class="product-detail-gallery">' +
       '  <div class="gallery-main-wrap">' +
       '    <div id="gallery-main"></div>' +
       '    <span id="gallery-counter" class="gallery-counter"></span>' +
       '  </div>' +
       '  <div id="gallery-thumbs" class="gallery-thumbs"></div>' +
-      '</div>' +
-      '<div class="product-detail-info">' +
-      '<span class="product-detail-category">' + escapeHtml(product.category) + '</span>' +
-      '<h1>' + escapeHtml(product.name) + '</h1>' +
-      '<a class="product-price-wa product-price-wa-detail" href="' + getProductWaUrl(product) + '" target="_blank" rel="noopener">Tanya Harga via WhatsApp</a>' +
-      '<p class="product-detail-desc">' + escapeHtml(product.description) + '</p>' +
-      '<table class="product-spec-table">' +
-      '<tr><th>Kategori</th><td>' + escapeHtml(product.category) + '</td></tr>' +
-      '<tr><th>Material</th><td>' + escapeHtml(product.material) + '</td></tr>' +
-      '<tr><th>Warna</th><td>' + escapeHtml(product.color) + '</td></tr>' +
-      '<tr><th>Dimensi</th><td>' + escapeHtml(product.dimensions) + '</td></tr>' +
-      '</table>' +
-      '<div class="button-container product-detail-actions">' +
-      '<button type="button" id="detailAddCart" class="animated-button">' +
-      '<svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
-      '<span class="text">Tambah ke Keranjang</span>' +
-      '<span class="circle"></span>' +
-      '<svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
-      '</button>' +
-      '<a href="https://wa.me/6289504977797?text=' + waMessage + '" target="_blank" rel="noopener" class="animated-button">' +
-      '<svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
-      '<span class="text">Pesan via WhatsApp</span>' +
-      '<span class="circle"></span>' +
-      '<svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
-      '</a>' +
-      '<a href="kategori.html?slug=' + encodeURIComponent(categorySlug) + '" class="animated-button">' +
-      '<svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
-      '<span class="text">Kembali ke ' + escapeHtml(product.category) + '</span>' +
-      '<span class="circle"></span>' +
-      '<svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>' +
-      '</a>' +
-      '</div>' +
       '</div>';
 
     var addCartBtn = document.getElementById("detailAddCart");
@@ -512,8 +553,28 @@ function renderProductDetail() {
     }
 
     initProductGallery(product, category ? category.icon_svg : null);
+    renderRelatedProducts(product, category);
   }).catch(function (err) {
     console.error("Gagal memuat produk:", err);
     wrapper.innerHTML = '<p class="empty-state">Gagal memuat produk. Coba muat ulang halaman.</p>';
   });
+}
+
+/* ===== Produk terkait di halaman detail (kategori yang sama) ===== */
+function renderRelatedProducts(product, category) {
+  var section = document.getElementById("related-products");
+  if (!section) return;
+  var others = getProductsByCategorySlug(product.category_slug).filter(function (p) {
+    return String(p.id) !== String(product.id);
+  }).slice(0, 4);
+  if (others.length === 0) { section.hidden = true; return; }
+
+  section.innerHTML =
+    marqueeHtml("Produk Terkait", "tilt") +
+    '<h2 class="visually-hidden">Produk Terkait</h2>' +
+    '<div class="product-list-grid related-grid">' +
+    others.map(function (p) { return productCardHtml(p, category ? category.icon_svg : null); }).join("") +
+    '</div>';
+  section.hidden = false;
+  bindAddCartButtons(section);
 }
