@@ -7,8 +7,8 @@
   <meta name="description" content="Hubungi Kalea Furniture via WhatsApp atau Instagram untuk konsultasi gratis, pemesanan custom furniture, dan informasi produk. Berlokasi di Jepara, Jawa Tengah.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="asset/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="asset/css/style.css?v=20261126">
   <link rel="icon" type="image/svg+xml" href="asset/favicon.svg">
 </head>
 <body>
@@ -35,21 +35,22 @@
         </svg>
         <span class="cart-badge" id="navCartBadge">0</span>
       </a>
+      <a href="https://wa.me/6289504977797" class="nav-cta" target="_blank" rel="noopener">Konsultasi Gratis</a>
       </nav>
     </div>
   </header>
 
-  <main class="page">
+  <main class="page contact-page">
+    <section class="contact-hero page-hero" aria-labelledby="contact-title">
+      <video class="page-hero-media" autoplay muted loop playsinline preload="metadata" poster="asset/images/kalea-contact-hero-wide.jpg" aria-hidden="true"><source src="asset/video/showroom.mp4" type="video/mp4"></video>
+      <div class="page-hero-veil" aria-hidden="true"></div>
+      <div class="page-hero-content">
+        <p class="page-hero-intro">Silakan hubungi kami melalui informasi di bawah ini.</p>
+        <h1 class="page-hero-title" id="contact-title" data-fit="desktop">Kontak</h1>
+      </div>
+    </section>
+
     <div class="page-content">
-      <section class="contact-hero" aria-labelledby="contact-title">
-        <img src="asset/images/kalea-contact-hero-wide.png" alt="Ruang keluarga Kalea dengan sofa linen, furniture kayu Jepara, dan jendela taman">
-        <video class="contact-hero-video" autoplay muted loop playsinline preload="metadata" poster="asset/images/kalea-contact-hero-wide.png" aria-hidden="true"><source src="https://videos.pexels.com/video-files/40723271/17395482_3840_2160_25fps.mp4" type="video/mp4"></video>
-        <div class="secondary-hero-veil" aria-hidden="true"></div>
-        <div class="contact-hero-copy">
-          <h1 id="contact-title">Kontak</h1>
-          <p>Silakan hubungi kami melalui informasi di bawah ini.</p>
-        </div>
-      </section>
 
       <div class="contact-grid">
 
@@ -121,7 +122,7 @@
 
       </div>
       <div class="contact-map-section">
-        <h2>Lokasi Kami</h2>
+        <h2 class="display-text display-text--section" data-split>Lokasi <span class="tag" aria-hidden="true">Jepara</span> Kami</h2>
         <div class="contact-map-wrap">
           <iframe src="https://www.google.com/maps?q=Sukosono,%20Kec.%20Kedung,%20Kabupaten%20Jepara,%20Jawa%20Tengah%2059463&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Lokasi Kalea Furniture"></iframe>
         </div>
@@ -142,6 +143,14 @@
     </div>
   </main>
 
+  <!-- ===== Ajakan konsultasi ===== -->
+  <section class="closing-cta" aria-labelledby="closing-title">
+    <h2 id="closing-title" class="display-text" data-split>
+      Mari bicara <span class="tag" aria-hidden="true">Gratis</span> tentang ruang Anda
+    </h2>
+    <a href="https://wa.me/6289504977797" class="btn-solid" target="_blank" rel="noopener" data-reveal>Konsultasi via WhatsApp</a>
+  </section>
+
   <footer class="footer">
     <div class="footer-content">
       <h2>Kalea Furniture</h2>
@@ -156,8 +165,8 @@
   <script>window.KALEA_ASSET_PREFIX = "";</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="asset/js/supabase-client.js"></script>
-  <script src="asset/js/products.js"></script>
-  <script src="asset/js/cart.js"></script>
-  <script src="asset/js/script.js"></script>
+  <script src="asset/js/products.js?v=20261126"></script>
+  <script src="asset/js/cart.js?v=20261126"></script>
+  <script src="asset/js/script.js?v=20261126"></script>
 </body>
 </html>

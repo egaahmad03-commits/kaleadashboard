@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Beranda - Kalea Furniture</title>
-  <meta name="description" content="Kalea Furniture Ã¢â‚¬â€ furniture kayu jati dan mahoni solid buatan tangan pengrajin Jepara. Kursi, meja, lemari, dan sofa custom untuk rumah Anda, pengiriman ke seluruh Indonesia.">
+  <meta name="description" content="Kalea Furniture — furniture kayu jati dan mahoni solid buatan tangan pengrajin Jepara. Kursi, meja, lemari, dan sofa custom untuk rumah Anda, pengiriman ke seluruh Indonesia.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="asset/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="asset/css/style.css?v=20261126">
   <link rel="icon" type="image/svg+xml" href="asset/favicon.svg">
 </head>
-<body>
+<body class="home">
 
   <header class="site-header">
     <div class="site-header-inner">
@@ -35,72 +35,106 @@
         </svg>
         <span class="cart-badge" id="navCartBadge">0</span>
       </a>
+      <a href="https://wa.me/6289504977797" class="nav-cta" target="_blank" rel="noopener">Konsultasi Gratis</a>
       </nav>
     </div>
   </header>
 
+  <!-- ===== Hero: foto/video penuh + nama besar di bawah ===== -->
   <main class="hero">
-    <video class="kalea-hero-video" autoplay muted loop playsinline preload="metadata" poster="asset/images/kalea-living-room.jpeg" aria-hidden="true"><source src="https://videos.pexels.com/video-files/7749263/7749263-uhd_2160_2700_30fps.mp4" type="video/mp4"></video>
+    <video class="kalea-hero-video" autoplay muted loop playsinline preload="metadata" poster="asset/images/kalea-living-room.jpeg" aria-hidden="true"><source src="asset/video/beranda.mp4" type="video/mp4"></video>
     <div class="kalea-hero-veil" aria-hidden="true"></div>
     <div class="hero-inner">
       <div class="hero-content">
-        <h1>Keanggunan Abadi untuk Hunian Anda</h1>
-        <p>Hadirkan suasana berkelas melalui koleksi dengan desain istimewa, material pilihan, dan detail yang dirancang untuk melengkapi ruang Anda.</p>
-
-        <div class="button-container">
-          <a href="katalog.html" class="animated-button">
-            <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-            </svg>
-            <span class="text">Lihat Katalog</span>
-            <span class="circle"></span>
-            <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.7781L10.8076 18.3639L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-            </svg>
-          </a>
-
-          <a href="kontak.html" class="hero-link-secondary">Konsultasi Gratis &rarr;</a>
-        </div>
+        <p class="hero-intro">Furniture kayu solid, dibuat tangan oleh pengrajin Jepara.</p>
+        <a href="katalog.html" class="link-underline link-underline--light hero-cta">Lihat Katalog</a>
+        <h1 class="hero-wordmark" data-fit aria-label="Kalea Furniture">
+          <span class="hero-word" aria-hidden="true"><span>Kalea</span></span>
+          <span class="hero-word" aria-hidden="true"><span>Furniture</span></span>
+        </h1>
       </div>
     </div>
   </main>
 
-  <section class="why-us">
+  <!-- ===== Pernyataan besar dengan label kurung ===== -->
+  <section class="statement" aria-labelledby="statement-title">
+    <h2 id="statement-title" class="display-text" data-split>
+      Kami membuat <span class="tag" aria-hidden="true">Tentang Kami</span> furniture kayu solid untuk rumah <span class="tag" aria-hidden="true">Dari Jepara</span> yang Anda cintai
+    </h2>
+    <p class="statement-copy" data-reveal>Kalea Furniture adalah workshop furniture di Jepara. Kursi, meja, lemari, dan sofa kami dibuat dari kayu jati dan mahoni pilihan, dapat dipesan dengan ukuran dan finishing custom, lalu dikirim ke seluruh Indonesia.</p>
+    <a href="tentangkami.html" class="link-underline" data-reveal>Selengkapnya</a>
+  </section>
+
+  <!-- ===== Koleksi per ruangan ===== -->
+  <section class="collections" aria-labelledby="collections-title">
+    <h2 id="collections-title" class="display-text display-text--section" data-split>
+      Koleksi <span class="tag" aria-hidden="true">Ruangan</span> Kami
+    </h2>
+
+    <div class="collection-grid" data-stagger>
+      <a class="collection-card collection-card--all" href="katalog.html">
+        <span class="collection-meta"><b>Semua Koleksi</b><small>Pilih ruangan Anda</small></span>
+        <svg class="collection-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+      </a>
+      <a class="collection-card" href="katalog.html?ruangan=ruang-tamu">
+        <span class="collection-photo"><img src="asset/images/kalea-living-room.jpeg" alt="Ruang tamu dengan sofa dan furniture kayu Kalea" loading="lazy"></span>
+        <span class="collection-meta"><b>Ruang Tamu</b><small>Sofa, meja kopi, kabinet</small></span>
+        <svg class="collection-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="3" stroke-linecap="square"/></svg>
+      </a>
+      <a class="collection-card" href="katalog.html?ruangan=ruang-makan">
+        <span class="collection-photo"><img src="asset/images/kalea-dining-room.jpeg" alt="Ruang makan dengan meja kayu solid Kalea" loading="lazy"></span>
+        <span class="collection-meta"><b>Ruang Makan</b><small>Meja makan, kursi makan, kursi bar</small></span>
+        <svg class="collection-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 13h7v7h-7z" fill="currentColor"/></svg>
+      </a>
+      <a class="collection-card" href="katalog.html?ruangan=kamar-tidur">
+        <span class="collection-photo"><img src="asset/images/kalea-bedroom.jpeg" alt="Kamar tidur dengan rangka tempat tidur kayu Kalea" loading="lazy"></span>
+        <span class="collection-meta"><b>Kamar Tidur</b><small>Tempat tidur, lemari, meja samping</small></span>
+        <svg class="collection-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="3"/></svg>
+      </a>
+    </div>
+
+    <a href="katalog.html" class="link-underline collections-all" data-reveal>Lihat Semua</a>
+  </section>
+
+  <!-- ===== Keunggulan, bernomor ===== -->
+  <section class="why-us" aria-label="Keunggulan Kalea Furniture">
     <div class="why-us-inner">
       <div class="why-us-item">
-        <div class="why-us-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4v5c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V7l8-4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+        <span class="why-us-num">01</span>
         <h3>Kualitas Material</h3>
-        <p>Menggunakan kayu jati dan mahoni pilihan untuk menghadirkan furniture yang indah dan nyaman digunakan.</p>
+        <p>Kayu jati dan mahoni pilihan, menghasilkan furniture yang indah, kokoh, dan nyaman digunakan.</p>
       </div>
       <div class="why-us-item">
-        <div class="why-us-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h11v9H3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 10h4l3 3v3h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="18" r="1.6" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="18" r="1.6" stroke="currentColor" stroke-width="1.6"/></svg>
-        </div>
+        <span class="why-us-num">02</span>
         <h3>Pengiriman Seluruh Indonesia</h3>
-        <p>Dikemas aman langsung dari workshop Jepara, sampai ke rumah Anda kapan pun dan di mana pun.</p>
+        <p>Dikemas aman langsung dari workshop Jepara hingga sampai ke rumah Anda.</p>
       </div>
       <div class="why-us-item">
-        <div class="why-us-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 12a8 8 0 11-3-6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v5h-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+        <span class="why-us-num">03</span>
         <h3>Custom Ukuran &amp; Finishing</h3>
-        <p>Sesuaikan ukuran, warna, dan detail sesuai kebutuhan ruang Anda melalui layanan pesanan khusus.</p>
+        <p>Sesuaikan ukuran, warna, dan detail dengan kebutuhan ruang Anda melalui pesanan khusus.</p>
       </div>
     </div>
   </section>
 
-  <section class="home-collections" aria-labelledby="home-collections-title">
-    <div class="home-collections-heading">
-      <div><span class="home-collections-kicker">DIBUAT UNTUK RUANG ANDA</span><h2 id="home-collections-title">Temukan gaya <em>favorit Anda.</em></h2></div>
-      <a class="home-collections-all" href="katalog.html">Jelajahi semua koleksi <span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="home-collection-grid">
-      <a class="home-collection-card home-collection-living" href="katalog.html"><span class="home-collection-photo" role="img" aria-label="Ruang tamu minimalis dengan sofa dan furniture kayu"></span><span class="home-collection-index">01 / RUANG TAMU</span><span class="home-collection-title">Ruang tamu <b>↗</b></span></a>
-      <a class="home-collection-card home-collection-dining" href="katalog.html"><span class="home-collection-photo" role="img" aria-label="Ruang makan modern dengan meja kayu"></span><span class="home-collection-index">02 / RUANG MAKAN</span><span class="home-collection-title">Ruang makan <b>↗</b></span></a>
-      <a class="home-collection-card home-collection-bedroom" href="katalog.html"><span class="home-collection-photo" role="img" aria-label="Interior minimalis hangat dengan furniture kayu"></span><span class="home-collection-index">03 / KAMAR TIDUR</span><span class="home-collection-title">Kamar tidur <b>↗</b></span></a>
-    </div>
+  <!-- ===== Klien proyek ===== -->
+  <section class="clients" aria-labelledby="clients-title">
+    <p id="clients-title" class="clients-label">Dipercaya oleh</p>
+    <ul class="clients-list" data-stagger>
+      <li>Mr. Bitsy</li>
+      <li>Inner Circle SCBD</li>
+      <li>BINUS @Semarang</li>
+      <li>Enki Investment</li>
+    </ul>
+    <a href="tentangkami.html#projects-title" class="link-underline" data-reveal>Lihat Proyek Kami</a>
+  </section>
+
+  <!-- ===== Ajakan konsultasi ===== -->
+  <section class="closing-cta" aria-labelledby="closing-title">
+    <h2 id="closing-title" class="display-text" data-split>
+      Rancang <span class="tag" aria-hidden="true">Konsultasi</span> ruang impian Anda bersama kami
+    </h2>
+    <a href="https://wa.me/6289504977797" class="btn-solid" target="_blank" rel="noopener" data-reveal>Konsultasi via WhatsApp</a>
   </section>
 
   <footer class="footer">
@@ -145,8 +179,8 @@
   <script>window.KALEA_ASSET_PREFIX = "";</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="asset/js/supabase-client.js"></script>
-  <script src="asset/js/products.js"></script>
-  <script src="asset/js/cart.js"></script>
-  <script src="asset/js/script.js"></script>
+  <script src="asset/js/products.js?v=20261126"></script>
+  <script src="asset/js/cart.js?v=20261126"></script>
+  <script src="asset/js/script.js?v=20261126"></script>
 </body>
 </html>

@@ -8,8 +8,8 @@ let draggedRoomCategory = null;
 
 function roomFallbackImage(slug) {
     const prefix = typeof window.KALEA_ASSET_PREFIX === 'string' ? window.KALEA_ASSET_PREFIX : '../';
-    const files = { 'ruang-tamu': 'catalog-hero.png', 'ruang-makan': 'hero-dining.png', 'kamar-tidur': 'hero-bedroom.png', 'ruang-kerja': 'hero-work.png', 'area-outdoor': 'hero-outdoor.png' };
-    return prefix + 'asset/images/' + (files[slug] || 'catalog-hero.png');
+    const files = { 'ruang-tamu': 'catalog-hero.jpg', 'ruang-makan': 'hero-dining.jpg', 'kamar-tidur': 'hero-bedroom.jpg', 'ruang-kerja': 'hero-work.jpg', 'area-outdoor': 'hero-outdoor.jpg' };
+    return prefix + 'asset/images/' + (files[slug] || 'catalog-hero.jpg');
 }
 
 async function loadAdminRooms() {

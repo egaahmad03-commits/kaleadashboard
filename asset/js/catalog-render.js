@@ -99,8 +99,8 @@ function initRoomCatalog() {
 
   function assetPrefix() { return typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : ""; }
   function fallbackRoomImage(slug) {
-    var files = { "ruang-tamu": "catalog-hero.png", "ruang-makan": "hero-dining.png", "kamar-tidur": "hero-bedroom.png", "ruang-kerja": "hero-work.png", "area-outdoor": "hero-outdoor.png" };
-    return assetPrefix() + "asset/images/" + (files[slug] || "catalog-hero.png");
+    var files = { "ruang-tamu": "catalog-hero.jpg", "ruang-makan": "hero-dining.jpg", "kamar-tidur": "hero-bedroom.jpg", "ruang-kerja": "hero-work.jpg", "area-outdoor": "hero-outdoor.jpg" };
+    return assetPrefix() + "asset/images/" + (files[slug] || "catalog-hero.jpg");
   }
 
   function loadRooms() {
@@ -144,8 +144,9 @@ function initRoomCatalog() {
       title.textContent = room.name;
       description.textContent = room.description || "Pilihan furniture untuk " + room.name.toLowerCase() + ".";
       if (hero) {
-        hero.removeAttribute("data-room");
-        hero.style.backgroundImage = 'linear-gradient(90deg,rgba(20,18,15,.62),rgba(20,18,15,.12) 78%),url("' + String(room.image_url || fallbackRoomImage(room.slug)).replace(/["\\]/g, "\\$&") + '")';
+        // Foto ruangan menggantikan video showroom.
+        hero.classList.add("has-room-image");
+        hero.style.backgroundImage = 'linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.14) 40%,rgba(0,0,0,.45)),url("' + String(room.image_url || fallbackRoomImage(room.slug)).replace(/["\\]/g, "\\$&") + '")';
       }
       var cards = categories.map(function (category) {
         var categoryLabel = category.slug === "furnitur-luar-ruangan" ? "Furniture Outdoor & Taman" : category.name;
@@ -171,7 +172,7 @@ function initRoomCatalog() {
     if (backBottomWrap) backBottomWrap.hidden = true;
     title.textContent = "Pilih Ruangan";
     description.textContent = "Mulai dari ruangan yang ingin Anda lengkapi, lalu temukan furniture yang sesuai.";
-    if (hero) { hero.removeAttribute("data-room"); hero.style.backgroundImage = ""; }
+    if (hero) { hero.classList.remove("has-room-image"); hero.style.backgroundImage = ""; }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   if (back) back.addEventListener("click", returnToRooms);
@@ -187,7 +188,15 @@ function initRoomCatalog() {
   }
   window.addEventListener("focus", refreshCategoriesOnReturn);
   document.addEventListener("visibilitychange", refreshCategoriesOnReturn);
-  loadRooms().catch(function (error) {
+  // Buka ruangan langsung dari link, misalnya katalog.html?ruangan=ruang-tamu
+  function openRoomFromUrl() {
+    var slug = new URLSearchParams(window.location.search).get("ruangan");
+    if (!slug) return;
+    var room = rooms.find(function (item) { return item.slug === slug; });
+    if (room) showRoom(room.id, true);
+  }
+
+  loadRooms().then(openRoomFromUrl).catch(function (error) {
     console.error("Gagal memuat ruangan:", error);
     rooms = [
       { id: 'living', slug: 'ruang-tamu', name: 'Ruang Tamu', description: 'Pilihan furniture untuk ruang tamu Anda.', categories: ['sofa','kursi-santai','meja-kopi','meja-samping','meja-konsol','kabinet','kursi-bar'], keywords: ['rak buku','rak tv','rak televisi'] },
@@ -198,6 +207,7 @@ function initRoomCatalog() {
     ];
     roomDataFromDatabase = false;
     renderRoomButtons();
+    openRoomFromUrl();
   });
 }
 

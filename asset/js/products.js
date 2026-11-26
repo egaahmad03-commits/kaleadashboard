@@ -111,7 +111,7 @@ function rebuildProductImages(p) {
   // Primary image override for the locally supplied, watermark-free Lenox photo.
   if (p.slug === "kursi-bar-lenox") {
     var assetPrefix = typeof window !== "undefined" && typeof window.KALEA_ASSET_PREFIX === "string" ? window.KALEA_ASSET_PREFIX : "../";
-    var localPrimaryImage = assetPrefix + "asset/images/products/kursi-bar-lenox/kalea-bar-lenox-clean.png";
+    var localPrimaryImage = assetPrefix + "asset/images/products/kursi-bar-lenox/kalea-bar-lenox-clean.jpg";
     var remainingImages = Array.isArray(p.images) ? p.images.slice(1).map(withVersion) : [];
     p.images = [withVersion(localPrimaryImage)].concat(remainingImages);
     p.image = p.images[0];
