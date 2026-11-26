@@ -758,10 +758,7 @@ body:has(.hero, .page-hero) .site-header.is-scrolled,
 
 .product-detail-category { display: block; margin-bottom: 12px; color: var(--k-muted); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .product-detail-info h1 { margin-bottom: 18px; font-size: clamp(2.4rem, 5vw, 5rem); font-weight: 800; font-stretch: 125%; letter-spacing: -.045em; line-height: .88; text-transform: uppercase; overflow-wrap: anywhere; }
-.product-price-wa { display: inline-block; color: var(--k-ink); font-weight: 600; cursor: pointer; }
-.product-price-wa-detail { margin: 4px 0 22px; padding-bottom: 2px; border-bottom: 1.5px solid var(--k-ink); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
-.product-price-wa-detail:hover { opacity: .65; }
-.product-detail-desc { max-width: 46ch; margin-bottom: 18px; color: var(--k-muted); font-size: .92rem; line-height: 1.65; }
+.product-detail-desc { max-width: 46ch; margin-bottom: 28px; color: var(--k-muted); font-size: .92rem; line-height: 1.65; }
 .product-spec-table { width: 100%; border-collapse: collapse; }
 .product-spec-table th, .product-spec-table td { padding: 12px 0; border-bottom: 1px solid var(--k-line); font-size: .92rem; text-align: left; vertical-align: top; }
 .product-spec-table th { width: 140px; color: var(--k-muted); font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }

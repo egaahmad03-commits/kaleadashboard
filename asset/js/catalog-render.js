@@ -6,15 +6,6 @@
    Supabase, bukan array yang sudah ada saat halaman dimuat.
    ========================================================= */
 
-/* Harga produk tidak ditampilkan. Sebagai gantinya, pengunjung diarahkan
-   langsung ke WhatsApp untuk menanyakan harga. */
-var PRICE_WA_NUMBER = "6289504977797";
-
-function getProductWaUrl(product) {
-  var msg = "Halo Kalea Furniture, saya ingin menanyakan harga produk " + product.name + ".";
-  return "https://wa.me/" + PRICE_WA_NUMBER + "?text=" + encodeURIComponent(msg);
-}
-
 function renderIconPlaceholder(iconSvg) {
   return (
     '<svg class="product-photo-fallback-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" ' +
@@ -511,7 +502,6 @@ function renderProductDetail() {
       '<span class="product-detail-category">' + categoryName + '</span>' +
       '<h1>' + escapeHtml(product.name) + '</h1>' +
       '<p class="product-detail-desc">' + escapeHtml(product.description) + '</p>' +
-      '<a class="product-price-wa product-price-wa-detail" href="' + getProductWaUrl(product) + '" target="_blank" rel="noopener">Tanya Harga via WhatsApp</a>' +
       '<div class="product-detail-actions">' +
       '<a href="https://wa.me/6289504977797?text=' + waMessage + '" target="_blank" rel="noopener" class="btn-solid">Pesan via WhatsApp</a>' +
       '<button type="button" id="detailAddCart" class="btn-outline"><span class="text">Tambah ke Keranjang</span></button>' +
