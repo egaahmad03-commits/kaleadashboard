@@ -1,1 +1,13 @@
 *.zip
+
+# Dependensi lokal (Supabase CLI) — pasang ulang dengan `npm install`
+node_modules/
+
+# File sementara Supabase CLI (berisi info koneksi proyek)
+supabase/.temp/
+
+# Rahasia & file sistem
+.env
+.env.*
+.DS_Store
+Thumbs.db
