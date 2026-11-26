@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://www.kaleafurniture.id/sitemap.xml
+Sitemap: https://kaleafurniture.id/sitemap.xml
