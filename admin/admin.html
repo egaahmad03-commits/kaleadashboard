@@ -7,9 +7,9 @@
     <link rel="icon" type="image/svg+xml" href="../asset/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="admin.css?v=20261123-room-categories">
+    <link rel="stylesheet" href="admin.css?v=20261126">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -17,14 +17,14 @@
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <img src="../asset/favicon.svg" alt="Logo Kalea Furniture">
-                <span>Kalea Furniture</span>
+                <span>Kalea<small>Panel Admin</small></span>
             </div>
             <nav class="sidebar-menu">
-                <a href="admin.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-                <a href="admin.html#productSection"><i class="fa-solid fa-box"></i> Produk</a>
-                <a href="admin.html#categorySection"><i class="fa-solid fa-tags"></i> Kategori</a>
-                <a href="admin.html#roomSection"><i class="fa-solid fa-couch"></i> Ruangan</a>
-                <a href="../katalog.html" target="_blank"><i class="fa-solid fa-store"></i> Lihat Toko</a>
+                <a href="#top" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                <a href="#productSection"><i class="fa-solid fa-box"></i> Produk</a>
+                <a href="#categorySection"><i class="fa-solid fa-tags"></i> Kategori</a>
+                <a href="#roomSection"><i class="fa-solid fa-couch"></i> Ruangan</a>
+                <a href="../index.html" target="_blank" rel="noopener" class="sidebar-external"><i class="fa-solid fa-store"></i> Lihat Toko <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </nav>
             <div class="sidebar-footer">
                 <a href="#" class="btn-logout" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
@@ -32,9 +32,12 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" id="top">
             <div class="topbar">
-                <h1>Dashboard</h1>
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="topbar-subtitle">Kelola produk, kategori, dan ruangan yang tampil di katalog.</p>
+                </div>
                 <div class="topbar-right">
                     <div class="user-profile">
                         <i class="fa-solid fa-circle-user"></i>
@@ -86,12 +89,15 @@
             <!-- Product Table -->
             <div class="content-section" id="productSection">
                 <div class="section-header">
-                    <h2>Daftar Produk</h2>
+                    <div>
+                        <h2>Produk</h2>
+                        <p class="section-desc">Semua produk yang tampil di katalog website.</p>
+                    </div>
                     <button class="btn-primary" onclick="openModal('add')"><i class="fa-solid fa-plus"></i> Tambah Produk</button>
                 </div>
                 <div class="table-filter-bar">
                     <div class="filter-group">
-                        <label for="categoryFilter"><i class="fa-solid fa-filter"></i> Kategori</label>
+                        <label for="categoryFilter">Filter</label>
                         <select id="categoryFilter" onchange="onCategoryFilterChange()">
                             <option value="all">Semua Kategori</option>
                         </select>
@@ -100,11 +106,11 @@
                         <i class="fa-solid fa-trash"></i> Hapus Terpilih (<span id="bulkDeleteCount">0</span>)
                     </button>
                 </div>
-                <div style="overflow-x:auto;">
+                <div class="table-wrap">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th style="width:36px;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th>
+                                <th class="col-check"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th>
                                 <th>ID</th>
                                 <th>Foto</th>
                                 <th>Nama Produk</th>
@@ -120,14 +126,17 @@
             <!-- Category Table -->
             <div class="content-section" id="categorySection">
                 <div class="section-header">
-                    <h2>Daftar Kategori</h2>
+                    <div>
+                        <h2>Kategori</h2>
+                        <p class="section-desc">Kelompok produk dan tampilan kartunya di katalog.</p>
+                    </div>
                     <button class="btn-primary" onclick="openCategoryModal()"><i class="fa-solid fa-plus"></i> Tambah Kategori</button>
                 </div>
-                <div style="overflow-x:auto;">
+                <div class="table-wrap">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th style="width:64px;">Tampilan</th>
+                                <th class="col-thumb">Tampilan</th>
                                 <th>Nama Kategori</th>
                                 <th>Slug (URL)</th>
                                 <th>Jumlah Produk</th>
@@ -141,13 +150,15 @@
 
             <div class="content-section" id="roomSection">
                 <div class="section-header">
-                    <h2>Ruangan &amp; Kategori</h2>
+                    <div>
+                        <h2>Ruangan</h2>
+                        <p class="section-desc">Atur ruangan di katalog, pilih kategorinya, dan seret kategori untuk mengubah urutan.</p>
+                    </div>
                     <button class="btn-primary" onclick="openRoomModal()"><i class="fa-solid fa-plus"></i> Tambah Ruangan</button>
                 </div>
-                <p class="room-admin-note">Atur ruangan yang tampil di katalog. Pilih kategori produk untuk tiap ruangan dan seret kategori untuk mengubah urutannya.</p>
-                <div style="overflow-x:auto;">
+                <div class="table-wrap">
                     <table class="data-table">
-                        <thead><tr><th style="width:80px;">Foto</th><th>Nama Ruangan</th><th>Kategori Tampil</th><th>Urutan</th><th>Aksi</th></tr></thead>
+                        <thead><tr><th class="col-thumb">Foto</th><th>Nama Ruangan</th><th>Kategori Tampil</th><th>Urutan</th><th>Aksi</th></tr></thead>
                         <tbody id="roomTableBody"></tbody>
                     </table>
                 </div>
@@ -192,7 +203,7 @@
                 <div class="form-group">
                     <label for="categoryName">Nama Kategori</label>
                     <input type="text" id="categoryName" placeholder="Contoh: Rak Sepatu" autocomplete="off" required>
-                    <p id="categorySlugNote" style="font-size:12px;color:var(--text-muted);margin-top:6px;">Slug URL dibuat otomatis dari nama (tidak berubah lagi setelah kategori dibuat).</p>
+                    <p id="categorySlugNote" class="form-hint">Slug URL dibuat otomatis dari nama (tidak berubah lagi setelah kategori dibuat).</p>
                 </div>
 
                 <div class="form-group">
@@ -215,7 +226,7 @@
                 </div>
 
                 <div class="form-group" id="categoryImageGroup" style="display:none;">
-                    <label>Foto Kategori <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(disarankan rasio 1:1)</span></label>
+                    <label>Foto Kategori <span class="label-note">(disarankan rasio 1:1)</span></label>
                     <label for="categoryPhotoInput" class="photo-dropzone" id="categoryDropzone">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Klik atau seret foto ke sini (JPG/PNG/WebP)</span>
@@ -224,7 +235,7 @@
                     <div id="categoryPhotoPreview" class="photo-preview-list"></div>
                 </div>
 
-                <p id="categoryFormError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-4px;margin-bottom:16px;"></p>
+                <p id="categoryFormError" class="form-error" style="display:none;"></p>
 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeCategoryModal()">Batal</button>
@@ -277,27 +288,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Foto Produk <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(maks. 6, urutan = urutan tampil)</span></label>
+                    <label>Foto Produk <span class="label-note">(maks. 6, urutan = urutan tampil)</span></label>
                     <label for="productPhotoInput" class="photo-dropzone" id="photoDropzone">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <span>Klik atau seret foto ke sini (JPG/PNG/WebP)</span>
                     </label>
                     <input type="file" id="productPhotoInput" accept="image/*" multiple style="display:none;" onchange="handlePhotoFilesSelected(this.files)">
                     <div id="photoPreviewList" class="photo-preview-list"></div>
-                    <p id="photoStatusNote" style="font-size:12px;color:var(--text-muted);margin-top:6px;"></p>
+                    <p id="photoStatusNote" class="form-hint"></p>
                 </div>
 
-                <p style="font-size:12px;color:var(--text-muted);margin-top:-6px;margin-bottom:18px;">
-                    <i class="fa-solid fa-circle-info"></i>
-                    Foto otomatis dikonversi ke JPG dan diupload langsung ke Supabase Storage saat produk disimpan. Bisa dipakai dari browser mana pun, termasuk HP — tidak perlu menghubungkan folder atau <code>git push</code>.
-                </p>
+                <details class="form-help">
+                    <summary><i class="fa-solid fa-circle-info"></i> Tips</summary>
+                    <p>Foto otomatis dikonversi ke JPG dan diupload ke Supabase Storage saat produk disimpan. Bisa dari browser mana pun, termasuk HP.</p>
+                    <p>Muncul saran nama/ukuran lama saat mengetik? Itu riwayat autofill browser, bukan data produk. Arahkan mouse ke saran tersebut lalu tekan <strong>Shift+Delete</strong> untuk menghapusnya.</p>
+                </details>
 
-                <p style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:16px;">
-                    <i class="fa-solid fa-circle-info"></i>
-                    Masih melihat saran nama/ukuran lama saat mengetik? Itu riwayat autofill browser (bukan data produk). Arahkan mouse ke saran yang mau dibuang lalu tekan <strong>Shift+Delete</strong> (Chrome/Edge/Firefox) untuk menghapusnya satu per satu.
-                </p>
-
-                <p id="formError" style="display:none;color:var(--danger-color);font-size:13px;margin-top:-10px;margin-bottom:16px;"></p>
+                <p id="formError" class="form-error" style="display:none;"></p>
 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
@@ -312,5 +319,19 @@
     <script src="../asset/js/products.js"></script>
     <script src="admin.js?v=20261123-room-categories"></script>
     <script src="rooms.js?v=20261123-room-categories"></script>
+    <script>
+        // Tandai menu samping sesuai bagian yang sedang terlihat.
+        (function () {
+            var links = document.querySelectorAll('.sidebar-menu a[href^="#"]');
+            var sections = Array.prototype.map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+            function update() {
+                var current = 0;
+                sections.forEach(function (sec, i) { if (sec && sec.getBoundingClientRect().top < 160) current = i; });
+                links.forEach(function (a, i) { a.classList.toggle('active', i === current); });
+            }
+            window.addEventListener('scroll', update, { passive: true });
+            update();
+        })();
+    </script>
 </body>
 </html>
